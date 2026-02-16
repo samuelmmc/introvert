@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introvert Xiaomi Case</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #eff0f5; margin: 0; padding: 0; }
+        .header { background: #f57224; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .container { padding: 12px; max-width: 500px; margin: auto; }
+        .card { background: white; border-radius: 8px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card img { width: 100%; display: block; }
+        .info { padding: 15px; }
+        .price { font-size: 24px; color: #f57224; font-weight: bold; }
+        .stock-label { font-size: 14px; margin-top: 5px; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .in-stock { background: #e8f8f0; color: #2ecc71; }
+        .out-of-stock { background: #fdeaea; color: #e74c3c; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .buy-btn { background: #f57224; color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .buy-btn:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+
+<div class="header"><h1>Introvert Xiaomi Case</h1></div>
+
+<div class="container">
+    <div class="card"><img src="https://via.placeholder.com/500x500?text=Xiaomi+Premium+Case" alt="Case"></div>
+    <div class="card info">
+        <div class="price">15,000 MMK</div>
+        <div id="status" class="stock-label">Loading stock...</div>
+        <h3>Xiaomi Redmi Series Premium Case</h3>
+        <input type="text" id="name" placeholder="သင့်အမည်">
+        <input type="number" id="phone" placeholder="ဖုန်းနံပါတ်">
+        <textarea id="address" rows="3" placeholder="လိပ်စာ"></textarea>
+        <button id="btn" class="buy-btn" onclick="makeOrder()">အခုပဲ ဝယ်ယူမည်</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
+        authDomain: "introvert-case-shop.firebaseapp.com",
+        databaseURL: "https://introvert-case-shop-default-rtdb.firebaseio.com",
+        projectId: "introvert-case-shop",
+        storageBucket: "introvert-case-shop.firebasestorage.app",
+        messagingSenderId: "531673000312",
+        appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('stock_count');
+
+    db.on('value', (s) => {
+        const count = s.val() || 0;
+        const status = document.getElementById('status');
+        const btn = document.getElementById('btn');
+        if(count > 0) {
+            status.innerText = "လက်ကျန်ရှိသည်: " + count;
+            status.className = "stock-label in-stock";
+            btn.disabled = false;
+        } else {
+            status.innerText = "ပစ္စည်းပြတ်သွားပါပြီ";
+            status.className = "stock-label out-of-stock";
+            btn.disabled = true;
+        }
+    });
+
+    function makeOrder() {
+        const n = document.getElementById('name').value;
+        const p = document.getElementById('phone').value;
+        const a = document.getElementById('address').value;
+        if(!n || !p || !a) return alert("အချက်အလက်ဖြည့်ပါ");
+
+        db.transaction((current) => {
+            return (current || 0) - 1;
+        }).then(() => {
+            const msg = `🛒 **အော်ဒါသစ်**%0Aအမည်: ${n}%0Aဖုန်း: ${p}%0Aလိပ်စာ: ${a}`;
+            window.location.href = `https://t.me/samuelmmc?text=${msg}`;
+        });
+    }
+</script>
+</body>
+</html>

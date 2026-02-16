@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Stock Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; background: #333; color: white; }
+        input { padding: 15px; width: 80%; font-size: 20px; margin: 20px 0; border-radius: 8px; border: none; }
+        button { background: #f57224; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>ပစ္စည်းလက်ကျန် ထိန်းချုပ်ရန်</h2>
+    <p>အောက်တွင် Stock အရေအတွက် ရိုက်ထည့်ပါ</p>
+    <input type="number" id="newStock" placeholder="ဥပမာ - 50">
+    <br>
+    <button onclick="update()">Update Stock</button>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
+            authDomain: "introvert-case-shop.firebaseapp.com",
+            databaseURL: "https://introvert-case-shop-default-rtdb.firebaseio.com",
+            projectId: "introvert-case-shop",
+            storageBucket: "introvert-case-shop.firebasestorage.app",
+            messagingSenderId: "531673000312",
+            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('stock_count');
+
+        db.on('value', (s) => { document.getElementById('newStock').value = s.val(); });
+
+        function update() {
+            const val = parseInt(document.getElementById('newStock').value);
+            db.set(val).then(() => alert("Stock ပြင်ဆင်ပြီးပါပြီ!"));
+        }
+    </script>
+</body>
+</html>
