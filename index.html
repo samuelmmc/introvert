@@ -3,39 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introvert Xiaomi Case</title>
+    <title>Introvert Mobile Shop</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #eff0f5; margin: 0; padding: 0; }
         .header { background: #f57224; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
         .container { padding: 12px; max-width: 500px; margin: auto; }
-        .card { background: white; border-radius: 8px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .card img { width: 100%; display: block; }
+        .card { background: white; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card img { width: 100%; display: block; height: 300px; object-fit: contain; background: #fff; }
         .info { padding: 15px; }
-        .price { font-size: 24px; color: #f57224; font-weight: bold; }
-        .stock-label { font-size: 14px; margin-top: 5px; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .price { font-size: 22px; color: #f57224; font-weight: bold; }
+        .stock-label { font-size: 13px; margin-top: 5px; padding: 4px 8px; border-radius: 4px; display: inline-block; }
         .in-stock { background: #e8f8f0; color: #2ecc71; }
         .out-of-stock { background: #fdeaea; color: #e74c3c; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .buy-btn { background: #f57224; color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .buy-btn { background: #f57224; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .buy-btn:disabled { background: #ccc; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div class="header"><h1>Introvert Xiaomi Case</h1></div>
+<div class="header"><h1>Introvert Shop</h1></div>
 
 <div class="container">
-    <div class="card"><img src="https://via.placeholder.com/500x500?text=Xiaomi+Premium+Case" alt="Case"></div>
-    <div class="card info">
-        <div class="price">15,000 MMK</div>
-        <div id="status" class="stock-label">Loading stock...</div>
-        <h3>Xiaomi Redmi Series Premium Case</h3>
-        <input type="text" id="name" placeholder="သင့်အမည်">
-        <input type="number" id="phone" placeholder="ဖုန်းနံပါတ်">
-        <textarea id="address" rows="3" placeholder="လိပ်စာ"></textarea>
-        <button id="btn" class="buy-btn" onclick="makeOrder()">အခုပဲ ဝယ်ယူမည်</button>
+    <div class="card">
+        <img src="https://via.placeholder.com/500x500?text=Xiaomi+Case" alt="Xiaomi Case">
+        <div class="info">
+            <div class="price">15,000 MMK</div>
+            <div id="status1" class="stock-label">Loading...</div>
+            <h3>Xiaomi Premium Soft Case</h3>
+            <input type="text" id="n1" placeholder="သင့်အမည်">
+            <input type="number" id="p1" placeholder="ဖုန်းနံပါတ်">
+            <button id="btn1" class="buy-btn" onclick="order('xiaomi')">အခုပဲ ဝယ်ယူမည်</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <img src="https://i.postimg.cc/VkcFsfvh/1767012089377.png" alt="Redmi Turbo 4 Pro">
+        <div class="info">
+            <div class="price">9,900 MMK</div>
+            <div id="status2" class="stock-label">Loading...</div>
+            <h3>Redmi Turbo 4 Pro (White Color)</h3>
+            <input type="text" id="n2" placeholder="သင့်အမည်">
+            <input type="number" id="p2" placeholder="ဖုန်းနံပါတ်">
+            <button id="btn2" class="buy-btn" onclick="order('redmi')">အခုပဲ ဝယ်ယူမည်</button>
+        </div>
     </div>
 </div>
 
@@ -50,34 +63,30 @@
         appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
     };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref('stock_count');
+    const db = firebase.database();
 
-    db.on('value', (s) => {
-        const count = s.val() || 0;
-        const status = document.getElementById('status');
-        const btn = document.getElementById('btn');
-        if(count > 0) {
-            status.innerText = "လက်ကျန်ရှိသည်: " + count;
-            status.className = "stock-label in-stock";
-            btn.disabled = false;
-        } else {
-            status.innerText = "ပစ္စည်းပြတ်သွားပါပြီ";
-            status.className = "stock-label out-of-stock";
-            btn.disabled = true;
-        }
-    });
+    // Stock ဖတ်ရန်
+    function syncStock(path, labelId, btnId) {
+        db.ref(path).on('value', (s) => {
+            const count = s.val() || 0;
+            document.getElementById(labelId).innerText = count > 0 ? "လက်ကျန်: " + count : "ပစ္စည်းပြတ်ပြီ";
+            document.getElementById(labelId).className = count > 0 ? "stock-label in-stock" : "stock-label out-of-stock";
+            document.getElementById(btnId).disabled = count <= 0;
+        });
+    }
+    syncStock('stock_xiaomi', 'status1', 'btn1');
+    syncStock('stock_redmi', 'status2', 'btn2');
 
-    function makeOrder() {
-        const n = document.getElementById('name').value;
-        const p = document.getElementById('phone').value;
-        const a = document.getElementById('address').value;
-        if(!n || !p || !a) return alert("အချက်အလက်ဖြည့်ပါ");
+    function order(item) {
+        let n = (item === 'xiaomi') ? document.getElementById('n1').value : document.getElementById('n2').value;
+        let p = (item === 'xiaomi') ? document.getElementById('p1').value : document.getElementById('p2').value;
+        let path = (item === 'xiaomi') ? 'stock_xiaomi' : 'stock_redmi';
+        let name = (item === 'xiaomi') ? 'Xiaomi Case' : 'Redmi Turbo 4 Pro';
 
-        db.transaction((current) => {
-            return (current || 0) - 1;
-        }).then(() => {
-            const msg = `🛒 **အော်ဒါသစ်**%0Aအမည်: ${n}%0Aဖုန်း: ${p}%0Aလိပ်စာ: ${a}`;
-            window.location.href = `https://t.me/samuelmmc?text=${msg}`;
+        if(!n || !p) return alert("အချက်အလက်ဖြည့်ပါ");
+
+        db.ref(path).transaction(c => (c || 0) - 1).then(() => {
+            window.location.href = `https://t.me/samuelmmc?text=🛒 **အော်ဒါသစ်**%0Aပစ္စည်း: ${name}%0Aအမည်: ${n}%0Aဖုန်း: ${p}`;
         });
     }
 </script>
