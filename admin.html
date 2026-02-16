@@ -6,17 +6,26 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; background: #333; color: white; }
-        input { padding: 15px; width: 80%; font-size: 20px; margin: 20px 0; border-radius: 8px; border: none; }
-        button { background: #f57224; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; }
+        body { font-family: sans-serif; padding: 20px; background: #333; color: white; text-align: center; }
+        .box { background: #444; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        input { padding: 10px; width: 60%; margin: 10px 0; border-radius: 5px; border: none; font-size: 18px; }
+        button { background: #f57224; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2>ပစ္စည်းလက်ကျန် ထိန်းချုပ်ရန်</h2>
-    <p>အောက်တွင် Stock အရေအတွက် ရိုက်ထည့်ပါ</p>
-    <input type="number" id="newStock" placeholder="ဥပမာ - 50">
-    <br>
-    <button onclick="update()">Update Stock</button>
+    <h2>Stock Control Panel</h2>
+
+    <div class="box">
+        <h3>Xiaomi Case</h3>
+        <input type="number" id="s1">
+        <button onclick="update('stock_xiaomi', 's1')">Update</button>
+    </div>
+
+    <div class="box">
+        <h3>Redmi Turbo 4 Pro</h3>
+        <input type="number" id="s2">
+        <button onclick="update('stock_redmi', 's2')">Update</button>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -29,13 +38,15 @@
             appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref('stock_count');
+        const db = firebase.database();
 
-        db.on('value', (s) => { document.getElementById('newStock').value = s.val(); });
+        function load(path, id) { db.ref(path).on('value', s => document.getElementById(id).value = s.val()); }
+        load('stock_xiaomi', 's1');
+        load('stock_redmi', 's2');
 
-        function update() {
-            const val = parseInt(document.getElementById('newStock').value);
-            db.set(val).then(() => alert("Stock ပြင်ဆင်ပြီးပါပြီ!"));
+        function update(path, id) {
+            const val = parseInt(document.getElementById(id).value);
+            db.ref(path).set(val).then(() => alert("Updated!"));
         }
     </script>
 </body>
