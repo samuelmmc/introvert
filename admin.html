@@ -2,170 +2,78 @@
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INTROVERT Admin | Liquid Glass</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>INTROVERT Admin - Liquid Control</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Myanmar:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.2);
-            --accent: #ffffff;
-            --text: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            outline: none;
-            -webkit-tap-highlight-color: transparent; /* အပြာရောင် Highlight ဖျောက်ထားသည် */
-        }
-
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        /* Liquid Glass Styling */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            width: 95%;
-            max-width: 600px;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Login Screen */
-        #login-screen {
-            text-align: center;
-        }
-
-        h2 { margin-bottom: 20px; font-weight: 300; letter-spacing: 2px; }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            color: white;
-            transition: 0.3s;
-        }
-
-        input:focus { border-color: rgba(255, 255, 255, 0.5); }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            margin-top: 15px;
-            border-radius: 15px;
-            border: none;
-            background: white;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        button:active { transform: scale(0.95); }
-
-        /* Admin Dashboard */
-        #admin-panel { display: none; width: 95%; max-width: 800px; margin-top: 50px; margin-bottom: 50px; }
-
-        .form-section { margin-bottom: 40px; }
+        :root { --accent: #E6BE8A; --glass: rgba(255,255,255,0.05); --danger: #ff453a; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Noto Sans Myanmar', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         
-        .img-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .full-width { grid-column: span 2; }
+        #liquidNoti { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 30px; border-radius: 50px; background: rgba(255,255,255,0.12); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.2); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10000; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .auth-card, .admin-container { background: var(--glass); padding: 40px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(30px); width: 92%; max-width: 450px; text-align: center; animation: float In 0.8s ease; }
+        @keyframes floatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Inventory List */
-        .inventory-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid var(--border);
-            animation: slideIn 0.5s ease-out;
-        }
+        input, select { width: 100%; padding: 16px; margin: 10px 0; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+        
+        button { width: 100%; padding: 18px; border-radius: 20px; border: none; background: white; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:active { transform: scale(0.96); }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 25px 0; }
+        .slot { aspect-ratio: 1/1; border: 2px dashed rgba(255,255,255,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(255,255,255,0.03); font-size: 20px; transition: 0.3s; }
+        .slot:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+        .slot img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .loading-spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .item-info img {
-            width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 15px;
-        }
-
-        .delete-btn {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff4d4d;
-            width: auto;
-            padding: 8px 15px;
-            font-size: 12px;
-            border: 1px solid rgba(255, 0, 0, 0.3);
-        }
+        #adminPanel { display: none; }
+        .del-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 10px; }
     </style>
 </head>
 <body>
+    <div id="liquidNoti"></div>
 
-    <div id="login-screen" class="glass-panel">
-        <h2>INTROVERT ADMIN</h2>
-        <input type="password" id="adminPass" placeholder="Enter Admin Password">
-        <button onclick="checkLogin()">Login</button>
+    <div id="authSection" class="auth-card">
+        <h2 style="font-family: serif; letter-spacing: 4px; margin-bottom: 5px;">INTROVERT</h2>
+        <p style="opacity:0.5; font-size: 13px; margin-bottom: 30px;">Security Access</p>
+        <input type="password" id="passInput" placeholder="Enter Password" style="text-align: center; border-radius: 50px;">
+        <button onclick="checkPass()" style="background: var(--accent); border-radius: 50px;">Access Panel</button>
     </div>
 
-    <div id="admin-panel">
-        <div class="glass-panel form-section">
-            <h2 style="text-align: center;">New Case Product</h2>
-            
-            <input type="text" id="pName" placeholder="Product Name (e.g. iPhone 15 Pro Liquid Case)">
-            
-            <div class="img-inputs">
-                <input type="text" id="img1" placeholder="Image URL 1 (Main)">
-                <input type="text" id="img2" placeholder="Image URL 2">
-                <input type="text" id="img3" placeholder="Image URL 3">
-                <input type="text" id="img4" placeholder="Image URL 4">
-                <input type="text" id="img5" class="full-width" placeholder="Image URL 5">
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <input type="number" id="pPrice" placeholder="Price (MMK)">
-                <input type="number" id="pStock" placeholder="Stock Quantity">
-            </div>
-
-            <button onclick="addProduct()" id="addBtn">Add Product</button>
+    <div id="adminPanel" class="admin-container">
+        <h3 style="color: var(--accent); margin-bottom: 25px; letter-spacing: 1px;">INVENTORY CONTROL</h3>
+        
+        <select id="modelSelect" onchange="loadCurrentData()">
+            <optgroup label="Xiaomi Series">
+                <option value="xiaomi_17">Xiaomi 17</option>
+                <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
+                <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
+            </optgroup>
+            </select>
+        
+        <div class="img-grid" id="imgGrid">
+            <div class="slot" onclick="chooseFile(0)" id="sl0">+</div>
+            <div class="slot" onclick="chooseFile(1)" id="sl1">+</div>
+            <div class="slot" onclick="chooseFile(2)" id="sl2">+</div>
+            <div class="slot" onclick="chooseFile(3)" id="sl3">+</div>
+            <div class="slot" onclick="chooseFile(4)" id="sl4">+</div>
         </div>
 
-        <h3 style="margin-bottom: 20px; font-weight: 300;">Current Inventory</h3>
-        <div id="inventory-list">
-            </div>
+        <input type="file" id="fileInp" hidden accept="image/*" onchange="uploadToStorage(this)">
+        <input type="number" id="priceInp" placeholder="ဈေးနှုန်း (ကျပ်)">
+        <input type="number" id="stockInp" placeholder="လက်ကျန်အရေအတွက်">
+        
+        <button onclick="saveToFirebase()" style="background: #fff; color: #000;">Save Changes</button>
+        <button onclick="deleteProduct()" class="del-btn">Delete Product</button>
     </div>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
             authDomain: "introvert-case-shop.firebaseapp.com",
@@ -173,96 +81,97 @@
             projectId: "introvert-case-shop",
             storageBucket: "introvert-case-shop.firebasestorage.app",
             messagingSenderId: "531673000312",
-            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d",
-            measurementId: "G-W7RCY4F27V"
+            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
+        const storage = firebase.storage();
 
-        // 1. Admin Login Function
-        function checkLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === '261521011') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                document.body.style.alignItems = 'flex-start'; // Adjust for list scrolling
-                fetchProducts();
-            } else {
-                alert('Password မှားယွင်းနေပါသည်။');
+        let currentImgUrls = ["", "", "", "", ""];
+        let activeSlot = 0;
+
+        function showNoti(m) {
+            const n = document.getElementById('liquidNoti');
+            n.innerText = m; n.style.top = '35px';
+            setTimeout(() => n.style.top = '-100px', 3000);
+        }
+
+        function checkPass() {
+            if(document.getElementById('passInput').value === '261521011') {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadCurrentData();
+            } else { showNoti("Password မှားယွင်းနေပါသည်ရှင်"); }
+        }
+
+        function chooseFile(i) { activeSlot = i; document.getElementById('fileInp').click(); }
+
+        async function uploadToStorage(input) {
+            if(!input.files[0]) return;
+            const file = input.files[0];
+            const model = document.getElementById('modelSelect').value;
+            const slotDiv = document.getElementById(`sl${activeSlot}`);
+            
+            slotDiv.innerHTML = '<div class="loading-spinner"></div>';
+            showNoti("ပုံတင်နေပါသည် ခဏစောင့်ပေးပါ...");
+            
+            try {
+                const ref = storage.ref(`products/${model}/${Date.now()}`);
+                const snap = await ref.put(file);
+                const url = await snap.ref.getDownloadURL();
+                currentImgUrls[activeSlot] = url;
+                slotDiv.innerHTML = `<img src="${url}">`;
+                showNoti("ပုံတင်ခြင်း အောင်မြင်ပါသည်ရှင်");
+            } catch (e) {
+                showNoti("Error: ပုံတင်မရပါ");
+                slotDiv.innerHTML = '+';
             }
         }
 
-        // 2. Add Product Function
-        function addProduct() {
-            const name = document.getElementById('pName').value;
-            const price = document.getElementById('pPrice').value;
-            const stock = document.getElementById('pStock').value;
-            const images = [
-                document.getElementById('img1').value,
-                document.getElementById('img2').value,
-                document.getElementById('img3').value,
-                document.getElementById('img4').value,
-                document.getElementById('img5').value
-            ].filter(url => url !== "");
+        async function saveToFirebase() {
+            const modelSelect = document.getElementById('modelSelect');
+            const key = modelSelect.value;
+            const name = modelSelect.options[modelSelect.selectedIndex].text;
+            const price = document.getElementById('priceInp').value;
+            const stock = document.getElementById('stockInp').value;
 
-            if (!name || !price || !stock || images.length === 0) {
-                alert("အချက်အလက်များကို ပြည့်စုံစွာ ဖြည့်စွက်ပါ");
-                return;
-            }
+            if(!price || !stock) return showNoti("အချက်အလက် အကုန်ဖြည့်ပါရှင်");
 
-            const newProductRef = database.ref('products').push();
-            newProductRef.set({
-                id: newProductRef.key,
-                name: name,
-                price: price,
-                stock: stock,
-                images: images,
-                timestamp: Date.now()
-            }).then(() => {
-                alert("Product Added Successfully!");
-                clearForm();
+            await db.ref('inventory/' + key).set({
+                name, price, stock: parseInt(stock), images: currentImgUrls
             });
+            showNoti("Database ထဲသို့ သိမ်းဆည်းပြီးပါပြီ ✨");
         }
 
-        function clearForm() {
-            ['pName', 'pPrice', 'pStock', 'img1', 'img2', 'img3', 'img4', 'img5'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
+        async function deleteProduct() {
+            if(!confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) return;
+            const key = document.getElementById('modelSelect').value;
+            await db.ref('inventory/' + key).remove();
+            showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
+            loadCurrentData();
         }
 
-        // 3. Real-time Visual Inventory Fetching
-        function fetchProducts() {
-            database.ref('products').on('value', (snapshot) => {
-                const list = document.getElementById('inventory-list');
-                list.innerHTML = '';
-                const data = snapshot.val();
-                
-                for (let id in data) {
-                    const product = data[id];
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'inventory-item glass-panel';
-                    itemDiv.innerHTML = `
-                        <div style="display: flex; align-items: center;">
-                            <img src="${product.images[0]}" style="width: 60px; height: 60px; border-radius: 12px; margin-right: 15px; object-fit: cover;">
-                            <div>
-                                <p style="font-weight: bold;">${product.name}</p>
-                                <p style="font-size: 13px; opacity: 0.7;">${product.price} MMK | Stock: ${product.stock}</p>
-                            </div>
-                        </div>
-                        <button class="delete-btn" onclick="deleteProduct('${id}')">Delete</button>
-                    `;
-                    list.prepend(itemDiv);
+        function loadCurrentData() {
+            const model = document.getElementById('modelSelect').value;
+            currentImgUrls = ["", "", "", "", ""];
+            for(let i=0; i<5; i++) document.getElementById(`sl${i}`).innerHTML = '+';
+
+            db.ref('inventory/' + model).once('value', s => {
+                const d = s.val();
+                if(d) {
+                    document.getElementById('priceInp').value = d.price;
+                    document.getElementById('stockInp').value = d.stock;
+                    if(d.images) {
+                        currentImgUrls = d.images;
+                        currentImgUrls.forEach((u, i) => {
+                            if(u) document.getElementById(`sl${i}`).innerHTML = `<img src="${u}">`;
+                        });
+                    }
+                } else {
+                    document.getElementById('priceInp').value = "";
+                    document.getElementById('stockInp').value = "";
                 }
             });
-        }
-
-        // 4. Delete Function
-        function deleteProduct(id) {
-            if(confirm('ဤပစ္စည်းကို ဖျက်ရန် သေချာပါသလား?')) {
-                database.ref('products/' + id).remove();
-            }
         }
     </script>
 </body>
