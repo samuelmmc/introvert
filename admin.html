@@ -3,108 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Professional Inventory Control</title>
+    <title>INTROVERT - Admin Secure Access</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --accent: #f57224;
-            --liquid-ease: cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            padding: 20px; 
-            text-align: center; 
-            background: #000;
-            background-image: radial-gradient(circle at 50% -20%, #1a1a1a, #000);
-            color: white; 
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        /* Specification 2: Liquid Glass Pill Noti */
-        #liquidNoti {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; padding: 14px 35px; border-radius: 50px;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff; font-size: 14px; font-weight: 500; opacity: 0.9;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            transition: all 0.7s var(--liquid-ease); white-space: nowrap; pointer-events: none;
-        }
-        #liquidNoti.show { top: 35px; }
-
-        /* Specification 3: Admin Card Interaction */
-        .container {
-            max-width: 500px; margin: 40px auto;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 35px; border-radius: 40px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            transition: 0.5s var(--liquid-ease);
-        }
-        .container:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); }
-
-        /* Specification 1: Multi-Image Grid */
-        .admin-image-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0;
-        }
-        .img-slot {
-            aspect-ratio: 1/1; border: 1.5px dashed #444; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; overflow: hidden;
-            background: rgba(255,255,255,0.02); transition: 0.3s;
-        }
-        .img-slot:hover { border-color: var(--accent); background: rgba(245, 114, 36, 0.05); }
-        .img-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .img-slot span { font-size: 20px; color: #666; }
-
-        select, input {
-            width: 100%; padding: 16px; border-radius: 18px;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            color: white; font-size: 16px; margin-bottom: 20px; transition: 0.3s;
-        }
-        select:focus, input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
-
-        button { 
-            background: #fff; color: #000; padding: 18px; 
-            border: none; border-radius: 50px; font-size: 16px;
-            font-weight: 700; cursor: pointer; width: 100%;
-            transition: 0.4s var(--liquid-ease);
-        }
-        button:active { transform: scale(0.95); opacity: 0.8; }
-
-        .label-text { text-align: left; padding-left: 5px; margin-bottom: 8px; font-size: 13px; color: var(--accent); font-weight: 500; }
-        h2 { margin: 0 0 10px; font-weight: 700; letter-spacing: 1px; }
-        p { opacity: 0.5; font-size: 13px; margin-bottom: 30px; }
+        :root { --accent: #f57224; --glass: rgba(255,255,255,0.05); }
+        body { font-family: 'Inter', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        #liquidNoti { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 30px; border-radius: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10000; }
+        .auth-card, .admin-container { background: var(--glass); padding: 40px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); width: 90%; max-width: 450px; text-align: center; }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: white; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+        .slot { aspect-ratio: 1/1; border: 1px dashed #555; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(0,0,0,0.2); }
+        .slot img { width: 100%; height: 100%; object-fit: cover; }
+        #adminPanel { display: none; }
     </style>
 </head>
 <body>
-
     <div id="liquidNoti"></div>
 
-    <div class="container">
-        <h2>INTROVERT Admin</h2>
-        <p>Premium Inventory Manager</p>
+    <div id="authSection" class="auth-card">
+        <h2>Admin Login</h2>
+        <p style="opacity:0.6">Security Password ရိုက်ထည့်ပါ</p>
+        <input type="password" id="passInput" placeholder="Enter Password">
+        <button onclick="checkPass()">Access Panel</button>
+    </div>
 
-        <div class="label-text">Select Device Model</div>
-        <select id="modelSelect" onchange="loadProductData()">
-            <optgroup label="Xiaomi & Redmi Series">
+    <div id="adminPanel" class="admin-container">
+        <h3>INTROVERT INVENTORY</h3>
+        <select id="modelSelect" onchange="loadCurrentData()">
+            <optgroup label="Xiaomi Series">
                 <option value="xiaomi_17">Xiaomi 17</option>
                 <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
                 <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
-                <option value="redmi_turbo_4">Redmi Turbo 4</option>
-                <option value="redmi_turbo_4_pro">Redmi Turbo 4 Pro</option>
+            </optgroup>
+            <optgroup label="Redmi Series">
                 <option value="redmi_k80">Redmi K80</option>
                 <option value="redmi_k80_ultra">Redmi K80 Ultra</option>
                 <option value="redmi_k90">Redmi K90</option>
                 <option value="redmi_k90_ultra">Redmi K90 Ultra</option>
+                <option value="redmi_turbo_4">Redmi Turbo 4</option>
             </optgroup>
             <optgroup label="Note Series">
                 <option value="note_14">Note 14</option>
@@ -115,25 +54,21 @@
                 <option value="note_15_pro_plus">Note 15 Pro Plus</option>
             </optgroup>
         </select>
-
-        <div class="label-text">Product Images (Up to 5)</div>
-        <div class="admin-image-grid">
-            <div class="img-slot" onclick="triggerFile(0)" id="slot-0"><span>+</span></div>
-            <div class="img-slot" onclick="triggerFile(1)" id="slot-1"><span>+</span></div>
-            <div class="img-slot" onclick="triggerFile(2)" id="slot-2"><span>+</span></div>
-            <div class="img-slot" onclick="triggerFile(3)" id="slot-3"><span>+</span></div>
-            <div class="img-slot" onclick="triggerFile(4)" id="slot-4"><span>+</span></div>
-        </div>
-        <input type="file" id="fileInput" hidden accept="image/*" onchange="handleFile(this)">
-
-        <div class="label-text">Set Stock Quantity</div>
-        <input type="number" id="newStock" placeholder="အရေအတွက် ရိုက်ထည့်ပါ">
         
-        <button onclick="saveToFirebase()">Update & Sync Data</button>
+        <div class="img-grid" id="imgGrid">
+            <div class="slot" onclick="chooseFile(0)" id="sl0">+</div>
+            <div class="slot" onclick="chooseFile(1)" id="sl1">+</div>
+            <div class="slot" onclick="chooseFile(2)" id="sl2">+</div>
+            <div class="slot" onclick="chooseFile(3)" id="sl3">+</div>
+            <div class="slot" onclick="chooseFile(4)" id="sl4">+</div>
+        </div>
+        <input type="file" id="fileInp" hidden onchange="uploadToStorage(this)">
+        <input type="number" id="priceInp" placeholder="ဈေးနှုန်း (ကျပ်)">
+        <input type="number" id="stockInp" placeholder="လက်ကျန်အရေအတွက်">
+        <button id="saveBtn" onclick="saveToFirebase()">Save Changes</button>
     </div>
 
     <script>
-        // Firebase Config (Original)
         const firebaseConfig = {
             apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
             authDomain: "introvert-case-shop.firebaseapp.com",
@@ -144,80 +79,64 @@
             appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
         };
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
+        const storage = firebase.storage();
 
-        let currentImages = [null, null, null, null, null];
+        let currentImgUrls = [null, null, null, null, null];
         let activeSlot = 0;
 
-        function showNoti(msg) {
+        function showNoti(m) {
             const n = document.getElementById('liquidNoti');
-            n.innerText = msg;
-            n.classList.add('show');
-            setTimeout(() => n.classList.remove('show'), 3500);
+            n.innerText = m; n.style.top = '30px';
+            setTimeout(() => n.style.top = '-100px', 3000);
         }
 
-        function triggerFile(index) {
-            activeSlot = index;
-            document.getElementById('fileInput').click();
+        function checkPass() {
+            if(document.getElementById('passInput').value === '261521011') {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadCurrentData();
+            } else { showNoti("Password မှားယွင်းနေပါသည်"); }
         }
 
-        function handleFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64 = e.target.result;
-                    currentImages[activeSlot] = base64;
-                    document.getElementById(`slot-${activeSlot}`).innerHTML = `<img src="${base64}">`;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+        function chooseFile(i) { activeSlot = i; document.getElementById('fileInp').click(); }
+
+        async function uploadToStorage(input) {
+            if(!input.files[0]) return;
+            showNoti("ပုံတင်နေပါသည်...");
+            const file = input.files[0];
+            const ref = storage.ref(`products/${Date.now()}_${activeSlot}`);
+            const snap = await ref.put(file);
+            const url = await snap.ref.getDownloadURL();
+            currentImgUrls[activeSlot] = url;
+            document.getElementById(`sl${activeSlot}`).innerHTML = `<img src="${url}">`;
+            showNoti("ပုံတင်ပြီးပါပြီ");
         }
 
-        // Specification 4: Firebase Sync & Load
-        function loadProductData() {
+        async function saveToFirebase() {
             const model = document.getElementById('modelSelect').value;
-            database.ref('inventory/' + model).once('value', (s) => {
-                const data = s.val();
-                if (data) {
-                    document.getElementById('newStock').value = data.stock || 0;
-                    if (data.images) {
-                        currentImages = data.images;
-                        currentImages.forEach((img, i) => {
-                            if (img) document.getElementById(`slot-${i}`).innerHTML = `<img src="${img}">`;
-                            else document.getElementById(`slot-${i}`).innerHTML = `<span>+</span>`;
-                        });
-                    }
-                } else {
-                    document.getElementById('newStock').value = "";
-                    currentImages = [null, null, null, null, null];
-                    for(let i=0; i<5; i++) document.getElementById(`slot-${i}`).innerHTML = `<span>+</span>`;
+            const price = document.getElementById('priceInp').value;
+            const stock = document.getElementById('stockInp').value;
+            await db.ref('inventory/' + model).set({
+                price: price, stock: parseInt(stock), images: currentImgUrls, updated: Date.now()
+            });
+            showNoti("Database သို့ သိမ်းဆည်းပြီးပါပြီရှင်");
+        }
+
+        function loadCurrentData() {
+            const model = document.getElementById('modelSelect').value;
+            db.ref('inventory/' + model).once('value', s => {
+                const d = s.val();
+                if(d) {
+                    document.getElementById('priceInp').value = d.price || "";
+                    document.getElementById('stockInp').value = d.stock || 0;
+                    currentImgUrls = d.images || [null, null, null, null, null];
+                    currentImgUrls.forEach((u, i) => {
+                        document.getElementById(`sl${i}`).innerHTML = u ? `<img src="${u}">` : '+';
+                    });
                 }
             });
         }
-
-        function saveToFirebase() {
-            const model = document.getElementById('modelSelect').value;
-            const stockVal = parseInt(document.getElementById('newStock').value);
-            
-            if (isNaN(stockVal)) return showNoti("လက်ကျန်အရေအတွက် ထည့်ပေးပါရှင်");
-            
-            // Check if at least one image is uploaded
-            if (!currentImages.some(img => img !== null)) {
-                return showNoti("အနည်းဆုံး ပုံတစ်ပုံ ထည့်ပေးပါရှင်");
-            }
-
-            database.ref('inventory/' + model).set({
-                stock: stockVal,
-                images: currentImages,
-                lastUpdated: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                showNoti("ပစ္စည်းတင်ခြင်း အောင်မြင်ပါသည်ရှင်");
-            }).catch(() => {
-                showNoti("အမှားအယွင်းတစ်ခု ရှိနေပါသည်ရှင်");
-            });
-        }
-
-        window.onload = loadProductData;
     </script>
 </body>
 </html>
