@@ -3,81 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTROVERT - Admin Panel 2026</title>
-    
+    <title>INTROVERT - Admin Inventory</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+Myanmar:wght@300;500&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Myanmar:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.15);
             --accent: #E6BE8A;
-            --liquid-ease: cubic-bezier(0.23, 1, 0.32, 1);
         }
-
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
-
-        body {
-            margin: 0; background: #000; color: #fff;
-            font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
+        body { 
+            margin: 0; background: #000; color: #fff; font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             background-image: radial-gradient(circle at 50% -20%, #1a1a1a, #000);
         }
-
-        /* Liquid Pill Noti */
         #noti {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            padding: 14px 30px; border-radius: 50px; background: rgba(255, 255, 255, 0.12);
+            padding: 14px 30px; border-radius: 50px; background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-            transition: 0.6s var(--liquid-ease); z-index: 10000; font-size: 14px;
+            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); z-index: 1000;
         }
-
-        /* Login UI */
         #loginOverlay {
             background: var(--glass); backdrop-filter: blur(25px);
             padding: 40px; border-radius: 40px; border: 1px solid var(--glass-border);
             text-align: center; width: 90%; max-width: 400px;
         }
-
-        /* Admin Main UI */
-        #adminContainer { display: none; width: 95%; max-width: 900px; margin: 40px 0; }
+        #adminPanel { display: none; width: 95%; max-width: 600px; padding: 20px 0; }
         .card {
             background: var(--glass); backdrop-filter: blur(20px);
             padding: 30px; border-radius: 40px; border: 1px solid var(--glass-border);
-            margin-bottom: 25px;
         }
-
         input, select {
             width: 100%; padding: 15px; border-radius: 18px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 15px;
+            background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 20px; font-size: 16px;
         }
-
-        .image-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
         .img-slot {
             aspect-ratio: 1/1; background: rgba(255,255,255,0.05); border: 2px dashed var(--glass-border);
-            border-radius: 15px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; overflow: hidden;
+            border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;
         }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .del-img { 
-            position: absolute; top: 2px; right: 2px; background: rgba(255,69,58,0.8); 
-            border: none; color: white; border-radius: 50%; width: 20px; height: 20px; 
-            font-size: 10px; cursor: pointer; display: none;
-        }
-
         .btn {
-            background: #fff; color: #000; padding: 16px; width: 100%;
-            border-radius: 18px; border: none; font-weight: 600; cursor: pointer;
-            transition: 0.3s var(--liquid-ease);
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-add { background: var(--accent); margin-bottom: 20px; }
-        
-        .product-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px; border-bottom: 1px solid var(--glass-border);
+            background: #fff; color: #000; padding: 18px; width: 100%; border-radius: 20px; border: none; font-weight: 600; cursor: pointer;
         }
     </style>
 </head>
@@ -86,32 +55,51 @@
     <div id="noti"></div>
 
     <div id="loginOverlay">
-        <h2 style="margin-top:0; letter-spacing: 2px;">ADMIN ACCESS</h2>
+        <h2 style="margin-top:0">Admin Login</h2>
         <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ">
         <button class="btn" onclick="checkAuth()">Login ဝင်မည်</button>
     </div>
 
-    <div id="adminContainer">
-        <h1 style="text-align: center; color: var(--accent); letter-spacing: 4px;">INVENTORY</h1>
-
+    <div id="adminPanel">
         <div class="card">
-            <h3 style="margin-top:0">ပစ္စည်းအသစ်ထည့်ရန်</h3>
-            <input type="text" id="newModel" placeholder="Model အမည် (ဥပမာ - Xiaomi 17 Ultra)">
-            <input type="number" id="newPrice" placeholder="ဈေးနှုန်း (ကျပ်)">
-            <input type="number" id="newStock" placeholder="လက်ကျန်အရေအတွက်">
+            <h2 style="margin-top:0; color:var(--accent); text-align:center;">Inventory Control</h2>
             
-            <p style="font-size: 12px; opacity: 0.6;">ပုံ ၅ ပုံ (Image URLs)</p>
-            <div class="image-grid">
-                <div class="img-slot" onclick="uploadImg(0)"><span id="p0">+</span><img id="i0"><button class="del-img" id="d0" onclick="removeImg(event,0)">✕</button></div>
-                <div class="img-slot" onclick="uploadImg(1)"><span id="p1">+</span><img id="i1"><button class="del-img" id="d1" onclick="removeImg(event,1)">✕</button></div>
-                <div class="img-slot" onclick="uploadImg(2)"><span id="p2">+</span><img id="i2"><button class="del-img" id="d2" onclick="removeImg(event,2)">✕</button></div>
-                <div class="img-slot" onclick="uploadImg(3)"><span id="p3">+</span><img id="i3"><button class="del-img" id="d3" onclick="removeImg(event,3)">✕</button></div>
-                <div class="img-slot" onclick="uploadImg(4)"><span id="p4">+</span><img id="i4"><button class="del-img" id="d4" onclick="removeImg(event,4)">✕</button></div>
-            </div>
-            <button class="btn btn-add" onclick="addNewProduct()">ပစ္စည်းအသစ် သိမ်းမည်</button>
-        </div>
+            <label style="display:block; margin-bottom:10px; opacity:0.7;">မော်ဒယ် ရွေးချယ်ပါ</label>
+            <select id="modelSelect" onchange="loadData()">
+                <optgroup label="Xiaomi & Redmi Series">
+                    <option value="xiaomi_17">Xiaomi 17</option>
+                    <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
+                    <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
+                    <option value="redmi_turbo_4">Redmi Turbo 4</option>
+                    <option value="redmi_turbo_4_pro">Redmi Turbo 4 Pro</option>
+                    <option value="redmi_k80">Redmi K80</option>
+                    <option value="redmi_k80_ultra">Redmi K80 Ultra</option>
+                    <option value="redmi_k90">Redmi K90</option>
+                    <option value="redmi_k90_ultra">Redmi K90 Ultra</option>
+                </optgroup>
+                <optgroup label="Note Series">
+                    <option value="note_14">Note 14</option>
+                    <option value="note_14_pro">Note 14 Pro</option>
+                    <option value="note_14_pro_plus">Note 14 Pro Plus</option>
+                    <option value="note_15">Note 15</option>
+                    <option value="note_15_pro">Note 15 Pro</option>
+                    <option value="note_15_pro_plus">Note 15 Pro Plus</option>
+                </optgroup>
+            </select>
 
-        <div id="productList"></div>
+            <div class="img-grid">
+                <div class="img-slot" onclick="setImg(0)"><span id="p0">+</span><img id="i0"></div>
+                <div class="img-slot" onclick="setImg(1)"><span id="p1">+</span><img id="i1"></div>
+                <div class="img-slot" onclick="setImg(2)"><span id="p2">+</span><img id="i2"></div>
+                <div class="img-slot" onclick="setImg(3)"><span id="p3">+</span><img id="i3"></div>
+                <div class="img-slot" onclick="setImg(4)"><span id="p4">+</span><img id="i4"></div>
+            </div>
+
+            <input type="number" id="pPrice" placeholder="ဈေးနှုန်း (ကျပ်)">
+            <input type="number" id="pStock" placeholder="လက်ကျန် Stock">
+
+            <button class="btn" style="background:var(--accent)" onclick="save()">Save Changes</button>
+        </div>
     </div>
 
     <script>
@@ -126,107 +114,57 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        let tempImages = ["", "", "", "", ""];
+        let currentImgs = ["", "", "", "", ""];
 
         function showNoti(msg) {
             const n = document.getElementById('noti');
-            n.innerText = msg; n.style.top = '30px';
+            n.innerText = msg; n.style.top = '35px';
             setTimeout(() => n.style.top = '-100px', 3000);
         }
 
         function checkAuth() {
             if(document.getElementById('passInput').value === '261521011') {
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminContainer').style.display = 'block';
-                fetchProducts();
-            } else {
-                showNoti("Password မှားယွင်းနေပါတယ်ရှင်");
-            }
+                document.getElementById('adminPanel').style.display = 'block';
+                loadData();
+            } else { showNoti("Password မှားယွင်းနေပါတယ်"); }
         }
 
-        function uploadImg(index) {
-            const url = prompt("ပုံ URL (Direct Link) ထည့်ပေးပါရှင်:");
+        function setImg(idx) {
+            const url = prompt("ပုံ URL ကို ထည့်ပေးပါရှင်:");
             if(url) {
-                tempImages[index] = url;
-                document.getElementById(`i${index}`).src = url;
-                document.getElementById(`p${index}`).style.display = 'none';
-                document.getElementById(`d${index}`).style.display = 'block';
+                currentImgs[idx] = url;
+                document.getElementById(`i${idx}`).src = url;
+                document.getElementById(`p${idx}`).style.display = 'none';
+                showNoti("ပုံတင်ခြင်း အောင်မြင်ပါသည်ရှင်");
             }
         }
 
-        function removeImg(e, index) {
-            e.stopPropagation();
-            tempImages[index] = "";
-            document.getElementById(`i${index}`).src = "";
-            document.getElementById(`p${index}`).style.display = 'block';
-            document.getElementById(`d${index}`).style.display = 'none';
-        }
-
-        function addNewProduct() {
-            const model = document.getElementById('newModel').value.trim();
-            const price = document.getElementById('newPrice').value;
-            const stock = document.getElementById('newStock').value;
-
-            if(!model || !price || !stock) return showNoti("အချက်အလက် အားလုံးဖြည့်ပေးပါရှင်");
-
-            const dbId = model.replace(/\s+/g, '_').toLowerCase();
-            db.ref('inventory/' + dbId).set({
-                name: model,
-                price: parseInt(price),
-                stock: parseInt(stock),
-                images: tempImages
-            }).then(() => {
-                showNoti("ပစ္စည်းအသစ် ထည့်သွင်းပြီးပါပြီရှင်");
-                resetForm();
-            });
-        }
-
-        function resetForm() {
-            document.getElementById('newModel').value = "";
-            document.getElementById('newPrice').value = "";
-            document.getElementById('newStock').value = "";
-            tempImages = ["", "", "", "", ""];
-            for(let i=0; i<5; i++) {
-                document.getElementById(`i${i}`).src = "";
-                document.getElementById(`p${i}`).style.display = 'block';
-                document.getElementById(`d${i}`).style.display = 'none';
-            }
-        }
-
-        function fetchProducts() {
-            db.ref('inventory').on('value', (snap) => {
-                const data = snap.val();
-                const listDiv = document.getElementById('productList');
-                listDiv.innerHTML = "<h3>လက်ရှိပစ္စည်းများ စီမံရန်</h3>";
-                for(let id in data) {
-                    const p = data[id];
-                    listDiv.innerHTML += `
-                        <div class="card">
-                            <div style="display:flex; justify:space-between; align-items:center; margin-bottom:15px;">
-                                <strong style="color:var(--accent)">${p.name}</strong>
-                                <button onclick="deleteProduct('${id}')" style="background:none; border:none; color:#ff453a; cursor:pointer;">Delete</button>
-                            </div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                <input type="number" value="${p.price}" onchange="updateValue('${id}', 'price', this.value)" placeholder="Price">
-                                <input type="number" value="${p.stock}" onchange="updateValue('${id}', 'stock', this.value)" placeholder="Stock">
-                            </div>
-                            <p style="font-size:11px; opacity:0.5;">* တန်ဖိုးများကို ပြောင်းလိုက်သည်နှင့် Customer ဘက်တွင် ချက်ချင်း Update ဖြစ်ပါမည်။</p>
-                        </div>
-                    `;
+        function loadData() {
+            const id = document.getElementById('modelSelect').value;
+            db.ref('inventory/' + id).once('value', (s) => {
+                const data = s.val() || { price: 0, stock: 0, images: ["","","","",""] };
+                document.getElementById('pPrice').value = data.price;
+                document.getElementById('pStock').value = data.stock;
+                currentImgs = data.images || ["","","","",""];
+                for(let i=0; i<5; i++) {
+                    const img = document.getElementById(`i${i}`);
+                    const plus = document.getElementById(`p${i}`);
+                    if(currentImgs[i]) { img.src = currentImgs[i]; plus.style.display = 'none'; }
+                    else { img.src = ""; plus.style.display = 'block'; }
                 }
             });
         }
 
-        function updateValue(id, field, value) {
-            db.ref('inventory/' + id).update({ [field]: parseInt(value) })
-              .then(() => showNoti("Update အောင်မြင်ပါတယ်ရှင်"));
-        }
-
-        function deleteProduct(id) {
-            if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလားရှင်?")) {
-                db.ref('inventory/' + id).remove().then(() => showNoti("ဖျက်ပြီးပါပြီရှင်"));
-            }
+        function save() {
+            const id = document.getElementById('modelSelect').value;
+            const name = document.getElementById('modelSelect').options[document.getElementById('modelSelect').selectedIndex].text;
+            db.ref('inventory/' + id).set({
+                name: name,
+                price: parseInt(document.getElementById('pPrice').value),
+                stock: parseInt(document.getElementById('pStock').value),
+                images: currentImgs
+            }).then(() => showNoti("အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီရှင်"));
         }
     </script>
 </body>
