@@ -3,77 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTROVERT Admin - Liquid Control</title>
+    <title>INTROVERT Admin - 2026 Liquid UI</title>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Myanmar:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&family=Noto+Sans+Myanmar:wght@300;500&display=swap" rel="stylesheet">
+
     <style>
-        :root { --accent: #E6BE8A; --glass: rgba(255,255,255,0.05); --danger: #ff453a; }
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Noto Sans Myanmar', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
-        
-        #liquidNoti { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 30px; border-radius: 50px; background: rgba(255,255,255,0.12); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.2); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10000; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        .auth-card, .admin-container { background: var(--glass); padding: 40px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(30px); width: 92%; max-width: 450px; text-align: center; animation: float In 0.8s ease; }
-        @keyframes floatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        :root {
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --accent: #E6BE8A;
+            --danger: #ff453a;
+            --ios-blur: blur(25px);
+            --liquid-ease: cubic-bezier(0.23, 1, 0.32, 1);
+        }
 
-        input, select { width: 100%; padding: 16px; margin: 10px 0; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 16px; transition: 0.3s; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
+
+        body {
+            margin: 0; padding: 0; background: #000;
+            color: #fff; font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Liquid Pill Noti */
+        #liquidNoti {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; padding: 14px 35px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--glass-border); transition: 0.7s var(--liquid-ease);
+            font-size: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        #liquidNoti.show { top: 30px; }
+
+        /* Login Section */
+        #authSection {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .auth-card {
+            background: var(--glass); padding: 50px 30px; border-radius: 40px;
+            border: 1px solid var(--glass-border); backdrop-filter: var(--ios-blur);
+            text-align: center; width: 90%; max-width: 380px;
+        }
+
+        /* Admin Layout */
+        #adminPanel { display: none; padding: 40px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .glass-card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 35px; padding: 30px; backdrop-filter: var(--ios-blur);
+            margin-bottom: 30px;
+        }
+
+        h2, h3 { font-family: 'Playfair Display', serif; letter-spacing: 2px; color: var(--accent); }
+
+        input {
+            width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 18px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: #fff; font-size: 14px; transition: 0.3s;
+        }
         input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
-        
-        button { width: 100%; padding: 18px; border-radius: 20px; border: none; background: white; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-        button:active { transform: scale(0.96); }
 
-        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 25px 0; }
-        .slot { aspect-ratio: 1/1; border: 2px dashed rgba(255,255,255,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(255,255,255,0.03); font-size: 20px; transition: 0.3s; }
-        .slot:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
-        .slot img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .loading-spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .img-input-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; margin: 15px 0; }
 
-        #adminPanel { display: none; }
-        .del-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 10px; }
+        .btn {
+            width: 100%; padding: 18px; border-radius: 20px; border: none;
+            font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-add { background: #fff; color: #000; }
+        .btn-add:hover { transform: scale(1.02); }
+        .btn-del { background: rgba(255, 69, 58, 0.1); color: var(--danger); border: 1px solid rgba(255, 69, 58, 0.2); margin-top: 20px; }
+
+        /* Inventory List UI */
+        .inventory-item {
+            display: flex; align-items: center; gap: 15px; padding: 15px;
+            background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .inventory-item img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
+        .item-info { flex: 1; }
+        .item-info b { display: block; font-size: 15px; }
+        .item-info span { font-size: 12px; opacity: 0.6; }
+
     </style>
 </head>
 <body>
+
     <div id="liquidNoti"></div>
 
-    <div id="authSection" class="auth-card">
-        <h2 style="font-family: serif; letter-spacing: 4px; margin-bottom: 5px;">INTROVERT</h2>
-        <p style="opacity:0.5; font-size: 13px; margin-bottom: 30px;">Security Access</p>
-        <input type="password" id="passInput" placeholder="Enter Password" style="text-align: center; border-radius: 50px;">
-        <button onclick="checkPass()" style="background: var(--accent); border-radius: 50px;">Access Panel</button>
+    <div id="authSection">
+        <div class="auth-card">
+            <h2 style="color: #fff; margin-bottom: 10px;">INTROVERT</h2>
+            <p style="opacity: 0.5; font-size: 13px; margin-bottom: 30px;">Security Access Required</p>
+            <input type="password" id="passInput" placeholder="Password ကို ရိုက်ထည့်ပါ" style="text-align: center;">
+            <button class="btn btn-add" onclick="checkAuth()">Access Panel</button>
+        </div>
     </div>
 
-    <div id="adminPanel" class="admin-container">
-        <h3 style="color: var(--accent); margin-bottom: 25px; letter-spacing: 1px;">INVENTORY CONTROL</h3>
-        
-        <select id="modelSelect" onchange="loadCurrentData()">
-            <optgroup label="Xiaomi Series">
-                <option value="xiaomi_17">Xiaomi 17</option>
-                <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
-                <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
-            </optgroup>
-            </select>
-        
-        <div class="img-grid" id="imgGrid">
-            <div class="slot" onclick="chooseFile(0)" id="sl0">+</div>
-            <div class="slot" onclick="chooseFile(1)" id="sl1">+</div>
-            <div class="slot" onclick="chooseFile(2)" id="sl2">+</div>
-            <div class="slot" onclick="chooseFile(3)" id="sl3">+</div>
-            <div class="slot" onclick="chooseFile(4)" id="sl4">+</div>
-        </div>
+    <div id="adminPanel">
+        <div class="container">
+            <div class="glass-card">
+                <h3>ADD NEW PRODUCT</h3>
+                <input type="text" id="pName" placeholder="ပစ္စည်းအမည် (ဥပမာ - Xiaomi 14 Pro Case)">
+                <input type="number" id="pPrice" placeholder="ဈေးနှုန်း (ကျပ်)">
+                <input type="number" id="pStock" placeholder="လက်ကျန်အရေအတွက်">
+                
+                <div style="font-size: 12px; opacity: 0.5; margin: 15px 0 5px 5px;">Image Links (Direct URL)</div>
+                <div class="img-input-grid">
+                    <input type="text" class="img-link" placeholder="Image URL 1 (Cover)">
+                    <input type="text" class="img-link" placeholder="Image URL 2">
+                    <input type="text" class="img-link" placeholder="Image URL 3">
+                    <input type="text" class="img-link" placeholder="Image URL 4">
+                    <input type="text" class="img-link" placeholder="Image URL 5">
+                </div>
+                
+                <button class="btn btn-add" onclick="addProduct()">Add to Inventory</button>
+            </div>
 
-        <input type="file" id="fileInp" hidden accept="image/*" onchange="uploadToStorage(this)">
-        <input type="number" id="priceInp" placeholder="ဈေးနှုန်း (ကျပ်)">
-        <input type="number" id="stockInp" placeholder="လက်ကျန်အရေအတွက်">
-        
-        <button onclick="saveToFirebase()" style="background: #fff; color: #000;">Save Changes</button>
-        <button onclick="deleteProduct()" class="del-btn">Delete Product</button>
+            <div class="glass-card">
+                <h3 style="margin-bottom: 20px;">CURRENT INVENTORY</h3>
+                <div id="inventoryList">
+                    <p style="text-align: center; opacity: 0.3;">Loading Data...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // 5. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
             authDomain: "introvert-case-shop.firebaseapp.com",
@@ -81,97 +141,103 @@
             projectId: "introvert-case-shop",
             storageBucket: "introvert-case-shop.firebasestorage.app",
             messagingSenderId: "531673000312",
-            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
+            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d",
+            measurementId: "G-W7RCY4F27V"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const storage = firebase.storage();
-
-        let currentImgUrls = ["", "", "", "", ""];
-        let activeSlot = 0;
 
         function showNoti(m) {
             const n = document.getElementById('liquidNoti');
-            n.innerText = m; n.style.top = '35px';
-            setTimeout(() => n.style.top = '-100px', 3000);
+            n.innerText = m; n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 3000);
         }
 
-        function checkPass() {
-            if(document.getElementById('passInput').value === '261521011') {
+        // 1. Password Check
+        function checkAuth() {
+            const pass = document.getElementById('passInput').value;
+            if(pass === '261521011') {
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                loadCurrentData();
-            } else { showNoti("Password မှားယွင်းနေပါသည်ရှင်"); }
-        }
-
-        function chooseFile(i) { activeSlot = i; document.getElementById('fileInp').click(); }
-
-        async function uploadToStorage(input) {
-            if(!input.files[0]) return;
-            const file = input.files[0];
-            const model = document.getElementById('modelSelect').value;
-            const slotDiv = document.getElementById(`sl${activeSlot}`);
-            
-            slotDiv.innerHTML = '<div class="loading-spinner"></div>';
-            showNoti("ပုံတင်နေပါသည် ခဏစောင့်ပေးပါ...");
-            
-            try {
-                const ref = storage.ref(`products/${model}/${Date.now()}`);
-                const snap = await ref.put(file);
-                const url = await snap.ref.getDownloadURL();
-                currentImgUrls[activeSlot] = url;
-                slotDiv.innerHTML = `<img src="${url}">`;
-                showNoti("ပုံတင်ခြင်း အောင်မြင်ပါသည်ရှင်");
-            } catch (e) {
-                showNoti("Error: ပုံတင်မရပါ");
-                slotDiv.innerHTML = '+';
+                loadInventory();
+            } else {
+                showNoti("Password မှားယွင်းနေပါသည်ရှင်");
             }
         }
 
-        async function saveToFirebase() {
-            const modelSelect = document.getElementById('modelSelect');
-            const key = modelSelect.value;
-            const name = modelSelect.options[modelSelect.selectedIndex].text;
-            const price = document.getElementById('priceInp').value;
-            const stock = document.getElementById('stockInp').value;
-
-            if(!price || !stock) return showNoti("အချက်အလက် အကုန်ဖြည့်ပါရှင်");
-
-            await db.ref('inventory/' + key).set({
-                name, price, stock: parseInt(stock), images: currentImgUrls
+        // 2. Add Product Logic
+        async function addProduct() {
+            const name = document.getElementById('pName').value.trim();
+            const price = document.getElementById('pPrice').value;
+            const stock = document.getElementById('pStock').value;
+            const imgInputs = document.querySelectorAll('.img-link');
+            let images = [];
+            
+            imgInputs.forEach(input => {
+                if(input.value.trim() !== "") images.push(input.value.trim());
             });
-            showNoti("Database ထဲသို့ သိမ်းဆည်းပြီးပါပြီ ✨");
+
+            if(!name || !price || !stock || images.length === 0) {
+                showNoti("အချက်အလက်များကို အပြည့်အစုံ ဖြည့်ပေးပါရှင်");
+                return;
+            }
+
+            const productId = name.toLowerCase().replace(/ /g, "_") + "_" + Date.now();
+            
+            try {
+                await db.ref('inventory/' + productId).set({
+                    id: productId,
+                    name: name,
+                    price: price,
+                    stock: parseInt(stock),
+                    images: images,
+                    timestamp: Date.now()
+                });
+                showNoti("ပစ္စည်းအသစ် ထည့်သွင်းပြီးပါပြီရှင် ✨");
+                // Clear Form
+                document.getElementById('pName').value = "";
+                document.getElementById('pPrice').value = "";
+                document.getElementById('pStock').value = "";
+                imgInputs.forEach(i => i.value = "");
+            } catch (e) {
+                showNoti("Error: " + e.message);
+            }
         }
 
-        async function deleteProduct() {
-            if(!confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) return;
-            const key = document.getElementById('modelSelect').value;
-            await db.ref('inventory/' + key).remove();
-            showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
-            loadCurrentData();
-        }
+        // 3. Load & View Inventory List
+        function loadInventory() {
+            db.ref('inventory').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const listDiv = document.getElementById('inventoryList');
+                listDiv.innerHTML = "";
 
-        function loadCurrentData() {
-            const model = document.getElementById('modelSelect').value;
-            currentImgUrls = ["", "", "", "", ""];
-            for(let i=0; i<5; i++) document.getElementById(`sl${i}`).innerHTML = '+';
+                if(!data) {
+                    listDiv.innerHTML = `<p style="text-align: center; opacity: 0.3;">ပစ္စည်းစာရင်း မရှိသေးပါ</p>`;
+                    return;
+                }
 
-            db.ref('inventory/' + model).once('value', s => {
-                const d = s.val();
-                if(d) {
-                    document.getElementById('priceInp').value = d.price;
-                    document.getElementById('stockInp').value = d.stock;
-                    if(d.images) {
-                        currentImgUrls = d.images;
-                        currentImgUrls.forEach((u, i) => {
-                            if(u) document.getElementById(`sl${i}`).innerHTML = `<img src="${u}">`;
-                        });
-                    }
-                } else {
-                    document.getElementById('priceInp').value = "";
-                    document.getElementById('stockInp').value = "";
+                for(let id in data) {
+                    const p = data[id];
+                    listDiv.innerHTML += `
+                        <div class="inventory-item">
+                            <img src="${p.images[0]}" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="item-info">
+                                <b>${p.name}</b>
+                                <span>${p.price} ကျပ် | Stock: ${p.stock} ခု</span>
+                            </div>
+                            <button onclick="deleteProduct('${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:18px;">✕</button>
+                        </div>
+                    `;
                 }
             });
+        }
+
+        // Delete Logic
+        async function deleteProduct(id) {
+            if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလားရှင်?")) {
+                await db.ref('inventory/' + id).remove();
+                showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
+            }
         }
     </script>
 </body>
