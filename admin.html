@@ -2,104 +2,78 @@
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTROVERT - Admin Inventory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTROVERT - Admin Secure Access</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+Myanmar:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --accent: #E6BE8A;
-        }
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
-        body { 
-            margin: 0; background: #000; color: #fff; font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            background-image: radial-gradient(circle at 50% -20%, #1a1a1a, #000);
-        }
-        #noti {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            padding: 14px 30px; border-radius: 50px; background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); z-index: 1000;
-        }
-        #loginOverlay {
-            background: var(--glass); backdrop-filter: blur(25px);
-            padding: 40px; border-radius: 40px; border: 1px solid var(--glass-border);
-            text-align: center; width: 90%; max-width: 400px;
-        }
-        #adminPanel { display: none; width: 95%; max-width: 600px; padding: 20px 0; }
-        .card {
-            background: var(--glass); backdrop-filter: blur(20px);
-            padding: 30px; border-radius: 40px; border: 1px solid var(--glass-border);
-        }
-        input, select {
-            width: 100%; padding: 15px; border-radius: 18px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 20px; font-size: 16px;
-        }
-        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
-        .img-slot {
-            aspect-ratio: 1/1; background: rgba(255,255,255,0.05); border: 2px dashed var(--glass-border);
-            border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden;
-        }
-        .img-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .btn {
-            background: #fff; color: #000; padding: 18px; width: 100%; border-radius: 20px; border: none; font-weight: 600; cursor: pointer;
-        }
+        :root { --accent: #E6BE8A; --glass: rgba(255,255,255,0.05); }
+        body { font-family: 'Inter', 'Noto Sans Myanmar', sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        #liquidNoti { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 30px; border-radius: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10000; font-size: 14px; }
+        .auth-card, .admin-container { background: var(--glass); padding: 40px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(25px); width: 92%; max-width: 450px; text-align: center; }
+        input, select { width: 100%; padding: 16px; margin: 10px 0; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 18px; border-radius: 20px; border: none; background: white; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:active { transform: scale(0.95); }
+        .img-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 25px 0; }
+        .slot { aspect-ratio: 1/1; border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: rgba(255,255,255,0.03); font-size: 20px; }
+        .slot img { width: 100%; height: 100%; object-fit: cover; }
+        #adminPanel { display: none; }
+        .loading { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
+    <div id="liquidNoti"></div>
 
-    <div id="noti"></div>
-
-    <div id="loginOverlay">
-        <h2 style="margin-top:0">Admin Login</h2>
-        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ">
-        <button class="btn" onclick="checkAuth()">Login ဝင်မည်</button>
+    <div id="authSection" class="auth-card">
+        <h2 style="font-family: serif; letter-spacing: 2px;">INTROVERT</h2>
+        <p style="opacity:0.6; font-size: 14px;">Security Password ရိုက်ထည့်ပါ</p>
+        <input type="password" id="passInput" placeholder="••••••••">
+        <button onclick="checkPass()">Access Panel</button>
     </div>
 
-    <div id="adminPanel">
-        <div class="card">
-            <h2 style="margin-top:0; color:var(--accent); text-align:center;">Inventory Control</h2>
-            
-            <label style="display:block; margin-bottom:10px; opacity:0.7;">မော်ဒယ် ရွေးချယ်ပါ</label>
-            <select id="modelSelect" onchange="loadData()">
-                <optgroup label="Xiaomi & Redmi Series">
-                    <option value="xiaomi_17">Xiaomi 17</option>
-                    <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
-                    <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
-                    <option value="redmi_turbo_4">Redmi Turbo 4</option>
-                    <option value="redmi_turbo_4_pro">Redmi Turbo 4 Pro</option>
-                    <option value="redmi_k80">Redmi K80</option>
-                    <option value="redmi_k80_ultra">Redmi K80 Ultra</option>
-                    <option value="redmi_k90">Redmi K90</option>
-                    <option value="redmi_k90_ultra">Redmi K90 Ultra</option>
-                </optgroup>
-                <optgroup label="Note Series">
-                    <option value="note_14">Note 14</option>
-                    <option value="note_14_pro">Note 14 Pro</option>
-                    <option value="note_14_pro_plus">Note 14 Pro Plus</option>
-                    <option value="note_15">Note 15</option>
-                    <option value="note_15_pro">Note 15 Pro</option>
-                    <option value="note_15_pro_plus">Note 15 Pro Plus</option>
-                </optgroup>
-            </select>
-
-            <div class="img-grid">
-                <div class="img-slot" onclick="setImg(0)"><span id="p0">+</span><img id="i0"></div>
-                <div class="img-slot" onclick="setImg(1)"><span id="p1">+</span><img id="i1"></div>
-                <div class="img-slot" onclick="setImg(2)"><span id="p2">+</span><img id="i2"></div>
-                <div class="img-slot" onclick="setImg(3)"><span id="p3">+</span><img id="i3"></div>
-                <div class="img-slot" onclick="setImg(4)"><span id="p4">+</span><img id="i4"></div>
-            </div>
-
-            <input type="number" id="pPrice" placeholder="ဈေးနှုန်း (ကျပ်)">
-            <input type="number" id="pStock" placeholder="လက်ကျန် Stock">
-
-            <button class="btn" style="background:var(--accent)" onclick="save()">Save Changes</button>
+    <div id="adminPanel" class="admin-container">
+        <h3 style="color: var(--accent); margin-bottom: 25px;">INVENTORY CONTROL</h3>
+        
+        <label style="font-size: 12px; opacity: 0.6; display: block; text-align: left; margin-left: 5px;">Model ရွေးချယ်ပါ</label>
+        <select id="modelSelect" onchange="loadCurrentData()">
+            <optgroup label="Xiaomi Series">
+                <option value="xiaomi_17">Xiaomi 17</option>
+                <option value="xiaomi_17_pro">Xiaomi 17 Pro</option>
+                <option value="xiaomi_17_ultra">Xiaomi 17 Ultra</option>
+            </optgroup>
+            <optgroup label="Redmi Series">
+                <option value="redmi_k80">Redmi K80</option>
+                <option value="redmi_k80_ultra">Redmi K80 Ultra</option>
+                <option value="redmi_k90">Redmi K90</option>
+                <option value="redmi_k90_ultra">Redmi K90 Ultra</option>
+                <option value="redmi_turbo_4">Redmi Turbo 4</option>
+            </optgroup>
+            <optgroup label="Note Series">
+                <option value="note_14">Note 14</option>
+                <option value="note_14_pro">Note 14 Pro</option>
+                <option value="note_14_pro_plus">Note 14 Pro Plus</option>
+                <option value="note_15">Note 15</option>
+                <option value="note_15_pro">Note 15 Pro</option>
+                <option value="note_15_pro_plus">Note 15 Pro Plus</option>
+            </optgroup>
+        </select>
+        
+        <div class="img-grid" id="imgGrid">
+            <div class="slot" onclick="chooseFile(0)" id="sl0">+</div>
+            <div class="slot" onclick="chooseFile(1)" id="sl1">+</div>
+            <div class="slot" onclick="chooseFile(2)" id="sl2">+</div>
+            <div class="slot" onclick="chooseFile(3)" id="sl3">+</div>
+            <div class="slot" onclick="chooseFile(4)" id="sl4">+</div>
         </div>
+
+        <input type="file" id="fileInp" hidden accept="image/*" onchange="uploadToStorage(this)">
+        <input type="number" id="priceInp" placeholder="ဈေးနှုန်း (ကျပ်)">
+        <input type="number" id="stockInp" placeholder="လက်ကျန်အရေအတွက်">
+        
+        <button id="saveBtn" onclick="saveToFirebase()" style="background: var(--accent);">Save to Database</button>
+        <p style="font-size: 11px; opacity: 0.4; margin-top: 15px;">INTROVERT Premium Case Shop © 2026</p>
     </div>
 
     <script>
@@ -114,57 +88,102 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let currentImgs = ["", "", "", "", ""];
+        const storage = firebase.storage();
 
-        function showNoti(msg) {
-            const n = document.getElementById('noti');
-            n.innerText = msg; n.style.top = '35px';
+        let currentImgUrls = ["", "", "", "", ""];
+        let activeSlot = 0;
+
+        function showNoti(m) {
+            const n = document.getElementById('liquidNoti');
+            n.innerText = m; n.style.top = '30px';
             setTimeout(() => n.style.top = '-100px', 3000);
         }
 
-        function checkAuth() {
+        function checkPass() {
             if(document.getElementById('passInput').value === '261521011') {
-                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('authSection').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                loadData();
-            } else { showNoti("Password မှားယွင်းနေပါတယ်"); }
+                loadCurrentData();
+            } else { showNoti("Password မှားယွင်းနေပါသည်ရှင်"); }
         }
 
-        function setImg(idx) {
-            const url = prompt("ပုံ URL ကို ထည့်ပေးပါရှင်:");
-            if(url) {
-                currentImgs[idx] = url;
-                document.getElementById(`i${idx}`).src = url;
-                document.getElementById(`p${idx}`).style.display = 'none';
-                showNoti("ပုံတင်ခြင်း အောင်မြင်ပါသည်ရှင်");
+        function chooseFile(i) { 
+            activeSlot = i; 
+            document.getElementById('fileInp').click(); 
+        }
+
+        async function uploadToStorage(input) {
+            if(!input.files[0]) return;
+            const file = input.files[0];
+            const model = document.getElementById('modelSelect').value;
+            
+            showNoti("ပုံတင်နေပါသည် ခဏစောင့်ပေးပါ...");
+            document.getElementById('adminPanel').classList.add('loading');
+            
+            try {
+                const ref = storage.ref(`products/${model}/${Date.now()}_${activeSlot}`);
+                const snap = await ref.put(file);
+                const url = await snap.ref.getDownloadURL();
+                
+                currentImgUrls[activeSlot] = url;
+                document.getElementById(`sl${activeSlot}`).innerHTML = `<img src="${url}">`;
+                showNoti("ပုံတင်ခြင်း အောင်မြင်ပါသည်");
+            } catch (e) {
+                showNoti("Error: ပုံတင်မရပါ - " + e.message);
+            } finally {
+                document.getElementById('adminPanel').classList.remove('loading');
+                input.value = ""; // reset input
             }
         }
 
-        function loadData() {
-            const id = document.getElementById('modelSelect').value;
-            db.ref('inventory/' + id).once('value', (s) => {
-                const data = s.val() || { price: 0, stock: 0, images: ["","","","",""] };
-                document.getElementById('pPrice').value = data.price;
-                document.getElementById('pStock').value = data.stock;
-                currentImgs = data.images || ["","","","",""];
-                for(let i=0; i<5; i++) {
-                    const img = document.getElementById(`i${i}`);
-                    const plus = document.getElementById(`p${i}`);
-                    if(currentImgs[i]) { img.src = currentImgs[i]; plus.style.display = 'none'; }
-                    else { img.src = ""; plus.style.display = 'block'; }
-                }
-            });
+        async function saveToFirebase() {
+            const modelSelect = document.getElementById('modelSelect');
+            const modelKey = modelSelect.value;
+            const modelName = modelSelect.options[modelSelect.selectedIndex].text;
+            const price = document.getElementById('priceInp').value;
+            const stock = document.getElementById('stockInp').value;
+
+            if(!price || !stock) {
+                showNoti("ဈေးနှုန်းနှင့် Stock ဖြည့်ပေးပါရှင်");
+                return;
+            }
+
+            try {
+                await db.ref('inventory/' + modelKey).set({
+                    name: modelName,
+                    price: price,
+                    stock: parseInt(stock),
+                    images: currentImgUrls,
+                    last_updated: new Date().toLocaleString()
+                });
+                showNoti("Database ထဲသို့ သိမ်းဆည်းပြီးပါပြီ ✨");
+            } catch (e) {
+                showNoti("Error: " + e.message);
+            }
         }
 
-        function save() {
-            const id = document.getElementById('modelSelect').value;
-            const name = document.getElementById('modelSelect').options[document.getElementById('modelSelect').selectedIndex].text;
-            db.ref('inventory/' + id).set({
-                name: name,
-                price: parseInt(document.getElementById('pPrice').value),
-                stock: parseInt(document.getElementById('pStock').value),
-                images: currentImgs
-            }).then(() => showNoti("အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီရှင်"));
+        function loadCurrentData() {
+            const model = document.getElementById('modelSelect').value;
+            // Reset slots first
+            currentImgUrls = ["", "", "", "", ""];
+            for(let i=0; i<5; i++) document.getElementById(`sl${i}`).innerHTML = '+';
+
+            db.ref('inventory/' + model).once('value', s => {
+                const d = s.val();
+                if(d) {
+                    document.getElementById('priceInp').value = d.price || "";
+                    document.getElementById('stockInp').value = d.stock || 0;
+                    if(d.images) {
+                        currentImgUrls = d.images;
+                        currentImgUrls.forEach((u, i) => {
+                            if(u) document.getElementById(`sl${i}`).innerHTML = `<img src="${u}">`;
+                        });
+                    }
+                } else {
+                    document.getElementById('priceInp').value = "";
+                    document.getElementById('stockInp').value = "";
+                }
+            });
         }
     </script>
 </body>
