@@ -164,7 +164,17 @@
     </style>
 </head>
 <body>
+<body>
+    <div id="liquidNoti"></div>
 
+    <div id="fsDisplay" style="display: none; margin: 10px 20px; padding: 15px; border-radius: 20px; background: rgba(230, 190, 138, 0.15); border: 1px solid rgba(230, 190, 138, 0.3); backdrop-filter: blur(15px); text-align: center; color: white;">
+        <div id="fsText" style="font-weight: 500; margin-bottom: 5px; font-size: 14px;">Flash Sale လျှော့ဈေးရှိနေပါသည်!</div>
+        <div id="fsTimerDisplay" style="font-family: 'Montserrat'; font-size: 20px; font-weight: 700; color: #E6BE8A; letter-spacing: 2px;">00:00:00</div>
+    </div>
+    <header class="branding-header">
+        <h1 class="logo-main">INTROVERT</h1>
+        ...
+        
     <div id="liquidNoti"></div>
 
     <div class="social-hub">
@@ -360,5 +370,85 @@
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
     </script>
+        <script>
+    let fsConfig = { active: false, endTime: 0 };
+    let fsInterval;
+
+    // Firebase မှ Settings ကို ဖတ်ခြင်း
+    db.ref('flashSaleSettings').on('value', (snap) => {
+        const val = snap.val();
+        if(!val) return;
+        fsConfig = val;
+        
+        const banner = document.getElementById('fsDisplay');
+        if(val.active) {
+            banner.style.display = 'block';
+            document.getElementById('fsText').innerText = val.promoText;
+            startCountdown(val.endTime);
+        } else {
+            banner.style.display = 'none';
+            clearInterval(fsInterval);
+        }
+        
+        // ဈေးနှုန်းများကို Update လုပ်ရန် render function ကို ပြန်ခေါ်ခြင်း
+        if(typeof allProducts !== 'undefined' && allProducts.length > 0) render(allProducts);
+    });
+
+    function startCountdown(end) {
+        clearInterval(fsInterval);
+        fsInterval = setInterval(() => {
+            const dist = end - new Date().getTime();
+            if(dist < 0) {
+                clearInterval(fsInterval);
+                document.getElementById('fsTimerDisplay').innerText = "EXPIRED";
+                return;
+            }
+            const h = Math.floor((dist % 86400000) / 3600000);
+            const m = Math.floor((dist % 3600000) / 60000);
+            const s = Math.floor((dist % 60000) / 1000);
+            document.getElementById('fsTimerDisplay').innerText = 
+                `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+
+    // Automatic Pricing Logic
+    const originalRender = render;
+    render = function(data) {
+        const grid = document.getElementById('productGrid');
+        if (data.length === 0) { grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px;">ပစ္စည်း မရှိသေးပါရှင်</div>`; return; }
+        
+        grid.innerHTML = data.map(p => {
+            const stockCount = parseInt(p.stock) || 0;
+            const originalPrice = parseInt(p.price.toString().replace(/,/g, ''));
+            const discountedPrice = Math.floor(originalPrice * 0.9); // ၁၀% လျှော့ဈေး
+            
+            const priceSection = fsConfig.active ? 
+                `<div class="price-tag">
+                    <span style="text-decoration: line-through; opacity: 0.5; font-size: 0.9rem; margin-right: 8px;">${p.price}</span>
+                    <span style="color: #E6BE8A; font-weight: 700;">${discountedPrice.toLocaleString()} ကျပ်</span>
+                </div>` : 
+                `<div class="price-tag">${p.price} ကျပ်</div>`;
+
+            return `
+            <div class="card">
+                <img src="${p.images ? p.images[0] : ''}" onclick="openGallery('${p.id}')">
+                <div style="font-weight: 500;">${p.name}</div>
+                ${priceSection}
+                <div class="stock-label ${stockCount <= 3 && stockCount > 0 ? 'blinking' : ''}">
+                    ${stockCount === 0 ? 'ကုန်သွားပါပြီရှင်' : 'လက်ကျန်: ' + stockCount + ' ခု'}
+                </div>
+                <div class="qty-box">
+                    <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
+                    <span id="q-val-${p.id}" style="font-weight:600; width: 20px;">1</span>
+                    <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
+                </div>
+                <button class="buy-btn" ${stockCount === 0 ? 'disabled' : ''} onclick="openOrder('${p.id}')">
+                    ${stockCount === 0 ? 'Sold Out' : 'ဝယ်မည်'}
+                </button>
+            </div>`;
+        }).join('');
+    };
+        </script>
+        
 </body>
 </html>
