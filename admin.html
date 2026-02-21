@@ -240,5 +240,64 @@
             }
         }
     </script>
+    <div id="adminFlashControl" style="margin: 40px 20px; padding: 30px; border-radius: 35px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(25px); color: white;">
+    <h3 style="color: #E6BE8A; font-family: 'Playfair Display'; margin-top: 0;">Flash Sale Management</h3>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <span>Sale ပိတ်/ဖွင့် လုပ်ရန်:</span>
+        <label class="switch"><input type="checkbox" id="fsActive"><span class="slider"></span></label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label style="font-size: 13px; opacity: 0.7;">Promotion စာသား:</label>
+        <input type="text" id="fsPromoText" placeholder="ဥပမာ- ရာသီကုန်အထူးလျှော့ဈေး" style="width:100%; padding:12px; border-radius:15px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; margin-top:5px;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label style="font-size: 13px; opacity: 0.7;">ကုန်ဆုံးမည့် ရက်စွဲနှင့် အချိန်:</label>
+        <input type="datetime-local" id="fsEndTime" style="width:100%; padding:12px; border-radius:15px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; margin-top:5px;">
+    </div>
+
+    <button onclick="updateFlashSettings()" style="width:100%; padding:15px; border-radius:20px; background:#E6BE8A; color:black; font-weight:bold; border:none; cursor:pointer;">Settings သိမ်းဆည်းမည်</button>
+</div>
+
+<style>
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+    .switch input:checked + .slider { background-color: #E6BE8A; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    .switch input:checked + .slider:before { transform: translateX(24px); }
+</style>
+
+<script>
+    // Firebase Path: flashSaleSettings သို့ Data ပို့ခြင်း
+    function updateFlashSettings() {
+        const active = document.getElementById('fsActive').checked;
+        const text = document.getElementById('fsPromoText').value;
+        const end = new Date(document.getElementById('fsEndTime').value).getTime();
+
+        db.ref('flashSaleSettings').set({
+            active: active,
+            promoText: text,
+            endTime: end || 0
+        }).then(() => alert("Flash Sale Settings ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီရှင် ✨"));
+    }
+
+    // လက်ရှိ Data ကို ပြန်ဖတ်ပြထားခြင်း
+    db.ref('flashSaleSettings').once('value', (snap) => {
+        const val = snap.val();
+        if(val) {
+            document.getElementById('fsActive').checked = val.active;
+            document.getElementById('fsPromoText').value = val.promoText || "";
+            if(val.endTime) {
+                const date = new Date(val.endTime);
+                date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+                document.getElementById('fsEndTime').value = date.toISOString().slice(0,16);
+            }
+        }
+    });
+</script>
+    
 </body>
 </html>
