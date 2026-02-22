@@ -16,7 +16,6 @@
             --glass-border: rgba(255, 255, 255, 0.15);
             --accent: #E6BE8A;
             --danger: #ff453a;
-            --success: #2ecc71;
             --ios-blur: blur(25px);
             --liquid-ease: cubic-bezier(0.23, 1, 0.32, 1);
         }
@@ -61,12 +60,12 @@
 
         h2, h3 { font-family: 'Playfair Display', serif; letter-spacing: 2px; color: var(--accent); }
 
-        input, textarea {
+        input, select {
             width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 18px;
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
             color: #fff; font-size: 14px; transition: 0.3s;
         }
-        input:focus, textarea:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+        input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
 
         .img-input-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; margin: 15px 0; }
 
@@ -77,42 +76,6 @@
         .btn-add { background: #fff; color: #000; }
         .btn-add:hover { transform: scale(1.02); }
         .btn-del { background: rgba(255, 69, 58, 0.1); color: var(--danger); border: 1px solid rgba(255, 69, 58, 0.2); margin-top: 20px; }
-        .btn-save { background: var(--success); color: #fff; }
-
-        /* Flash Sale Admin Styles */
-        .flash-sale-admin {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 25px;
-            margin-top: 30px;
-            margin-bottom: 30px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .4s; border-radius: 34px;
-        }
-        input:checked + .slider { background-color: var(--success); }
-        .status-text {
-            vertical-align: middle;
-            font-size: 14px;
-        }
-        .sale-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
 
         /* Inventory List UI */
         .inventory-item {
@@ -125,10 +88,24 @@
         .item-info b { display: block; font-size: 15px; }
         .item-info span { font-size: 12px; opacity: 0.6; }
 
-        .delete-btn {
-            background: none; border: none; color: var(--danger); 
-            cursor: pointer; font-size: 18px; padding: 10px;
+        /* Flash Sale Specific */
+        .sale-switch {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 0; margin-bottom: 20px;
         }
+        .toggle { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
+            background-color: #fff; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
     </style>
 </head>
 <body>
@@ -146,6 +123,29 @@
 
     <div id="adminPanel">
         <div class="container">
+            
+            <div class="glass-card">
+                <h3>⚡ FLASH SALE CONTROL</h3>
+                <div class="sale-switch">
+                    <span>Flash Sale Status</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="saleToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div style="font-size: 12px; opacity: 0.5; margin-left: 5px;">Promo Text</div>
+                <input type="text" id="promoText" placeholder="နွေရာသီ အထူးဈေးလျှော့ပွဲ">
+                
+                <div style="font-size: 12px; opacity: 0.5; margin-left: 5px;">Countdown End (Date & Time)</div>
+                <input type="datetime-local" id="endTime">
+                
+                <div style="font-size: 12px; opacity: 0.5; margin-left: 5px;">Discount Percentage (%)</div>
+                <input type="number" id="discountPercent" placeholder="10">
+                
+                <button class="btn btn-add" style="background: var(--accent);" onclick="saveFlashSettings()">Update Flash Sale Settings</button>
+            </div>
+
             <div class="glass-card">
                 <h3>ADD NEW PRODUCT</h3>
                 <input type="text" id="pName" placeholder="ပစ္စည်းအမည် (ဥပမာ - Xiaomi 14 Pro Case)">
@@ -164,25 +164,6 @@
                 <button class="btn btn-add" onclick="addProduct()">Add to Inventory</button>
             </div>
 
-            <!-- Flash Sale Admin Section -->
-            <div class="flash-sale-admin">
-                <h3>⚡ Flash Sale Settings</h3>
-                <div class="sale-header">
-                    <label class="switch">
-                        <input type="checkbox" id="saleToggle" onchange="updateSaleStatus()">
-                        <span class="slider"></span>
-                    </label>
-                    <span class="status-text" id="saleStatusText">Sale Status (ပိတ်/ဖွင့်)</span>
-                </div>
-                
-                <input type="text" id="promoText" placeholder="Promotion စာသား (ဥပမာ- Summer Sale 50%)" style="margin-top:15px;">
-                
-                <div style="font-size: 12px; opacity: 0.5; margin: 10px 0 5px 5px;">သက်တမ်းကုန်ဆုံးမည့်ရက်နှင့်အချိန်</div>
-                <input type="datetime-local" id="endTime" style="margin-top:5px;">
-                
-                <button class="btn btn-save" onclick="saveSaleSettings()" style="margin-top:20px;">💾 Save Flash Sale Settings</button>
-            </div>
-
             <div class="glass-card">
                 <h3 style="margin-bottom: 20px;">CURRENT INVENTORY</h3>
                 <div id="inventoryList">
@@ -193,7 +174,6 @@
     </div>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
             authDomain: "introvert-case-shop.firebaseapp.com",
@@ -207,39 +187,62 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Utility Functions
         function showNoti(m) {
             const n = document.getElementById('liquidNoti');
-            n.innerText = m; 
-            n.classList.add('show');
+            n.innerText = m; n.classList.add('show');
             setTimeout(() => n.classList.remove('show'), 3000);
         }
 
-        function formatDateTimeForInput(timestamp) {
-            if (!timestamp) return '';
-            const date = new Date(timestamp);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-
-        // Password Check
         function checkAuth() {
             const pass = document.getElementById('passInput').value;
             if(pass === '261521011') {
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadInventory();
-                loadFlashSaleSettings();
+                loadFlashSettings(); // Flash Settings များကိုပါ ဆွဲထုတ်မည်
             } else {
                 showNoti("Password မှားယွင်းနေပါသည်ရှင်");
             }
         }
 
-        // Add Product Logic
+        // --- FLASH SALE FUNCTIONS ---
+        async function saveFlashSettings() {
+            const isActive = document.getElementById('saleToggle').checked;
+            const promoText = document.getElementById('promoText').value.trim();
+            const endTime = document.getElementById('endTime').value;
+            const discount = document.getElementById('discountPercent').value;
+
+            if(!promoText || !endTime || !discount) {
+                showNoti("Flash Sale အချက်အလက်များ အပြည့်အစုံ ဖြည့်ပေးပါ");
+                return;
+            }
+
+            try {
+                await db.ref('flashSaleSettings').set({
+                    isActive: isActive,
+                    promoText: promoText,
+                    endTime: endTime,
+                    discountPercent: parseInt(discount)
+                });
+                showNoti("Flash Sale Settings များကို Update လုပ်ပြီးပါပြီ ⚡");
+            } catch (e) {
+                showNoti("Error: " + e.message);
+            }
+        }
+
+        function loadFlashSettings() {
+            db.ref('flashSaleSettings').once('value', (snap) => {
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('saleToggle').checked = data.isActive;
+                    document.getElementById('promoText').value = data.promoText || "";
+                    document.getElementById('endTime').value = data.endTime || "";
+                    document.getElementById('discountPercent').value = data.discountPercent || "";
+                }
+            });
+        }
+        // ----------------------------
+
         async function addProduct() {
             const name = document.getElementById('pName').value.trim();
             const price = document.getElementById('pPrice').value;
@@ -256,20 +259,18 @@
                 return;
             }
 
-            const productId = name.toLowerCase().replace(/[^a-z0-9]/g, "_") + "_" + Date.now();
+            const productId = name.toLowerCase().replace(/ /g, "_") + "_" + Date.now();
             
             try {
                 await db.ref('inventory/' + productId).set({
                     id: productId,
                     name: name,
-                    price: parseInt(price),
+                    price: price,
                     stock: parseInt(stock),
                     images: images,
                     timestamp: Date.now()
                 });
                 showNoti("ပစ္စည်းအသစ် ထည့်သွင်းပြီးပါပြီရှင် ✨");
-                
-                // Clear Form
                 document.getElementById('pName').value = "";
                 document.getElementById('pPrice').value = "";
                 document.getElementById('pStock').value = "";
@@ -279,7 +280,6 @@
             }
         }
 
-        // Load Inventory List
         function loadInventory() {
             db.ref('inventory').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -291,97 +291,28 @@
                     return;
                 }
 
-                // Convert to array and sort by timestamp (newest first)
-                const products = Object.entries(data).map(([id, p]) => ({ id, ...p }));
-                products.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                products.forEach(p => {
+                for(let id in data) {
+                    const p = data[id];
                     listDiv.innerHTML += `
                         <div class="inventory-item">
-                            <img src="${p.images ? p.images[0] : 'https://via.placeholder.com/150'}" 
-                                 onerror="this.src='https://via.placeholder.com/150'">
+                            <img src="${p.images[0]}" onerror="this.src='https://via.placeholder.com/150'">
                             <div class="item-info">
-                                <b>${p.name || 'Unknown'}</b>
-                                <span>${p.price?.toLocaleString() || 0} ကျပ် | Stock: ${p.stock || 0} ခု</span>
+                                <b>${p.name}</b>
+                                <span>${p.price} ကျပ် | Stock: ${p.stock} ခု</span>
                             </div>
-                            <button class="delete-btn" onclick="deleteProduct('${p.id}')">✕</button>
+                            <button onclick="deleteProduct('${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:18px;">✕</button>
                         </div>
                     `;
-                });
+                }
             });
         }
 
-        // Delete Product
         async function deleteProduct(id) {
             if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလားရှင်?")) {
-                try {
-                    await db.ref('inventory/' + id).remove();
-                    showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
-                } catch (e) {
-                    showNoti("Error: " + e.message);
-                }
+                await db.ref('inventory/' + id).remove();
+                showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
             }
         }
-
-        // Flash Sale Functions
-        function updateSaleStatus() {
-            const isActive = document.getElementById('saleToggle').checked;
-            const statusText = document.getElementById('saleStatusText');
-            statusText.innerHTML = isActive ? '⚡ Flash Sale ဖွင့်ထားသည်' : '💤 Flash Sale ပိတ်ထားသည်';
-        }
-
-        async function saveSaleSettings() {
-            const active = document.getElementById('saleToggle').checked;
-            const text = document.getElementById('promoText').value.trim();
-            const time = document.getElementById('endTime').value;
-            
-            if (!text) {
-                showNoti("Promotion စာသား ထည့်ပေးပါရှင်");
-                return;
-            }
-
-            if (!time) {
-                showNoti("သက်တမ်းကုန်ဆုံးမည့်ရက် ရွေးပေးပါရှင်");
-                return;
-            }
-
-            try {
-                await db.ref('flashSaleSettings').set({
-                    isActive: active,
-                    promoText: text,
-                    endTime: time,
-                    updatedAt: Date.now()
-                });
-                showNoti("✅ Flash Sale Settings သိမ်းဆည်းပြီးပါပြီ");
-            } catch (e) {
-                showNoti("Error: " + e.message);
-            }
-        }
-
-        function loadFlashSaleSettings() {
-            db.ref('flashSaleSettings').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    document.getElementById('saleToggle').checked = data.isActive || false;
-                    document.getElementById('promoText').value = data.promoText || '';
-                    document.getElementById('endTime').value = data.endTime || '';
-                    updateSaleStatus();
-                } else {
-                    // Default values
-                    document.getElementById('saleToggle').checked = false;
-                    document.getElementById('promoText').value = '';
-                    document.getElementById('endTime').value = '';
-                    updateSaleStatus();
-                }
-            });
-        }
-
-        // Make functions globally available
-        window.checkAuth = checkAuth;
-        window.addProduct = addProduct;
-        window.deleteProduct = deleteProduct;
-        window.saveSaleSettings = saveSaleSettings;
-        window.updateSaleStatus = updateSaleStatus;
     </script>
 </body>
 </html>
