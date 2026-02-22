@@ -29,77 +29,68 @@
             overflow-x: hidden; line-height: 1.6;
         }
 
-        /* 1. Branding Header (Natural Scroll) */
-        .branding-header { text-align: center; padding: 80px 20px 30px; }
+        /* --- [NEW] FLASH SALE LIQUID UI --- */
+        #flashSaleBanner {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            width: 92%; max-width: 450px; z-index: 10002;
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+            border-radius: 30px; padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transition: transform 0.8s var(--liquid-ease);
+        }
+        #flashSaleBanner.active { transform: translateX(-50%) translateY(0); }
+        .promo-tag { background: var(--danger); color: #fff; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 800; }
+        .timer-val { color: var(--accent); font-weight: 700; font-family: 'Montserrat', sans-serif; font-size: 15px; }
+
+        /* Modified pricing UI */
+        .price-row { display: flex; flex-direction: column; align-items: center; }
+        .original-price { text-decoration: line-through; opacity: 0.4; font-size: 0.85rem; }
+        .sale-price { color: var(--accent); font-weight: 600; font-size: 1.2rem; }
+        .sale-price.active-sale { color: var(--danger); }
+        /* --- END NEW UI --- */
+
+        .branding-header { text-align: center; padding: 110px 20px 30px; }
         .logo-main {
             font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 8vw, 3.5rem); letter-spacing: 8px; margin: 0;
             background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            backdrop-filter: blur(5px); font-weight: 700;
+            font-weight: 700;
         }
-        .logo-sub { 
-            font-family: 'Noto Sans Myanmar', sans-serif; font-size: 1.1rem; 
-            color: rgba(255,255,255,0.5); letter-spacing: 4px; margin-top: 10px;
-        }
+        .logo-sub { font-size: 1.1rem; color: rgba(255,255,255,0.5); letter-spacing: 4px; margin-top: 10px; }
 
-        /* 3. Flash Sale Module */
-        #flashSaleBanner {
-            display: none; background: rgba(230, 190, 138, 0.15);
-            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(230, 190, 138, 0.3); border-radius: 20px;
-            margin: 10px 20px; padding: 15px; text-align: center;
-            animation: slideDown 0.8s var(--liquid-ease);
-        }
-        @keyframes slideDown { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: translateY(0); } }
-        .timer-pill {
-            background: var(--accent); color: #000; padding: 4px 15px;
-            border-radius: 50px; font-weight: 700; font-family: 'Montserrat', sans-serif;
-            margin-left: 10px; display: inline-block;
-        }
-
-        /* 11. LiquidPill Notification */
         #liquidNoti {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             z-index: 10001; padding: 14px 35px; border-radius: 50px;
             background: rgba(255, 255, 255, 0.1); backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur); border: 1px solid var(--glass-border);
-            color: #fff; font-size: 14px; font-weight: 500;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            transition: all 0.7s var(--liquid-ease); white-space: nowrap; pointer-events: none;
+            border: 1px solid var(--glass-border); color: #fff;
+            transition: all 0.7s var(--liquid-ease); pointer-events: none;
         }
-        #liquidNoti.show { top: 35px; }
+        #liquidNoti.show { top: 90px; } /* Adjusted for Banner */
 
-        /* 2. Liquid Search Bar (Sticky) */
         .search-container { position: sticky; top: 20px; z-index: 1000; padding: 0 20px; margin-bottom: 40px; }
         #searchInput {
             width: 100%; max-width: 500px; display: block; margin: 0 auto;
             padding: 18px 30px; border-radius: 50px; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border); backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur); color: #fff; font-size: 16px; 
+            border: 1px solid var(--glass-border); backdrop-filter: var(--ios-blur); color: #fff; 
             transition: 0.5s var(--liquid-ease); text-align: center;
-            box-shadow: 0 0 0 rgba(230, 190, 138, 0);
         }
-        #searchInput:focus { 
-            transform: scale(1.02); border-color: var(--accent); 
-            box-shadow: 0 0 20px rgba(230, 190, 138, 0.2);
-        }
+        #searchInput:focus { transform: scale(1.02); border-color: var(--accent); }
 
-        /* 13. Social Hub */
         .social-hub { position: fixed; top: 25px; right: 25px; z-index: 2000; }
         .hub-trigger {
             width: 50px; height: 50px; border-radius: 50%; background: var(--glass);
             backdrop-filter: var(--ios-blur); border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
         .hub-menu {
             display: none; position: absolute; top: 60px; right: 0; background: rgba(255,255,255,0.05);
             backdrop-filter: var(--ios-blur); border: 1px solid var(--glass-border);
             border-radius: 30px; padding: 12px; flex-direction: column; gap: 12px;
         }
-        .hub-menu a { width: 45px; height: 45px; border-radius: 50%; overflow: hidden; display: block; }
-        .hub-menu img { width: 100%; height: 100%; object-fit: cover; }
+        .hub-menu img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
 
-        /* 4. Product Cards Grid */
         .grid-container {
             display: grid; padding: 20px; gap: 25px; max-width: 1300px; margin: 0 auto 100px;
             grid-template-columns: repeat(2, 1fr);
@@ -114,49 +105,35 @@
         .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
         .card img { width: 100%; border-radius: 25px; margin-bottom: 15px; cursor: zoom-in; aspect-ratio: 1/1; object-fit: cover; }
 
-        /* Pricing & Alert Logic */
-        .price-tag { color: var(--accent); font-weight: 600; font-size: 1.2rem; font-family: 'Inter'; }
-        .old-price { text-decoration: line-through; opacity: 0.4; font-size: 0.9rem; margin-right: 8px; color: #fff; }
         .stock-label { font-size: 12px; margin: 10px 0; font-weight: 500; opacity: 0.7; }
-        .blinking { color: var(--danger); animation: blink 1s infinite; opacity: 1; font-weight: 600; }
+        .blinking { color: var(--danger); animation: blink 1s infinite; font-weight: 600; }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* 6. Qty Selector */
         .qty-box {
             display: flex; align-items: center; justify-content: center;
             gap: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.05);
             border-radius: 50px; padding: 5px;
         }
-        .qty-btn {
-            width: 32px; height: 32px; border-radius: 50%; border: none;
-            background: #fff; color: #000; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff; cursor: pointer; font-weight: bold; }
 
         .buy-btn {
             width: 100%; padding: 15px; border-radius: 20px; border: none;
             background: #fff; color: #000; font-weight: 600; cursor: pointer;
-            transition: 0.3s; font-family: 'Noto Sans Myanmar';
         }
 
-        /* 5. Full-screen Multi-Image Gallery */
         .gallery-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(30px);
             z-index: 4000; flex-direction: column; justify-content: center; align-items: center;
         }
-        .slider-wrap {
-            width: 100%; height: 75vh; display: flex;
-            overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-        }
+        .slider-wrap { width: 100%; height: 75vh; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .slider-wrap::-webkit-scrollbar { display: none; }
         .slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; }
-        .slide img { max-width: 90%; max-height: 90%; border-radius: 30px; box-shadow: 0 40px 80px rgba(0,0,0,0.6); }
+        .slide img { max-width: 90%; max-height: 90%; border-radius: 30px; }
         .dots { display: flex; gap: 10px; margin-top: 30px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.4s var(--liquid-ease); }
         .dot.active { width: 28px; border-radius: 10px; background: var(--accent); }
 
-        /* 10. Order Modal */
         .modal {
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 3000;
@@ -168,16 +145,20 @@
             animation: modalIn 0.5s var(--liquid-ease);
         }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(30px); } }
+        input, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="liquidNoti"></div>
-
     <div id="flashSaleBanner">
-        <span id="bannerText" style="font-size: 14px; font-weight: 500;"></span>
-        <span id="countdown" class="timer-pill">00:00:00</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="promo-tag">FLASH SALE</div>
+            <div id="bannerText" style="font-size: 13px; font-weight: 500;">ကန့်သတ်ချိန်လျှော့ဈေး</div>
+        </div>
+        <div id="countdown" class="timer-val">00:00:00</div>
     </div>
+
+    <div id="liquidNoti"></div>
 
     <div class="social-hub">
         <div class="hub-trigger" onclick="toggleHub()">💬</div>
@@ -218,7 +199,6 @@
     </div>
 
     <script>
-        // FIREBASE CONFIG (INTEGRITY MAINTAINED)
         const firebaseConfig = {
             apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
             authDomain: "introvert-case-shop.firebaseapp.com",
@@ -237,7 +217,6 @@
         let discountPct = 0;
         let saleTimer;
 
-        // 11. LiquidPill Notifications
         function showNoti(msg) {
             const n = document.getElementById('liquidNoti');
             n.innerText = msg;
@@ -245,22 +224,22 @@
             setTimeout(() => n.classList.remove('show'), 3500);
         }
 
-        // 3. Firebase Flash Sale Sync
+        /* --- [NEW] FLASH SALE LISTENER --- */
         db.ref('flashSaleSettings').on('value', (snap) => {
             const data = snap.val();
             const banner = document.getElementById('flashSaleBanner');
             if(data && data.isActive) {
                 isFlashSale = true;
                 discountPct = data.discountPercent || 0;
-                banner.style.display = 'block';
-                document.getElementById('bannerText').innerText = data.promoText;
+                banner.classList.add('active');
+                document.getElementById('bannerText').innerText = data.promoText || "Flash Sale လျှော့ဈေး";
                 startCountdown(data.endTime);
             } else {
                 isFlashSale = false;
-                banner.style.display = 'none';
+                banner.classList.remove('active');
                 clearInterval(saleTimer);
             }
-            render(allProducts);
+            render(allProducts); // Auto re-render prices
         });
 
         function startCountdown(endTime) {
@@ -283,20 +262,25 @@
             render(allProducts);
         });
 
-        // 4 & 7. Render Product Logic
         function render(data) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = data.map(p => {
                 const stock = parseInt(p.stock) || 0;
-                const originalPrice = parseInt(p.price.toString().replace(/,/g, ''));
-                const salePrice = Math.floor(originalPrice * (1 - discountPct / 100));
+                const basePrice = parseInt(p.price.toString().replace(/,/g, ''));
                 
-                let priceUI = isFlashSale ? 
-                    `<div class="price-tag"><span class="old-price">${p.price}</span>${salePrice.toLocaleString()} ကျပ်</div>` : 
-                    `<div class="price-tag">${p.price} ကျပ်</div>`;
+                /* Dynamic Pricing Logic */
+                let priceUI = `<div class="sale-price">${p.price} ကျပ်</div>`;
+                if(isFlashSale && discountPct > 0) {
+                    const finalPrice = Math.floor(basePrice * (1 - discountPct / 100));
+                    priceUI = `
+                        <div class="price-row">
+                            <span class="original-price">${p.price} ကျပ်</span>
+                            <span class="sale-price active-sale">${finalPrice.toLocaleString()} ကျပ်</span>
+                        </div>`;
+                }
 
                 return `
-                <div class="card">
+                <div class="card" data-base-price="${basePrice}">
                     <img src="${p.images ? p.images[0] : ''}" onclick="openGallery('${p.id}')">
                     <div style="font-weight: 500;">${p.name}</div>
                     ${priceUI}
@@ -309,24 +293,21 @@
                         <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
                     </div>
                     <button class="buy-btn" ${stock === 0 ? 'disabled' : ''} onclick="openOrder('${p.id}')">
-                        ${stock === 0 ? 'ပစ္စည်းหมด' : 'ဝယ်မည်'}
+                        ${stock === 0 ? 'ပစ္စည်းကုန်ပြီ' : 'ဝယ်မည်'}
                     </button>
                 </div>`;
             }).join('');
         }
 
-        // 6. Advanced Qty Selector
         function updateQty(id, change) {
             const p = allProducts.find(x => x.id === id);
             const span = document.getElementById(`q-val-${id}`);
-            let current = parseInt(span.innerText);
-            let next = current + change;
+            let next = parseInt(span.innerText) + change;
             if (next < 1) return;
             if (next > p.stock) { showNoti(`လက်ကျန် ${p.stock} ခုသာ ရှိပါတော့တယ်`); return; }
             span.innerText = next;
         }
 
-        // 5. Liquid Gallery (5-image support)
         function openGallery(id) {
             const p = allProducts.find(x => x.id === id);
             if(!p.images) return;
@@ -352,7 +333,6 @@
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
 
-        // 8 & 12. Firebase Transaction & Telegram Integration
         async function confirmOrder() {
             const n = document.getElementById('cName').value.trim();
             const p = document.getElementById('cPhone').value.trim();
@@ -361,19 +341,13 @@
 
             if (!n || !p || !a) { showNoti("အချက်အလက်များကို အပြည့်အစုံ ဖြည့်ပေးပါရှင်"); return; }
 
-            const finalPrice = isFlashSale ? 
-                Math.floor(parseInt(activeOrder.price.toString().replace(/,/g, '')) * (1 - discountPct / 100)) : 
-                activeOrder.price;
+            const basePrice = parseInt(activeOrder.price.toString().replace(/,/g, ''));
+            const finalPrice = isFlashSale ? Math.floor(basePrice * (1 - discountPct / 100)) : basePrice;
 
             try {
-                // Deduct stock via Transaction
-                const stockRef = db.ref(`inventory/${activeOrder.id}/stock`);
-                await stockRef.transaction(currentStock => (currentStock || 0) - activeOrder.selectedQty);
-                
-                // Telegram API
-                const text = `🛒 **New Order**%0A👤 နာမည်: ${n}%0A📞 ဖုန်း: ${p}%0A🏠 လိပ်စာ: ${a}%0A📦 ပစ္စည်း: ${activeOrder.name}%0A🔢 အရေအတွက်: ${activeOrder.selectedQty}%0A💰 စုစုပေါင်း: ${finalPrice * activeOrder.selectedQty} ကျပ်%0A📝 မှတ်ချက်: ${nt || '-'}`;
+                await db.ref(`inventory/${activeOrder.id}/stock`).transaction(current => (current || 0) - activeOrder.selectedQty);
+                const text = `🛒 **New Order**%0A👤 နာမည်: ${n}%0A📞 ဖုန်း: ${p}%0A🏠 လိပ်စာ: ${a}%0A📦 ပစ္စည်း: ${activeOrder.name}%0A🔢 အရေအတွက်: ${activeOrder.selectedQty}%0A💰 စုစုပေါင်း: ${(finalPrice * activeOrder.selectedQty).toLocaleString()} ကျပ်%0A📝 မှတ်ချက်: ${nt || '-'}`;
                 window.open(`https://t.me/Samuelmmc?text=${text}`, '_blank');
-                
                 closeModal();
                 showNoti("မှာယူမှု အောင်မြင်ပါသည်။ ကျေးဇူးတင်ပါတယ် ✨");
             } catch (e) { showNoti("Error: " + e.message); }
