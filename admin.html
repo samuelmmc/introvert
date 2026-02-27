@@ -30,7 +30,7 @@
 
         /* Liquid Pill Noti */
         #liquidNoti {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: -150px; left: 50%; transform: translateX(-50%);
             z-index: 10000; padding: 14px 35px; border-radius: 50px;
             background: rgba(255, 255, 255, 0.1); backdrop-filter: var(--ios-blur);
             border: 1px solid var(--glass-border); transition: 0.7s var(--liquid-ease);
@@ -105,6 +105,19 @@
         }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(26px); }
+            /* Edit Modal Style */
+        .modal {
+            display: none; position: fixed; z-index: 20000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            width: 90%; max-width: 400px; padding: 30px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 35px; text-align: center;
+        }
+        .modal-content input { margin-bottom: 10px; }
 
     </style>
 </head>
@@ -172,6 +185,37 @@
             </div>
         </div>
     </div>
+<div id="liquidNoti" style="
+    position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+    z-index: 1000000; padding: 12px 25px; border-radius: 50px;
+    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1); color: white;
+    font-family: sans-serif; font-size: 14px; font-weight: 500;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: top 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex; align-items: center; gap: 10px;
+">
+    <span style="width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+    <span id="notiText"></span>
+</div>
+
+<div style="border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; width: 320px; 
+    margin: 30px auto; border-radius: 25px; background: rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    text-align: center; color: white; font-family: sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+    
+    <h3 style="margin-top: 0; font-weight: 300; letter-spacing: 1px;">Shop Control</h3>
+    <textarea id="closeReason" placeholder="ပိတ်ရသည့် အကြောင်းအရင်း..." 
+        style="width:90%; height: 70px; margin-bottom: 15px; padding: 10px; 
+        border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;"></textarea>
+    <br>
+    <button onclick="updateShopStatus(true)" 
+        style="background: #ff453a; color:white; border:none; padding: 12px 25px; 
+        cursor:pointer; border-radius: 50px; font-weight: bold; font-size: 14px; transition: 0.3s;">Close Shop</button>
+    <button onclick="updateShopStatus(false)" 
+        style="background: #30d158; color:white; border:none; padding: 12px 25px; 
+        cursor:pointer; border-radius: 50px; font-weight: bold; font-size: 14px; margin-left: 10px; transition: 0.3s;">Open Shop</button>
+</div>
 
     <script>
         const firebaseConfig = {
@@ -186,6 +230,41 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
+        function updateShopStatus(status) {
+    const reason = document.getElementById('closeReason').value;
+    db.ref('shopStatus').set({
+        isClosed: status,
+        reason: reason
+    });
+}
+
+db.ref('shopStatus').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const noti = document.getElementById('liquidNoti');
+    const statusDot = noti.querySelector('span');
+    
+    if (data && data.isClosed) {
+        noti.style.top = '20px';
+        noti.style.background = 'rgba(255, 69, 58, 0.2)';
+        statusDot.style.background = '#ff453a';
+        document.getElementById('notiText').innerText = "ဆိုင်ပိတ်လိုက်ပါပြီ";
+        
+        setTimeout(() => {
+            noti.style.top = '-100px';
+        }, 3000);
+        
+    } else if (data) {
+        noti.style.top = '20px';
+        noti.style.background = 'rgba(48, 209, 88, 0.2)';
+        statusDot.style.background = '#30d158';
+        document.getElementById('notiText').innerText = "ဆိုင်ပြန်ဖွင့်ပါပြီ";
+        
+        setTimeout(() => {
+            noti.style.top = '-100px';
+        }, 3000);
+    }
+});
 
         function showNoti(m) {
             const n = document.getElementById('liquidNoti');
@@ -229,6 +308,7 @@
                 showNoti("Error: " + e.message);
             }
         }
+
 
         function loadFlashSettings() {
             db.ref('flashSaleSettings').once('value', (snap) => {
@@ -300,12 +380,14 @@
                                 <b>${p.name}</b>
                                 <span>${p.price} ကျပ် | Stock: ${p.stock} ခု</span>
                             </div>
-                            <button onclick="deleteProduct('${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:18px;">✕</button>
+                            <button onclick="deleteProduct('${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:18px;">✕</button><button onclick="openEdit('${id}', '${p.name}', '${p.price}', '${p.stock}')" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:18px; margin-right:15px;">✎</button>
+
                         </div>
                     `;
                 }
             });
         }
+
 
         async function deleteProduct(id) {
             if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလားရှင်?")) {
@@ -313,6 +395,51 @@
                 showNoti("ပစ္စည်းကို ဖျက်လိုက်ပါပြီ");
             }
         }
+            function openEdit(id, name, price, stock) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editName').value = name;
+    document.getElementById('editPrice').value = price;
+    document.getElementById('editStock').value = stock;
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEdit() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+async function updateProduct() {
+    const id = document.getElementById('editId').value;
+    const name = document.getElementById('editName').value;
+    const price = document.getElementById('editPrice').value;
+    const stock = document.getElementById('editStock').value;
+
+    try {
+        await db.ref('inventory/' + id).update({
+            name: name,
+            price: price,
+            stock: parseInt(stock)
+        });
+        showNoti("ပြင်ဆင်ပြီးပါပြီ ✨");
+        closeEdit();
+    } catch (e) {
+        showNoti("Error: " + e.message);
+    }
+}
+
+
     </script>
+        <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0">EDIT PRODUCT</h3>
+            <input type="hidden" id="editId">
+            <input type="text" id="editName" placeholder="အမည်">
+            <input type="number" id="editPrice" placeholder="ဈေးနှုန်း">
+            <input type="number" id="editStock" placeholder="လက်ကျန်">
+            <button class="btn btn-add" onclick="updateProduct()" style="background: var(--accent);">Update Now</button>
+            <button class="btn" onclick="closeEdit()" style="background:none; color:#fff; opacity:0.5">Cancel</button>
+        </div>
+    </div>
+
+
 </body>
 </html>
