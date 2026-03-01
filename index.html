@@ -23,6 +23,72 @@
             --pill-shadow: rgba(0, 0, 0, 0.4);
             --icon-color: #fff;
         }
+        
+.announcement-bar {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto 20px auto;
+    padding: 12px 0;
+    background: rgba(255, 69, 58, 0.1);
+    border: 1px solid rgba(255, 69, 58, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+[data-theme="light"] .announcement-bar {
+    background: rgba(255, 69, 58, 0.05);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+}
+
+.announcement-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 15s linear infinite;
+    color: #ff6e66;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+@keyframes marquee {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+[data-theme="light"] .announcement-bar {
+    background: rgba(255, 69, 58, 0.05);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+}
+
+.warning-icon {
+    font-size: 1.2rem;
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
         [data-theme="light"] {
             --pill-bg: rgba(0, 0, 0, 0.05);
@@ -201,6 +267,11 @@
     70% { transform: scale(1.01, 0.99); }
     100% { transform: scale(1, 1); }
 }
+    .no-scroll {
+    overflow: hidden !important;
+    height: 100vh !important;
+    touch-action: none;
+}
 
     </style>
 </head>
@@ -215,7 +286,7 @@
         padding: 50px; border-radius: 30px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
         box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
         
-        <h1 style="font-size: 60px; margin: 0; animation: liquidFloat 3s infinite;">🚧</h1>
+        <h1 style="font-size: 60px; margin: 0; animation: liquidFloat 3s infinite;">🚫</h1>
         <h2 style="font-weight: 300; letter-spacing: 2px;">ဆိုင်ခေတ္တပိတ်ထားပါသည်</h2>
         <p id="reasonDisplay" style="color: #ccc; max-width: 300px; margin: 10px auto; font-weight: 300;"></p>
     </div>
@@ -243,6 +314,11 @@
         <h1 class="logo-main">INTROVERT</h1>
         <div class="logo-sub" style="opacity: 0.5; letter-spacing: 4px;">ဖုန်းကာဗာဆိုင်</div>
     </header>
+    
+    <div class="announcement-bar" id="warningBar">
+    <span class="announcement-text" id="warningText"></span>
+</div>
+
 
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="ပစ္စည်းအမည်ဖြင့် ရှာဖွေပါ..." onkeyup="smartSearch()">
@@ -340,6 +416,18 @@
                 themeBtn.innerText = '🌙';
             }
         }
+        db.ref('announcement').on('value', (snap) => {
+    const data = snap.val();
+    const bar = document.getElementById('warningBar');
+    const textSpan = document.getElementById('warningText');
+
+    if (data && data.text && data.isActive) {
+        textSpan.innerText = "📣 " + data.text;
+        bar.style.display = 'block';
+    } else {
+        bar.style.display = 'none';
+    }
+});
 
         db.ref('flashSaleSettings').on('value', (snap) => {
             const data = snap.val();
@@ -358,15 +446,19 @@
         db.ref('shopStatus').on('value', (snapshot) => {
     const data = snapshot.val();
     const overlay = document.getElementById('shopOverlay');
+    
     if (data && data.isClosed) {
         overlay.style.display = 'flex';
         setTimeout(() => overlay.style.opacity = '1', 10);
         document.getElementById('reasonDisplay').innerText = data.reason || "ခေတ္တဆိုင်ပိတ်ထားပါသည်။";
+        document.body.classList.add('no-scroll'); 
     } else {
         overlay.style.opacity = '0';
         setTimeout(() => overlay.style.display = 'none', 500);
+        document.body.classList.remove('no-scroll');
     }
 });
+
         function startCountdown(endTime) {
             clearInterval(saleTimer);
             saleTimer = setInterval(() => {
@@ -391,7 +483,7 @@
             grid.innerHTML = data.map(p => {
                 const stock = parseInt(p.stock) || 0;
                 const basePrice = parseInt(p.price.toString().replace(/,/g, ''));
-                             const currentQty = cart[p.id] ? cart[p.id].qty : 1; 
+                const currentQty = cart[p.id] ? cart[p.id].qty : 1; 
 
                 let priceUI = `<div class="sale-price">${p.price} ကျပ်</div>`;
                 if(isFlashSale && discountPct > 0) {
