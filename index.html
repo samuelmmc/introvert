@@ -1898,7 +1898,7 @@ function updatePlatformSelect(input) {
 async function saveAndSendTelegram() {
     // ၁။ ပုံကို အရင် သိမ်းမယ်
     if (tg.HapticFeedback) {
-    tg.HapticFeedback.notificationOccurred('success');
+    tg.HapticFeedback.notificationOccurred('success');}
     if (typeof downloadVoucher === 'function') {
         try { await downloadVoucher(); } catch (e) { console.log(e); }
     }
