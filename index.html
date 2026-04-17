@@ -1832,43 +1832,43 @@ async function downloadVoucher() {
         return;
     }
 
+    // ၁။ ပုံထုတ်မယ့်အချိန်မှာ အကုန်ပေါ်အောင် ခေတ္တပြင်ခြင်း
     const originalHeight = card.style.height;
     const originalOverflow = container.style.overflowY;
     card.style.height = 'auto'; 
     container.style.overflowY = 'visible';
 
     try {
+        // ၂။ ပုံထုတ်ခြင်း logic (Resolution အကြည်ဆုံး Scale 4 နဲ့)
         const canvas = await html2canvas(card, {
             scale: 4,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: "#ffffff"
+            backgroundColor: "#ffffff",
+            logging: false,
+            letterRendering: true,
+            imageTimeout: 0
         });
 
         const dataUrl = canvas.toDataURL("image/png", 1.0);
         const orderId = document.getElementById('vOrderID') ? document.getElementById('vOrderID').innerText : 'New';
         const fileName = `IVRT-Receipt-${orderId}.png`;
 
-        // --- ဒီနေရာက အပြောင်းအလဲပါ ---
-        
-        // Telegram Mini App ထဲမှာပဲ Share Window ကို သုံးမယ်
-        // tg variable က အစ်ကို့ <head> ထဲမှာ ကြေညာထားတာ ရှိရပါမယ်
-        const isTelegram = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "");
+        // ၃။ Telegram Mini App ဖြစ်နေရင် Share Window နဲ့ သိမ်းခိုင်းမယ်
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], fileName, { type: 'image/png' });
 
-        if (isTelegram && navigator.share) {
-            const blob = await (await fetch(dataUrl)).blob();
-            const file = new File([blob], fileName, { type: 'image/png' });
-            
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
                 files: [file],
-                title: 'IVRT Voucher',
-                text: 'Voucher သိမ်းဆည်းရန်'
+                title: 'IVRT Order Voucher',
+                text: 'လူကြီးမင်း၏ Receipt ပုံလေးကို သိမ်းဆည်းထားပါဦးခင်ဗျာ။'
             });
         } else {
-            // Web Browser (Chrome/Safari) မှာဆိုရင် အရင်အတိုင်း တန်းပြီး Download ဆွဲမယ်
+            // ၄။ ပုံမှန် Browser ဖြစ်နေရင် အရင်အတိုင်း Auto Download ချမယ်
             const link = document.createElement('a');
-            link.href = dataUrl;
             link.download = fileName;
+            link.href = dataUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1876,11 +1876,14 @@ async function downloadVoucher() {
 
     } catch (err) {
         console.error("Voucher Save Error:", err);
+        alert("Voucher သိမ်းလို့မရဖြစ်နေပါတယ်။ ခဏနေပြန်ကြိုးစားကြည့်ပါဗျ။");
     } finally {
+        // ၅။ မူလအတိုင်း UI ကို ပြန်ပြင်ခြင်း
         card.style.height = originalHeight;
         container.style.overflowY = originalOverflow;
     }
             }
+            
             
 
 function updatePaymentSelect(input) {
