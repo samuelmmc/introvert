@@ -12,7 +12,17 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // App ကို အပေါ်အောက် အပြည့်ချဲ့မယ်
+    tg.ready();
 
+    // Theme အရောင်ကို အစ်ကို့ဆိုင်နဲ့လိုက်အောင် အမည်းရောင်ပြောင်းမယ်
+    tg.setHeaderColor('#000000');
+    tg.setBackgroundColor('#000000');
+</script>
+    
     <style>
         :root {
             --text-color: #fff;
@@ -1887,6 +1897,8 @@ function updatePlatformSelect(input) {
 // Platform ဆီသို့ အော်ဒါပို့ရန်
 async function saveAndSendTelegram() {
     // ၁။ ပုံကို အရင် သိမ်းမယ်
+    if (tg.HapticFeedback) {
+    tg.HapticFeedback.notificationOccurred('success');
     if (typeof downloadVoucher === 'function') {
         try { await downloadVoucher(); } catch (e) { console.log(e); }
     }
@@ -2531,7 +2543,17 @@ db.ref('announcement').on('value', (snapshot) => {
     }
 });
 
-
+window.onload = function() {
+    const user = tg.initDataUnsafe.user;
+    if (user) {
+        // အကယ်၍ input field ရှိရင် နာမည်ကို ကြိုဖြည့်ပေးထားမယ်
+        const nameInput = document.getElementById('cName');
+        if (nameInput && !nameInput.value) {
+            nameInput.value = user.first_name + (user.last_name ? " " + user.last_name : "");
+        }
+    }
+};
+            
     </script>
     <div id="teleRedirectModal">
     <div class="glass-box">
