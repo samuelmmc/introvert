@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>INTROVERT - Premium Phone Cases</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;700&family=Playfair+Display:wght@700&family=Noto+Sans+Myanmar:wght@300;500&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --text-color: #fff;
+    --bg-color: #000;
+    --transition-speed: 1.3s;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --accent: #E6BE8A;
+            --ios-blur: blur(25px);
+            --danger: #ff453a;
+            --liquid-ease: cubic-bezier(0.23, 1, 0.32, 1);
+            --pill-bg: rgba(255, 255, 255, 0.05);
+            --pill-border: rgba(255, 255, 255, 0.15);
+            --pill-shadow: rgba(0, 0, 0, 0.4);
+            --icon-color: #fff;
+        }
+    
+        
+    /* Base Body (အခြေခံ) */    
+    body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden !important;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+/* ၃။ Light Mode Theme */
+body[data-theme="light"] {
+    background-color: #f2f2f7;
+    color: #000;
+}
+
+/* ၄။ Spotlight/Theme Effect (တစ်နေရာတည်းမှာ စုရေးပါ) */
+/* Light Mode မှာ အလင်းတန်း ပျောက်စေရန် */
+body[data-theme="light"] .spotlight::after,
+body.light-mode .spotlight::after {
+    opacity: 0 !important;
+}
+
+/* Dark Mode မှာ အလင်းတန်း ပေါ်စေရန် */
+body[data-theme="dark"] .spotlight::after {
+    opacity: 1 !important;
+}
+
+
+    * { 
+        -webkit-tap-highlight-color: transparent; 
+        box-sizing: border-box; 
+        outline: none; 
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    .container, .auth-glass-card, .branding-header {
+        width: 100%;
+        max-width: 100vw; 
+    }
+    
+        
+    .product-desc-container {
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 15px;
+    margin: 15px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* Modal အရွယ်အစားထိန်းချုပ်ရန် */
+.modal-content {
+    max-height: 85vh; 
+    overflow-y: auto;
+    scrollbar-width: thin; 
+}    
+     
+.announcement-bar {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto 20px auto;
+    padding: 12px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 50px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+[data-theme="light"] .announcement-bar {
+    background: rgba(255, 69, 58, 0.05);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+}
+
+.announcement-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 15s linear infinite;
+    color: #ff6e66;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+@keyframes marquee {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+[data-theme="light"] .announcement-bar {
+    background: rgba(255, 69, 58, 0.05);
+    border: 1px solid rgba(255, 69, 58, 0.2);
+}
+
+.warning-icon {
+    font-size: 1.2rem;
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+    * { box-sizing: border-box; outline: none; }
+
+  
+
+
+    /* Spotlight transition */
+    .spotlight::after {
+        transition: opacity 1s ease-in-out !important;
+    }
+/* Spotlight transition */
+.spotlight::after {
+    transition: opacity 1s ease !important;
+    opacity: 1; /* Dark မှာ ပေါ်မယ် */
+}
+
+
+/* အလင်းတန်းအတွက် */
+.spotlight::after {
+    transition: opacity 1s ease-in-out !important;
+}
+[data-theme="light"] .spotlight::after { opacity: 0 !important; }
+[data-theme="dark"] .spotlight::after { opacity: 1 !important; }
+
+
+        /* --- FLASH SALE UI --- */
+        #flashSaleBanner {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            width: 92%; max-width: 450px; z-index: 10002;
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+            border-radius: 30px; padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transition: transform 0.8s var(--liquid-ease);
+        }
+        #flashSaleBanner.active { transform: translateX(-50%) translateY(0); }
+        .promo-tag { background: var(--danger); color: #fff; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 800; }
+        .timer-val { color: var(--accent); font-weight: 700; font-family: 'Montserrat', sans-serif; font-size: 15px; }
+
+        .price-row { display: flex; flex-direction: column; align-items: center; }
+        .original-price { text-decoration: line-through; opacity: 0.4; font-size: 0.85rem; }
+        .sale-price { color: var(--accent); font-weight: 600; font-size: 1.2rem; }
+        .sale-price.active-sale { color: var(--danger); }
+
+        /* --- HEADER & NOTI --- */
+        .branding-header { text-align: center; padding: 110px 20px 30px;position: relative;
+    overflow: hidden; }
+        .logo-main {
+            font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 8vw, 3.5rem); letter-spacing: 8px; margin: 0;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        [data-theme="light"] .logo-main { -webkit-text-fill-color: #000; }
+
+        #liquidNoti {
+            position: fixed; top: -190px; left: 50%; transform: translateX(-50%);
+            z-index: 10001; padding: 14px 35px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--glass-border); color: inherit;
+            transition: all 0.7s var(--liquid-ease); pointer-events: none;
+        }
+        #liquidNoti.show { top: 90px; }
+
+        /* --- LIQUID PILL BAR --- */
+        .liquid-pill-bar {
+    position: fixed;
+    bottom: 30px;
+    /* အလယ်တည့်တည့်ကျစေဖို့ နည်းလမ်းသစ် */
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center; /* အထဲက icon တွေကိုလည်း အလယ်ညှိပေးတယ် */
+    gap: 30px;
+    padding: 12px 25px;
+    
+    width: fit-content;
+    max-width: 90%;
+    
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 50px;
+    z-index: 5000;
+    box-shadow: 0 15px 35px var(--pill-shadow);
+    transition: all 0.5s var(--liquid-ease);
+}
+
+        .pill-item { position: relative; cursor: pointer; font-size: 22px; display: flex; align-items: center; transition: transform 0.3s ease; }
+        .pill-item:active { transform: scale(0.8); }
+        .pill-badge { position: absolute; top: -8px; right: -12px; background: var(--danger); color: white; font-size: 10px; padding: 2px 7px; border-radius: 50px; display: none; }
+        .icon { color: var(--icon-color); }
+
+        /* --- SEARCH & GRID --- */
+        .search-container { position: sticky; top: 20px; z-index: 1000; padding: 0 20px; margin-bottom: 40px; }
+        #searchInput {
+            width: 100%; max-width: 500px; display: block; margin: 0 auto;
+            padding: 18px 30px; border-radius: 50px; background: var(--glass);
+            border: 1px solid var(--glass-border); backdrop-filter: var(--ios-blur); color: inherit; 
+            transition: 0.5s var(--liquid-ease); text-align: center;
+        }
+        .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* ဖုန်းမှာ ၂ ခုစီပြမယ် */
+    gap: 15px;
+    padding: 10px;
+}
+
+
+@media (min-width: 768px) {
+    .grid-container {
+        grid-template-columns: repeat(4, 1fr); /* ကွန်ပျူတာမှာ ၄ ခုပြမယ် */
+    }
+}
+
+        .grid-container { display: grid; padding: 20px; gap: 25px; max-width: 1300px; margin: 0 auto 120px; grid-template-columns: repeat(2, 1fr); }
+        @media (min-width: 1024px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+
+.card {
+    background: var(--glass); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 35px;
+    padding: 20px; 
+    text-align: center; 
+    backdrop-filter: var(--ios-blur);
+    position: relative; 
+    overflow: hidden;
+    
+    /* အရေးကြီးဆုံးအပိုင်း - Theme ပြောင်းတဲ့အခါ ဖြည်းဖြည်းချင်းဖြစ်စေဖို့ */
+    /* background, border နဲ့ color တို့ကို 1.5s အချိန်ယူခိုင်းထားပါတယ် */
+    transition: background-color 1.5s ease-in-out, 
+                border-color 1.5s ease-in-out, 
+                color 1.5s ease-in-out, 
+                box-shadow 1.5s ease-in-out, 
+                transform 0.4s var(--liquid-ease); /* Hover လုပ်ရင် ကြွတာကိုတော့ 0.4s နဲ့ သွက်သွက်လေးထားထားပါတယ် */
+}
+
+/* Light Mode Card အတွက် သီးသန့် transition ထပ်ထည့်ပေးခြင်း */
+[data-theme="light"] .card {
+    transition: background-color 1.5s ease-in-out, border-color 1.5s ease-in-out, color 1.5s ease-in-out;
+}
+
+
+        .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
+        .card img { width: 100%; border-radius: 25px; margin-bottom: 15px; cursor: zoom-in; aspect-ratio: 1/1; object-fit: cover; }
+        
+        .card.out-of-stock {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    filter: grayscale(100%) !important;
+}
+.card img { 
+    width: 100%; 
+    border-radius: 25px; 
+    margin-bottom: 15px; 
+    cursor: zoom-in; 
+    aspect-ratio: 1/1; 
+    object-fit: cover; 
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover img {
+    transform: scale(1.03);
+}
+        .card img { 
+            width: 100%; 
+            border-radius: 25px; 
+            margin-bottom: 15px; 
+            cursor: zoom-in; 
+            aspect-ratio: 1/1; 
+            object-fit: cover; 
+            transition: transform 0.5s var(--liquid-ease);
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+        .stock-label { font-size: 12px; margin: 10px 0; font-weight: 500; opacity: 0.7; }
+        .blinking { color: var(--danger); animation: blink 1s infinite; font-weight: 600; }
+        @keyframes blink { 50% { opacity: 0.2; } }
+
+        .qty-box { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 5px; }
+        .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff; cursor: pointer; font-weight: bold; color: #000; }
+        .buy-btn { width: 100%; padding: 15px; border-radius: 20px; border: none; background: #fff; color: #000; font-weight: 600; cursor: pointer; }
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 6000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: rgba(25, 25, 25, 0.85); border: 1px solid var(--glass-border); padding: 35px; border-radius: 40px; width: 100%; max-width: 420px; animation: modalIn 0.5s var(--liquid-ease); color: #fff; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(30px); } }
+        input, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; }
+
+        /* Gallery */
+        .gallery-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(30px); z-index: 7000; flex-direction: column; justify-content: center; align-items: center; }
+        .slider-wrap { width: 100%; height: 75vh; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; }
+        .slide img { max-width: 90%; max-height: 90%; border-radius: 30px; }
+        .dots { display: flex; gap: 10px; margin-top: 30px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.4s var(--liquid-ease); }
+        .dot.active { width: 28px; border-radius: 10px; background: var(--accent); }
+
+      /* Social Hub Menu (Bottom Left) */
+#hubMenu { 
+    display: none; 
+    position: fixed; 
+    bottom: 90px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: var(--pill-bg); 
+    backdrop-filter: var(--ios-blur); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 30px; 
+    padding: 15px; 
+    gap: 20px; 
+    z-index: 4999; 
+    animation: modalIn 0.4s var(--liquid-ease); 
+    
+    /* Logo တွေကို တန်းစီဖို့ ဒါလေးထည့်ပေးပါ */
+    align-items: center;
+    justify-content: center;
+}
+
+#hubMenu a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;  /* Link size ကို ပုံသေထားမယ် */
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden; /* အပြင်မထွက်အောင် ပိတ်မယ် */
+}
+
+#hubMenu img { 
+    width: 100%;   /* Link ရဲ့ size အပြည့်ယူမယ် */
+    height: 100%; 
+    object-fit: cover; /* ပုံမရှုံ့သွားအောင် ထိန်းမယ် */
+    border-radius: 50%; 
+}
+
+      
+#searchInput {
+    width: 100%;
+    padding: 18px 30px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    color: #fff;
+    text-align: center;
+    outline: none;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#searchInput:focus {
+    animation: relaxJelly 1.2s ease-in-out;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes relaxJelly {
+    0% { transform: scale(1, 1); }
+    20% { transform: scale(1.05, 0.97); }
+    45% { transform: scale(0.98, 1.02); }
+    70% { transform: scale(1.01, 0.99); }
+    100% { transform: scale(1, 1); }
+}
+    .no-scroll {
+    overflow: hidden !important;
+    height: 100vh !important;
+    touch-action: none;
+}
+
+    .detail-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    justify-content: center; align-items: center;
+    z-index: 1000;
+}
+.detail-content {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 25px; border-radius: 25px;
+    width: 85%; max-width: 400px;
+    color: white; text-align: center;
+}
+#detailDesc {
+        max-height: 250px; 
+        overflow-y: auto; 
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 15px;
+        line-height: 1.6;
+        text-align: left;
+    }
+    /* ၂။ Glass Card တွေ Flicker မဖြစ်အောင် Hardware Acceleration သုံးခြင်း */
+    .auth-glass-card {
+        will-change: background-color, color;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 2s ease, border-color 2s ease, color 2s ease;
+    } 
+[data-theme="light"] .card {
+    background: rgba(255, 255, 255, 0.8) !important; /* အဖြူရောင်နောက်ခံကို နည်းနည်းမင်အောင်လုပ်ခြင်း */
+    border: 1px solid rgba(0, 0, 0, 0.1) !important; /* Border ကို အမည်းရောင်အနုလေးထားပေးခြင်း */
+    color: #000 !important; /* စာသားကို အမည်းရောင်ပြောင်းခြင်း */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Card ပုံပေါ်အောင် အရိပ်ထည့်ခြင်း */
+}
+
+/* Light Mode မှာရှိတဲ့ စာသားနဲ့ အခြားအရာများအတွက် */
+[data-theme="light"] .stock-label, 
+[data-theme="light"] .price-row {
+    color: #333 !important;
+}
+
+[data-theme="light"] .sale-price {
+    color: #d32f2f !important; /* Light Mode မှာ ပိုမြင်သာတဲ့ အနီရောင် */
+}
+
+/* Light Mode မှာ စာသားတွေကို အမည်းရောင်ဖြစ်စေရန် */
+[data-theme="light"] .auth-glass-card h2, 
+[data-theme="light"] .auth-glass-card p,
+[data-theme="light"] .auth-glass-card label,
+[data-theme="light"] .auth-glass-card input {
+    color: #000 !important;
+}
+
+    /* ၄။ Transition ပြုလုပ်နေချိန် Flicker ကာကွယ်ရန် */
+    .no-transition, .no-transition * {
+        transition: none !important;
+    }
+
+    
+.loader-container {
+    position: fixed; inset: 0;
+    background: #000;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 999999;
+}
+
+.logo-wrapper { 
+    position: relative !important;display: inline-block; 
+  }
+
+.logo-text {
+    font-family: sans-serif; 
+    font-size: 3.1rem; 
+    font-weight: 800; 
+    letter-spacing: 6px;
+    background: linear-gradient(90deg, #333 0%, #fff 50%, #333 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent;
+    
+    /* Animation နှစ်ခုကို တွဲသုံးပါမည် - Shine ရော Blur ရော ပါအောင် */
+    animation: shine-sweep 1.5s infinite linear, light-blur 1s infinite linear;
+    filter: brightness(1.8) contrast(1.2); 
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); 
+}
+
+
+/* Hyper-realistic Lens Flare Positioning */
+.hyper-flare {
+    position: absolute; 
+    top:-9px; /* I ရဲ့ ဘယ်ဘက်အပေါ်ထောင့် */
+    left: -22px;
+    z-index: 10;    
+    width: 50px; height: 50px;
+    pointer-events: none;
+    /* တောက်/မှိန်ဖြစ်နေမည့် Pulse Animation */
+    animation: breathing-flare 2s infinite ease-in-out;
+}
+
+.core {
+    position: absolute; width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 40%, transparent 70%);
+}
+
+.streak {
+    position: absolute; top: 50%; left: 50%;
+    width: 140%; height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+@keyframes light-blur {
+    0%, 100% { 
+        filter: blur(0px) brightness(1); 
+    }
+    50% { 
+        /* အလင်းတန်းအလယ်ရောက်ချိန်မှာ ဝါးပြီး လင်းသွားစေရန် */
+        filter: blur(1.5px) brightness(1.8);
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    }
+}
+
+@keyframes shine-sweep {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+}
+@keyframes shine-sweep {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+}
+
+/* တောက်လိုက်မှိန်လိုက် ဖြစ်စေမည့် Animation */
+@keyframes breathing-flare {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.branding-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.spotlight {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    height: 30px;
+    background: #1a1a1a; /* မီးအိမ်ကိုယ်ထည်အရောင် */
+    border-radius: 5px;
+    z-index: 2;
+}
+
+/* မီးအလင်းတန်း (Light Beam) */
+.spotlight::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    width: 150px;
+    height: 350px;
+    background: radial-gradient(ellipse at top, rgba(230, 190, 138, 0.4) 0%,
+         rgba(230, 190, 138, 0.1) 40%, 
+    transparent 80%);
+    filter: blur(35px);
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+.loader-wrapper {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 999999;
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+.loader-content { text-align: center; }
+.spinner {
+    width: 50px; 
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.1); /* နောက်ခံအရောင် */
+    border-top: 5px solid #E6BE8A; /* လည်နေတဲ့ အရောင် */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px auto; /* အလယ်ဗဟိုကျအောင်လုပ်ခြင်း */
+    display: block;
+}
+
+@keyframes spin { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+}
+
+.loader-text {
+    color: #E6BE8A; font-family: 'Montserrat', sans-serif;
+    letter-spacing: 4px; font-weight: 700; opacity: 0.8;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ဘယ်ဘက်မီး */
+.spotlight-left {
+    left: -1%;
+    transform: rotate(-25deg); /* Logo ဆီသို့ စောင်းထားခြင်း */
+}
+.spotlight-left::after {
+    left: 0;
+    transform: rotate(-10deg);
+}
+
+/* ညာဘက်မီး */
+.spotlight-right {
+    right: -1%;
+    transform: rotate(25deg); /* Logo ဆီသို့ စောင်းထားခြင်း */
+}
+.spotlight-right::after {
+    right: 0;
+    transform: rotate(10deg);
+}
+
+/* မီးသီးရဲ့ အလင်းစက် (Glow) */
+.spot-inner {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 7px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 30px 10px
+    #fff,
+                0 0 60px 25px
+    var(--accent);
+}
+
+    @keyframes liquidFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+[data-theme="light"] .spotlight,
+[data-theme="light"] .spotlight::after {
+    opacity: 0 !important;                
+    pointer-events: none;                 
+    transition: opacity 1.5s ease;
+}
+    .auth-modal {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 35px;
+    padding: 40px 25px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.google-glass-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+}
+.profile-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+.profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -120px; /* ပုံကို အပေါ်တက်စေရန် */
+}
+.glass-profile {
+    width: 70%;
+    height: 50%;
+    border-radius: 50%; /* ဝိုင်းသွားစေရန် */
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3); /* Glass အနားသတ် */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); /* Glass blur effect */
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+/* Premium Smooth Scroll Effect */
+.card {
+    opacity: 0;
+    transform: translateY(20px); /* ၂၀ လောက်ပဲ နိမ့်ထားမယ် (မျက်စိမရှုပ်အောင်) */
+    transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.card.appear {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hover လုပ်ရင်လည်း ညင်သာစွာ ကြွလာစေရန် */
+.card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.fast-order-btn {
+    position: relative;
+    padding: 14px 36px;
+    background: #ff453a; /* သင့် Logo ရဲ့ အနီရောင်နဲ့ လိုက်ဖက်အောင် */
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: 50px; /* Pill Shape */
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.4s;
+    box-shadow: 0 8px 20px rgba(255, 69, 58, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+}
+
+/* Liquid Effect */
+.fast-order-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.5s;
+}
+
+.fast-order-btn:hover::before {
+    left: 100%;
+}
+
+.fast-order-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(255, 69, 58, 0.5);
+    background: #ff5e54;
+}
+
+.fast-order-btn:active {
+    transform: scale(0.95);
+}
+
+/* Pulsing Animation */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 69, 58, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0); }
+}
+
+.fast-order-btn {
+    animation: pulse-red 2s infinite;
+}
+
+/* Voucher ကတ်ကို ပစ္စည်းများရင် များသလို အောက်ကို ရှည်ထွက်သွားအောင် လုပ်ခြင်း */
+#voucherCard {
+    background: #fff;
+    width: 100%;
+    max-width: 350px;
+    border-radius: 20px;
+    padding: 25px;
+    position: relative;
+    height: auto !important; /* အမြင့်ကို အသေမထားဘဲ ပစ္စည်းအပေါ်မူတည်ပြီး အလိုအလျောက် ရှည်စေဖို့ */
+    min-height: 450px;       /* အနည်းဆုံးတော့ ဒီလောက် အမြင့်ရှိမယ် */
+    overflow: visible !important; /* စာသားတွေ အောက်ကို ထွက်မသွားအောင် */
+    margin: auto; /* အလယ်ကွက်တိ ဖြစ်နေအောင် */
+}
+
+/* Voucher တစ်ခုလုံး ဖုန်း Screen ထက် ရှည်သွားရင် အပေါ်အောက် Scroll ဆွဲလို့ရအောင် လုပ်ခြင်း */
+#voucherContainer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 30000;
+    padding: 20px;
+    overflow-y: auto; /* Web မှာ အပေါ်အောက် Scroll ဆွဲလို့ရစေရန် */
+    -webkit-overflow-scrolling: touch;
+}
+
+#voucherCard {
+    background: #fff;
+    width: 100%;
+    max-width: 360px;
+    margin: 20px auto; /* Card ကို အလယ်ပို့ပြီး အပေါ်အောက် ခြားထားခြင်း */
+    padding: 30px;
+    border-radius: 15px;
+    height: auto;
+    min-height: fit-content;
+    position: relative;
+}
+
+    input[type="radio"]:checked + .payment-card {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid #ffba08 !important; /* Gold အရောင်လေးနဲ့ highlight လုပ်တာပါ */
+        opacity: 1 !important;
+        transform: translateY(-2px);
+    }
+
+/* Liquid Glass Effect ရှိသော Edit Button အသစ် */
+.btn-liquid-glass {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08); /* အကြည်ရောင်အမှောင် */
+    color: #fff; /* စာသားအရောင် အဖြူ */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* ပါးပါးလေးဘောင် */
+    padding: 12px;
+    border-radius: 15px; /* ခလုတ်ထောင့်များဝိုင်းစေရန် */
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    transition: all 0.3s ease; /* Hover ဖြစ်ရင် ဖြည်းဖြည်းချင်းပြောင်းရန် */
+    backdrop-filter: blur(10px); /* Liquid glass blur effect (အရေးကြီးသည်) */
+    display: flex; /* အိုင်ကွန်နှင့်စာသား အလယ်ရောက်ရန် */
+    align-items: center;
+    justify-content: center;
+}
+
+/* ခလုတ်ပေါ် Mouse တင်လိုက်ရင် ဖြစ်မည့်ပုံစံ (Hover Effect) */
+.btn-liquid-glass:hover {
+    background: rgba(255, 255, 255, 0.12); /* အကြည်ရောင်ကို နည်းနည်းထပ်တိုးမယ် */
+    border-color: rgba(255, 255, 255, 0.15); /* ဘောင်အရောင်ကို နည်းနည်းလင်းစေမယ် */
+    transform: translateY(-2px); /* ခလုတ်ကို အပေါ်နည်းနည်းမြှင့်မယ် */
+}
+
+/* Loading Animation Style */
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 50px 0;
+}
+
+.liquid-loader {
+    width: 45px;
+    height: 45px;
+    border: 3px solid rgba(230, 190, 138, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--accent); /* ခင်ဗျားရဲ့ ရွှေရောင် */
+    animation: spin 1s var(--liquid-ease) infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 13px;
+    color: var(--accent);
+    opacity: 0.8;
+    letter-spacing: 1px;
+}
+
+/* ၁။ တစ် Website လုံးမှာရှိတဲ့ မည်သည့် Element မှာမဆို Scroll bar လုံးဝမပေါ်စေရန် */
+html, body, div, section, .glass-modal, .glass-modal-content, #orderModal, #paymentModal {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;     /* Firefox */
+}
+
+/* ၂။ Chrome, Safari, Opera နဲ့ Android Browser အားလုံးအတွက် */
+/* ဒါက ခင်ဗျားပြောတဲ့ Scroll ဆွဲချိန်မှာ ပေါ်လာတဲ့ Indicator ကို သတ်တာပါ */
+::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important; /* အောက်ခံကိုပါ အကြည်လုပ်ပစ်မယ် */
+}
+
+/* ၃။ အစွန်းထွက်နေတဲ့ Indicator တွေကိုပါ ထပ်ဖျောက်မယ် */
+::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border: none !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+#teleRedirectModal {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 9999999; /* ဘယ်အရာမဆို သူ့အောက်ရောက်သွားအောင် */
+    justify-content: center; 
+    align-items: center;
+}
+.glass-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px 20px;
+    border-radius: 30px;
+    width: 85%;
+    max-width: 380px;
+    text-align: center;
+}
+
+    </style>
+</head>
+<body>
+<div id="loadingScreen" class="loader-container">
+    <div class="logo-wrapper">
+        <div class="logo-text">IVRT</div>
+        <div class="hyper-flare">
+            <div class="core"></div>
+            <div class="streak"></div>
+        </div> </div>
+</div>
+
+    <div id="shopOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+    display: none; justify-content: center; align-items: center; z-index: 999999; 
+    color: white; text-align: center; font-family: 'Inter', sans-serif;
+    opacity: 0; transition: opacity 0.5s ease-in-out;">
+    
+    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
+        padding: 50px; border-radius: 30px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
+        
+        <h1 style="font-size: 60px; margin: 0; animation: liquidFloat 3s infinite;">🚧</h1>
+        <h2 style="font-weight: 300; letter-spacing: 2px;">ဆိုင်ခေတ္တပိတ်ထားပါသည်</h2>
+        <p id="reasonDisplay" style="color: #ccc; max-width: 300px; margin: 10px auto; font-weight: 300;"></p>
+    </div>
+</div>
+     <div id="liquidNoti"></div>
+    <div id="flashSaleBanner">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="promo-tag">FLASH SALE</div>
+            <div id="bannerText">ကန့်သတ်ချိန်လျှော့ဈေး</div>
+        </div>
+        <div id="countdown" class="timer-val">00:00:00</div>
+    </div>
+
+
+<header class="branding-header">
+    <div class="spotlight spotlight-left"><div class="spot-inner"></div></div>
+    <div class="spotlight spotlight-right"><div class="spot-inner"></div></div>
+    <h1 class="logo-main">IVRT</h1>
+    <div class="logo-sub" style="opacity: 0.5; letter-spacing: 4px;">Phone Case Boutique</div>
+</header>
+<div class="announcement-bar" id="warningBar">
+    <span class="announcement-text" id="warningText"></span>
+</div>
+<main>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="ပစ္စည်းအမည်ဖြင့် ရှာဖွေပါ..." onkeyup="smartSearch()">
+    </div>
+    
+    <div class="grid-container" id="productGrid"></div>
+</main>
+
+<div id="detailModal" class="detail-modal" onclick="closeDetail()">
+    <div class="detail-content" onclick="event.stopPropagation()">
+        <h2 id="detailName"></h2>
+        <p id="detailDesc" style="margin: 20px 0;"></p>
+        <button onclick="closeDetail()" style="background:var(--accent); border:none; padding:10px 20px; border-radius:15px; color:white;">ပိတ်ရန်</button>
+    </div>
+</div>
+    <div id="productDetailModal" class="modal">
+    <div class="modal-content">
+        <img id="detailImg" src="" style="width:100%; border-radius:20px;">
+        <h2 id="detailName"></h2>
+        
+        <div id="detailDesc" class="product-desc-container"></div>
+        
+        <button onclick="closeModal()">Close</button>
+    </div>
+</div>
+
+<div id="authModal" class="auth-modal">
+    <div class="auth-glass-card">
+        <h2 style="color: var(--accent);"></h2>
+        
+<div id="profileSection" style="display: none; padding: 20px; text-align: center;">
+    <div style="width: 80px; height: 80px; margin: 0 auto 15px; position: relative; z-index: 10;">
+        <img id="profileImg" src="" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3); object-fit: cover; background: rgba(255, 255, 255, 0.1);">
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 45px 15px 15px; margin-top: -55px;">
+        <h4 id="modalUserName" style="color: white; margin: 0; font-size: 18px;">Loading...</h4>
+        <p id="userEmail" style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 5px 0 15px;">Customer</p>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <span style="display: block; color: #ffba08; font-size: 14px; font-weight: bold;">500</span>
+                <span style="color: rgba(255,255,255,0.5); font-size: 10px;">Points</span>
+            </div>
+          <div onclick="showMyOrdersModal()" style="flex: 1; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+        <span id="orderCount" style="display: block; color: #fff; font-size: 14px; font-weight: bold;">0</span>
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px;">Orders</span>
+    </div>
+</div>
+
+       <button onclick="openEditModal()" class="btn-liquid-glass">
+    ✏️ Edit Profile Details
+</button>
+
+
+
+        <span id="savedPhone" style="display: none;"></span>
+        <span id="savedAddr" style="display: none;"></span>
+
+        <button onclick="viewOrders()" style="width: 100%; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">📋 My Order History</button>
+        <button onclick="logout()" style="width: 100%; background: transparent; color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 8px; border-radius: 12px; cursor: pointer; font-size: 12px;">Log Out</button>
+    </div>
+</div>
+
+<div id="editProfileModal" style="
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.5); 
+    z-index: 10000; 
+    backdrop-filter: blur(25px); 
+    -webkit-backdrop-filter: blur(25px);
+    align-items: center; 
+    justify-content: center; 
+    opacity: 0; 
+    transition: opacity 0.3s ease;">
+    
+    <div style="
+        background: rgba(26, 26, 26, 0.9); 
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        width: 88%; 
+        max-width: 380px; 
+        padding: 30px; 
+        border-radius: 35px; 
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        max-height: 85vh; 
+        overflow-y: auto;">
+
+        <h3 style="color: #c9a56a; margin: 0 0 10px 0; font-size: 20px; font-weight: bold;">
+            Edit Profile
+        </h3>
+        <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 25px;">အချက်အလက်များကို ပြင်ဆင်ရန်</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <input type="text" id="editName" placeholder="နာမည်လေး ဖြည့်ပေးပါရှင့် *" style="
+                width: 100%; padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
+                background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 14px;">
+            
+            <input type="tel" id="editPhone" placeholder="ဖုန်းနံပါတ်လေး ဖြည့်ပေးပါရှင့် *" style="
+                width: 100%; padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
+                background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 14px;">
+            
+            <textarea id="editAddress" placeholder="လိပ်စာလေး ဖြည့်ပေးပါရှင့် *" style="
+                width: 100%; height: 100px; padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
+                background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 14px; resize: none;"></textarea>
+        </div>
+
+        <button onclick="saveProfileData()" style="
+            width: 100%; 
+            background: #ffba08; 
+            color: #000; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            margin-top: 25px;
+            font-size: 15px;
+            font-weight: bold;">
+            သိမ်းဆည်းမည်
+        </button>
+
+        <p onclick="closeEditModal()" style="
+            color: rgba(255,255,255,0.3); 
+            font-size: 13px; 
+            text-align: center; 
+            margin-top: 20px; 
+            cursor: pointer;">
+            ပိတ်မည်
+        </p>
+    </div>
+</div>
+
+
+<div id="orderHistoryModal" style="
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.5); /* အနောက်က Object တွေကို ရေးရေးလေးပဲ မြင်ရအောင် အမှောင်ချထားမယ် */
+    z-index: 10000; 
+    backdrop-filter: blur(25px); /* ခင်ဗျား လိုချင်တဲ့ Background ဝါးဝါးလေး ဖြစ်အောင် လုပ်ပေးမည့်အပိုင်း */
+    -webkit-backdrop-filter: blur(25px);
+    align-items: center; 
+    justify-content: center; 
+    opacity: 0; 
+    transition: opacity 0.3s ease;">
+    
+    <div style="
+        background: rgba(26, 26, 26, 0.9); /* ပုံထဲကလို အမှောင်ဘက်သွားတဲ့ Glass look */
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        width: 88%; 
+        max-width: 380px; 
+        padding: 30px; 
+        border-radius: 35px; /* ခင်ဗျားပြထားတဲ့ ပုံစံအတိုင်း လုံးဝန်းသော ထောင့်ချိုး */
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        max-height: 75vh; 
+        overflow-y: auto;">
+
+        <h3 style="color: #c9a56a; margin: 0 0 25px 0; font-size: 20px; font-weight: bold; text-align: left;">
+            အော်ဒါမှတ်တမ်း
+        </h3>
+        
+        <div id="orderList" style="display: flex; flex-direction: column; gap: 15px;">
+            </div>
+
+        <button onclick="closeOrderModal()" style="
+            width: 100%; 
+            background: rgba(255, 255, 255, 0.05); 
+            color: rgba(255, 255, 255, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            margin-top: 25px;
+            font-size: 14px;
+            font-weight: 500;">
+            ပိတ်မည်
+        </button>
+    </div>
+</div>
+
+
+
+
+<button id="googleBtn" onclick="loginWithGoogle()" class="google-glass-btn" style="margin-top: 10px;">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+    <span>Google ဖြင့် အကောင့်ဝင်မည်</span>
+</button>
+
+        
+        <p style="color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; margin-top: 20px;" onclick="toggleAuthModal()">
+            ပိတ်မည်
+        </p>
+    </div>
+</div>
+
+   <div id="cartModal" class="modal" onclick="closeCart()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 style="font-family:'Playfair Display'; font-size:1.8rem; margin-bottom:20px; color:var(--accent);">ခြင်းထဲမှပစွည်းများ</h2>
+            <div id="liquidCartList" style="max-height:40vh; overflow-y:auto; margin-bottom:20px; border-bottom: 1px solid var(--glass-border);">
+                </div>
+            <div style="padding:15px 0; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; opacity:0.9;">
+                    <span>စုစုပေါင်း ကျသင့်ငွေ</span>
+                    <span id="liquidTotal" style="color:var(--accent); font-weight:bold;">0 ကျပ်</span>
+                </div>
+            </div>
+            <button class="buy-btn" style="background:var(--accent);" onclick="showCustomerForm('cart')">အကုန်လုံး မှာယူမည်</button>
+            <p onclick="closeCart()" style="text-align:center; opacity:0.5; margin-top:20px; cursor:pointer; font-size:13px;">ဆက်လက် ဝယ်ယူဦးမည်</p>
+        </div>
+    </div>
+
+<div id="orderModal" class="modal">
+        <div class="modal-content">
+            <h3 id="orderTargetTitle" style="color: var(--accent); margin-top: 0; font-family: 'Playfair Display'; font-size: 1.8rem;">Order Form<h3>
+            <p id="orderQtyDisplay" style="font-size: 14px; opacity: 0.8; margin-bottom: 25px;"></p>
+            <input type="text" id="cName" placeholder="နာမည်လေး ဖြည့်ပေးပါရှင် *">
+            <input type="number" id="cPhone" placeholder="ဖုန်းနံပါတ်လေး ဖြည့်ပေးပါရှင် *">
+            <textarea id="cAddr" rows="3" placeholder="လိပ်စာလေး ဖြည့်ပေးပါရှင် *"></textarea>
+            <textarea id="cNote" rows="2" placeholder="အခြားမှတ်ချက် (ရှိလျှင်)"></textarea>
+            <div style="margin: 20px 0; text-align: left;">
+    <div style="width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); margin: 25px 0;"></div>            
+    <p style="color: #fff; font-size: 14px; margin-bottom: 10px; opacity: 0.8;">ငွေပေးချေမှုစနစ် ရွေးချယ်ပါ *</p>
+    <div style="color: #ff4d4d; font-size: 11px; margin-bottom: 15px; font-weight: 500;">
+            *New Customer များ Deli ခ လေးကြိုရှင်းပေးပါရှင့်
+        </div>
+    <div style="display: flex; gap: 10px;">
+        <label style="flex: 1; cursor: pointer;">
+            <input type="radio" name="paymentType" value="COD" checked style="display: none;" onchange="updatePaymentSelect(this)">
+            <div class="payment-card active" style="
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 12px;
+                text-align: center;
+                color: #fff;
+                backdrop-filter: blur(10px);
+                transition: 0.3s;
+            ">
+                <span style="display: block; font-size: 12px;">🚚 COD</span>
+                <span style="font-size: 10px; opacity: 0.6;">ပစ္စည်းရောက်မှငွေချေ</span>
+            </div>
+        </label>
+
+        <label style="flex: 1; cursor: pointer;">
+            <input type="radio" name="paymentType" value="Prepaid" style="display: none;" onchange="updatePaymentSelect(this)">
+            <div class="payment-card" style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 12px;
+                text-align: center;
+                color: #fff;
+                backdrop-filter: blur(10px);
+                transition: 0.3s;
+                opacity: 0.6;
+            ">
+                <span style="display: block; font-size: 12px;">💳 Mobile Banking</span>
+                <span style="font-size: 10px; opacity: 0.6;">ကြိုတင်ငွေရှင်းမည်</span>
+            </div>
+        </label>
+    </div>
+</div>
+
+
+    <button onclick="confirmOrder()" class="fast-order-btn">
+    <span class="icon"></span> ORDER တင်မည်
+</button>
+
+
+           <p onclick="closeModal()" style="text-align:center; font-size:13px; opacity:0.5; margin-top:30px; cursor:pointer; letter-spacing: 1px;">
+    ပြန်ထွက်မည်
+</p>
+        </div>
+    </div>
+
+<div id="galleryModal" class="gallery-modal" onclick="closeGallery()">
+        <div class="slider-wrap" id="slider" onclick="event.stopPropagation()"></div>
+        <div class="dots" id="dotBox"></div>
+        <p style="color:rgba(255,255,255,0.4); font-size:12px; margin-top:30px;">ပိတ်ရန် အပြင်ဘက်ကို နှိပ်ပါ</p>
+    </div>
+     
+      <nav class="liquid-pill-bar">
+        <div class="pill-item" id="themeBtn" onclick="toggleTheme()">
+            <span class="icon">☀️</span>
+        </div>
+        <div class="pill-item" onclick="openCart()">
+    <span class="icon">🛒</span>
+    <span id="cartCountBadge" class="pill-badge">0</span>
+</div>
+
+           </span>
+        <div class="pill-item" onclick="toggleHub()">
+            <span class="icon">💬</span>
+        </div>
+        <div class="nav-item" onclick="toggleAuthModal()">👤</div>
+    </nav>
+
+    <div id="hubMenu">
+        <a href="https://connect.viber.com/business/89501c74-396e-11f1-9671-0e966613864e" target="_blank"><img src="https://i.postimg.cc/xdWWR4LS/fc7bba4053cb42db.jpg"></a>
+        <a href="https://t.me/ivrtcaseygn" target="_blank"><img src="https://i.postimg.cc/Df53hvhF/Telegram-logo-svg.png"></a>
+        <a href="https://www.tiktok.com/@introvert_xioamicasemymr?_r=1&_t=ZS-94GwDerkY1i" target="_blank"><img src="https://i.postimg.cc/Wz4NMkTD/e1dn-Dyx-K-400x400.jpg"></a>
+    </div>
+    
+<div id="voucherContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:20000; flex-direction:column; align-items:center; justify-content:flex-start; padding:40px 20px; overflow-y: auto;">
+    
+    <div id="voucherCard" style="background-color: #ffffff; background-image: url('https://www.transparenttextures.com/patterns/white-paperboard.png'); background-blend-mode: multiply; color:#000; width:100%; max-width:350px; border-radius:2px; padding:25px; font-family: 'Courier New', Courier, monospace; position:relative; overflow:hidden; flex-shrink: 0; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        
+        <div style="position: absolute; inset: -20%; z-index: 0; opacity: 0.03; transform: rotate(-15deg); pointer-events: none; user-select: none; background-repeat: repeat; background-size: 150px 70px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iNzAiIHZpZXdCb3g9IjAgMCAxNTAgNzAiPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeD0iLjM1ZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJQbGF5ZmFpciBEaXNwbGF5LCBzZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzAwMCI+SVZSVDwvdGV4dD48L3N2Zz4=');"></div>
+
+        <div style="position: relative; z-index: 1;">
+            <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:15px; margin-bottom:15px;">
+                <h2 style="margin:0; font-family: 'Playfair Display', serif; letter-spacing:3px; font-weight: 900;">IVRT</h2>
+                <p style="margin:5px 0; font-size:11px; opacity:0.8; text-transform: uppercase;">Phone Case Boutique</p>
+                <p style="margin:2px 0; font-size:10px; font-weight: bold;">TEL: 09-785684305</p> 
+                <div style="font-size: 10px; border: 1px solid #000; display: inline-block; padding: 2px 8px; margin-top: 5px;">
+                    RECEIPT #: <span id="vOrderID">000000</span>
+                </div>
+            </div>
+            
+            <div style="font-size:12px; line-height:1.6; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div style="display:flex; justify-content:space-between;"><span>DATE:</span> <span id="vDate"></span></div>
+                <div style="display:flex; justify-content:space-between;"><span>TIME:</span> <span id="vTime"></span></div>
+                <div style="display:flex; justify-content:space-between;"><span>PAYMENT:</span> <span id="vPayment">COD / cash on delivery</span></div>
+                
+                <p style="margin:10px 0 0;"><strong>NAME:</strong> <span id="vName"></span></p>
+                <p style="margin:0;"><strong>TEL:</strong> <span id="vPhone"></span></p>
+                <p style="margin:0; word-wrap: break-word;"><strong>ADDR:</strong> <span id="vAddress"></span></p> 
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; margin:15px 0; font-size:12px;">
+                <thead style="border-bottom:1px solid #000;">
+                    <tr>
+                        <th style="text-align:left; padding:8px 0;">ITEM</th>
+                        <th style="text-align:center;">QTY</th>
+                        <th style="text-align:right;">PRICE</th>
+                    </tr>
+                </thead>
+                <tbody id="vItems"></tbody>
+            </table>
+
+            <div style="border-top:3px double #000; padding-top:10px; display: flex; justify-content: space-between; font-weight:bold; font-size:16px;">
+                <span>TOTAL:</span>
+                <span><span id="vTotal"></span> Ks</span>
+            </div>
+
+            <div style="text-align:center; margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px; font-size: 10px; opacity: 0.8;">
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 5px;">
+                    <span>FB: IVRT Phone Case</span>
+                    <span>TG: @ivrt_boutique</span>
+                </div>
+                <div style="font-style: italic;">
+                    * မှားယွင်းမှုရှိပါက ၂ ရက်အတွင်း ဆက်သွယ်လဲလှယ်နိုင်ပါသည် *
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top: 15px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=IVRT_SHOP_LINK" style="width: 50px; opacity: 0.8;" alt="QR Code">
+                <p style="font-size: 8px; margin-top: 3px;">Scan to follow us</p>
+            </div>
+
+            <div style="text-align:center; margin-top:15px;">
+                <div style="font-size: 25px; letter-spacing: -1px; margin-bottom: 5px; opacity: 0.8;">|| ||| || |||| || ||| |</div>
+                <div style="font-size:10px; opacity:0.6;">
+                    *** IVRT နှင့်အတူ ရှိနေပေးသည့်အတွက် ကျေးဇူးတင်ပါသည်။ ***
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <div style="display:flex; gap:10px; padding-bottom: 40px;">
+        <button onclick="saveAndSendTelegram()" style="padding:12px 20px; border-radius:50px; border:none; background:#fff; color:#000; font-weight:bold; cursor: pointer;">RECEIPT သိမ်းမည်</button>
+        <button onclick="closeVoucher()" style="padding:12px 20px; border-radius:50px; border:1px solid #fff; background:transparent; color:#fff; cursor: pointer;">ပိတ်မည်</button>
+    </div>
+</div>
+
+
+        <script>
+          let cart = {};
+          let globalTeleLink = "";
+        let allProducts = [], activeOrder = null, isFlashSale = false, discountPct = 0, saleTimer;let notiTimer;let checkoutData = [];  
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVRV8EGOdsjqAVHeSYO-Qesovdvg0LbbM",
+            authDomain: "introvert-case-shop.firebaseapp.com",
+            databaseURL: "https://introvert-case-shop-default-rtdb.firebaseio.com",
+            projectId: "introvert-case-shop",
+            storageBucket: "introvert-case-shop.firebasestorage.app",
+            messagingSenderId: "531673000312",
+            appId: "1:531673000312:web:2a8d5fa0674a5b43af008d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+    function render(data) {
+    const grid = document.getElementById('productGrid');
+    if (!grid) return;
+
+    // data မရှိရင် (သို့) empty ဖြစ်နေရင် error မတက်အောင် ကာကွယ်ခြင်း
+   if (!data || !Array.isArray(data) || data.length === 0) {
+    grid.innerHTML = `
+        <div class="loader-container">
+            <div class="liquid-loader"></div>
+            <p class="loading-text">စောင့်ဆိုင်းပေးသည့်အတွက် ကျေးဇူးတင်ပါတယ်ရှင့် 🩷</p>
+        </div>
+    `;
+    return;
+}
+
+    if (typeof cart === 'undefined') window.cart = {};
+
+    grid.innerHTML = data.map(p => {
+        const priceStr = p.price ? p.price.toString() : "0";
+        const basePrice = parseInt(priceStr.replace(/,/g, '')) || 0;
+        const stock = parseInt(p.stock) || 0;
+        const isInCart = cart && cart[p.id];
+
+        let displayImg = (p.images && p.images[0]) ? p.images[0] : (p.img ? p.img : 'https://via.placeholder.com/150');
+
+        // Flash Sale Logic
+        let priceUI = `<div style="color:var(--accent); font-weight: 700; margin: 5px 0;">${p.price} ကျပ်</div>`;
+        if (typeof isFlashSale !== 'undefined' && isFlashSale && typeof discountPct !== 'undefined' && discountPct > 0) {
+            const finalPrice = Math.floor(basePrice * (1 - discountPct / 100));
+            priceUI = `
+            <div class="price-row" style="margin: 5px 0;">
+                <span class="original-price" style="text-decoration: line-through; opacity: 0.6; font-size: 0.8rem; display: block;">${p.price} ကျပ်</span>
+                <span class="sale-price active-sale" style="color:var(--accent); font-weight: 700;">${finalPrice.toLocaleString()} ကျပ်</span>
+            </div>`;
+        }
+
+        return `
+        <div class="card ${stock === 0 ? 'out-of-stock' : ''}">
+            <div style="position:relative;">
+                <img src="${displayImg}" onclick="openGallery('${p.id}')" onerror="this.src='https://via.placeholder.com/150'">
+                <span onclick="showDetail('${p.id}')" style="position:absolute; top:-14px; right:-12px; cursor:pointer; font-size:20px; z-index:10;">ⓘ</span>
+            </div>
+
+            <div style="font-weight: 500; margin-top: 10px; font-size: 0.9rem;">${p.name}</div>
+            
+            ${priceUI}
+            
+            <div class="stock-label ${stock <= 3 && stock > 0 ? 'blinking' : ''}">
+                ${stock === 0 ? 'ကုန်သွားပါပြီ' : 'လက်ကျန်: ' + stock + ' ခု'}
+            </div>
+
+            <div class="qty-box" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0;">
+                <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
+                <span id="q-val-${p.id}" style="font-weight:600; width: 20px; text-align:center;">${isInCart ? cart[p.id].qty : 0}</span>
+                <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
+            </div>
+
+            <button class="buy-btn" ${stock === 0 ? 'disabled' : ''} 
+                style="${isInCart ? 'background:var(--accent); color:#000;' : ''}"
+                onclick="openOrder('${p.id}')">
+                ${stock === 0 ? 'ပစ္စည်းကုန်ပြီ' : (isInCart ? '🛒' : 'ဝယ်မည်')}
+            </button>
+        </div>`;
+    }).join('');
+    
+    // ပစ္စည်းတွေ မျက်နှာပြင်မှာ ပေါ်လာပြီးမှ scroll effect ထည့်ပေးပါ
+    if (typeof applyScrollEffect === 'function') {
+        setTimeout(applyScrollEffect, 100);
+    }
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+}
+
+function smartSearch() {
+    const v = document.getElementById('searchInput').value.toLowerCase();
+    // နာမည်ထဲမှာ ပါတာကို ရှာတယ်
+    const filtered = allProducts.filter(p => p.name.toLowerCase().includes(v));
+    
+    // ဒီနေရာမှာ render ကို ရှာတွေ့တဲ့ data (filtered) ပေးလိုက်တာပါ
+    render(filtered);
+}
+
+
+ function applyScrollEffect() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // တစ်ခုချင်းစီ ၀.၁ စက္ကန့်စီ ခြားပြီး ပေါ်လာအောင် လုပ်တာပါ
+                setTimeout(() => {
+                    entry.target.classList.add('appear');
+                }, index * 100); 
+                observer.unobserve(entry.target); // တစ်ခါပေါ်ပြီးရင် ထပ်မလုပ်ခိုင်းတော့ဘူး (Performance ကောင်းအောင်)
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card').forEach(card => {
+        observer.observe(card);
+    });
+}
+
+     async function confirmOrder() {
+    const n = document.getElementById('cName').value.trim();
+    const p = document.getElementById('cPhone').value.trim();
+    const a = document.getElementById('cAddr').value.trim();
+    const nt = document.getElementById('cNote').value.trim();
+
+    if (!n || !p || !a) { 
+        showNoti("အချက်အလက်များကို အပြည့်အစုံ ဖြည့်ပေးပါရှင်"); 
+        return; 
+    }
+
+    let firebaseItems = [];
+    let totalAmount = 0;
+
+    if (typeof cart !== 'undefined' && Object.keys(cart).length > 0) {
+        for (const id in cart) {
+            const item = cart[id];
+            const price = parseInt(item.price.toString().replace(/,/g, ''));
+            firebaseItems.push({ id, name: item.name, qty: item.qty, price: price });
+            totalAmount += (price * item.qty);
+        }
+    } else if (typeof activeOrder !== 'undefined' && activeOrder) {
+        const price = parseInt(activeOrder.price.toString().replace(/,/g, ''));
+        firebaseItems.push({ id: activeOrder.id, name: activeOrder.name, qty: activeOrder.selectedQty || 1, price: price });
+        totalAmount = price * (activeOrder.selectedQty || 1);
+    } else {
+        showNoti("မှာယူမည့် ပစ္စည်း ရွေးချယ်ပေးပါ");
+        return;
+    }
+
+    try {
+        const fastOrderData = {
+            customerName: n,
+            customerPhone: p,
+            customerAddress: a,
+            items: firebaseItems,
+            totalAmount: totalAmount,
+            note: nt || "-",
+            status: "unread",
+            timestamp: Date.now()
+        };
+
+        // Firebase ဆီ အော်ဒါလှမ်းပို့မယ် (Stock မလျှော့သေးပါ)
+        await db.ref('fast_orders').push(fastOrderData);
+
+        closeModal();
+        cart = {}; // Cart ရှင်းမယ်
+        if (typeof updateCartBadge === 'function') updateCartBadge();
+        if (typeof renderCart === 'function') renderCart();
+        
+        ['cName', 'cPhone', 'cAddr', 'cNote'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
+
+        showNoti("မှာယူမှု အောင်မြင်ပါသည် ✨");
+        generateVoucher(fastOrderData);
+    } catch (e) {
+        showNoti("Error: " + e.message);
+    }
+}
+
+function generateVoucher(data) {
+    const now = new Date();
+    
+    // နေ့စွဲ နဲ့ အချိန်ကို သတ်မှတ်ခြင်း
+    document.getElementById('vDate').innerText = now.toLocaleDateString();
+    document.getElementById('vTime').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    document.getElementById('vName').innerText = data.customerName;
+    document.getElementById('vPhone').innerText = data.customerPhone;
+    document.getElementById('vOrderID').innerText = Math.floor(100000 + Math.random() * 900000);
+    
+    // လိပ်စာ ထည့်သွင်းခြင်း (data ထဲမှာ address ပါရပါမယ်)
+    document.getElementById('vAddress').innerText = data.customerAddress || "မရှိပါ"; 
+    
+    // ... ကျန်တဲ့ logic (Items, Total) တွေ အရင်အတိုင်း ထားပါ ...
+    
+    let itemsHTML = '';
+    data.items.forEach(item => {
+        itemsHTML += `
+            <tr>
+                <td style="padding:8px 0;">${item.name}</td>
+                <td style="text-align:center;">${item.qty}</td>
+                <td style="text-align:right;">${(item.price * item.qty).toLocaleString()}</td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('vItems').innerHTML = itemsHTML;
+    document.getElementById('vTotal').innerText = data.totalAmount.toLocaleString();
+    
+    const container = document.getElementById('voucherContainer');
+    container.style.display = 'flex';
+}
+
+// ၂။ Modal ဖွင့်ခြင်း (Hidden fields မှ data များကို input ထဲ ထည့်ပေးသည်)
+function openEditModal() {
+    const modal = document.getElementById('editProfileModal');
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+
+    document.getElementById('editName').value = document.getElementById('modalUserName').innerText;
+    document.getElementById('editPhone').value = document.getElementById('savedPhone').innerText;
+    document.getElementById('editAddress').value = document.getElementById('savedAddr').innerText;
+    
+}
+
+// ၃။ Modal ပိတ်ခြင်း
+function closeEditModal() {
+    const modal = document.getElementById('editProfileModal');
+    modal.style.display = 'none';
+}
+
+
+
+// ၄။ Database ထဲသို့ အချက်အလက် ၃ ခုလုံး သိမ်းဆည်းခြင်း
+function saveProfileData() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const name = document.getElementById('editName').value;
+    const phone = document.getElementById('editPhone').value;
+    const addr = document.getElementById('editAddress').value;
+
+    db.ref('users/' + user.uid).update({
+        name: name,
+        phone: phone,
+        address: addr
+    }).then(() => {
+        showNoti("သိမ်းဆည်းပြီးပါပြီ! ✨");
+        closeEditModal();
+    }).catch(err => showNoti("Error: " + err.message));
+}
+
+function closeVoucher() {
+    const container = document.getElementById('voucherContainer');
+    if (!container) return;
+
+    // ၁။ Apple Style Frosted Glass Popup ဖန်တီးခြင်း
+    const popupHTML = `
+        <div id="frostedPopup" style="
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 30000; transition: opacity 0.4s ease;
+            opacity: 0; pointer-events: none;
+            /* ၁။ မူလ Alert Box အစား မျက်နှာပြင်တစ်ခုလုံးကို Blur လုပ်ခြင်း */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(0, 0, 0, 0.4);
+        ">
+            <div style="
+                /* ၂။ Apple ကဲ့သို့ အလွန်ကြည်လင်သော Background Gradient သုံးခြင်း */
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+                box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(30px) saturate(200%);
+                -webkit-backdrop-filter: blur(30px) saturate(200%);
+                border-radius: 30px;
+                /* ၃။ အလွန်ပါးလွှာသော အဖြူရောင် Border ကို သုံးခြင်း */
+                border: 0.5px solid rgba(255, 255, 255, 0.2);
+                width: 85%; max-width: 320px;
+                padding: 35px 30px; text-align: center; color: #fff;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                overflow: hidden;
+            ">
+                <div style="
+                    position: absolute; top: -50px; right: -50px;
+                    width: 150px; height: 150px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+                    border-radius: 50%;
+                    filter: blur(30px);
+                "></div>
+
+                <div style="position: relative; z-index: 1;">
+                    <p style="font-size: 17px; font-weight: bold; margin: 0; line-height: 1.5; letter-spacing: -0.5px; text-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        ✨ IVRT: မှာယူမှု အောင်မြင်ပါသည်။ 
+                    </p>
+                    <p style="font-size: 14px; margin: 12px 0 25px 0; opacity: 0.9; line-height: 1.6; letter-spacing: -0.2px;">
+                        အားပေးမှုကို အထူးကျေးဇူးတင်ရှိပါတယ်ရှင့်။သာယာသောနေ့လေးကိုပိုင်ဆိုင်နိုင်ပါစေနော်။
+                    </p>
+                    
+                    <button id="closePopupBtn" style="
+                        background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9));
+                        color: #000;
+                        border: none;
+                        padding: 14px 40px;
+                        border-radius: 50px;
+                        font-weight: bold;
+                        font-size: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                        transition: transform 0.1s ease, box-shadow 0.2s ease;
+                        position: relative; overflow: hidden;
+                    " onclick="finalizeVoucherClose()">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // ၂။ Popup ကို Page ထဲသို့ ထည့်ခြင်း
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    const popup = document.getElementById('frostedPopup');
+
+    // ၃။ ပေါ်လာအောင် လုပ်ခြင်း (Animation)
+    setTimeout(() => {
+        popup.style.opacity = '1';
+        popup.style.pointerEvents = 'auto';
+    }, 10);
+}
+
+// ပေါ်လာတဲ့ Popup ကို ပိတ်ပြီး Refresh လုပ်ရန် Function
+function finalizeVoucherClose() {
+    const popup = document.getElementById('frostedPopup');
+    const voucherContainer = document.getElementById('voucherContainer');
+    
+    if (popup && voucherContainer) {
+        // ပိတ်တဲ့ Animation
+        popup.style.opacity = '0';
+        popup.style.pointerEvents = 'none';
+
+        setTimeout(() => {
+            // Popup ကို ဖျက်တယ်
+            popup.remove();
+            // Voucher ကို ပိတ်တယ်
+            voucherContainer.style.display = 'none';
+            // Refresh လုပ်တယ်
+            location.reload(); 
+        }, 400); // Animation ပြီးမှ ဖျက်ဖို့
+    }
+}
+
+// Order History Modal ဖွင့်ရန်
+function viewOrders() {
+    const modal = document.getElementById('orderHistoryModal');
+    const orderList = document.getElementById('orderList');
+    const user = firebase.auth().currentUser;
+
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.style.opacity = '1'; }, 50);
+
+    if (!user) {
+        orderList.innerHTML = `<p style="color: rgba(255,255,255,0.4); text-align: center;">Login ဝင်ပေးပါ</p>`;
+        return;
+    }
+
+    db.ref('users/' + user.uid + '/orders').on('value', (snapshot) => {
+        const orders = snapshot.val();
+        orderList.innerHTML = ""; 
+
+        if (!orders) {
+            orderList.innerHTML = `<p style="color: rgba(255,255,255,0.3); text-align: center; padding: 20px;">အော်ဒါမှတ်တမ်း မရှိသေးပါ။</p>`;
+            return;
+        }
+
+        Object.keys(orders).reverse().forEach(key => {
+            const order = orders[key];
+            orderList.innerHTML += `
+                <div style="
+                    background: rgba(255, 255, 255, 0.03); 
+                    border: 1px solid rgba(255, 255, 255, 0.08); 
+                    border-radius: 20px; 
+                    padding: 18px; 
+                    text-align: left;">
+                    
+                    <span style="
+                        float: right; font-size: 10px; padding: 4px 12px; border-radius: 20px; border: 1px solid;
+                        ${order.status === 'Completed' ? 'background: rgba(40, 167, 69, 0.1); color: #81e699; border-color: #28a745;' : 'background: rgba(201, 165, 106, 0.1); color: #c9a56a; border-color: #c9a56a;'}">
+                        ${order.status || 'Pending'}
+                    </span>
+                    
+                    <p style="color: #c9a56a; font-size: 12px; font-weight: bold; margin: 0 0 8px 0;">ID: #${key.substring(1, 8)}</p>
+                    <p style="color: #fff; font-size: 15px; margin: 0; opacity: 0.9;">${order.productName || 'ဖုန်းကာဗာ'}</p>
+                    <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 12px 0 0 0;">${order.date || 'Today'}</p>
+                </div>
+            `;
+        });
+    });
+}
+
+function closeOrderModal() {
+    const modal = document.getElementById('orderHistoryModal');
+    modal.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
+}
+
+
+
+// Voucher ကို ပုံအဖြစ် သိမ်းဆည်းရန် (html2canvas library လိုအပ်ပါသည်)
+function downloadVoucher() {
+    const card = document.getElementById('voucherCard');
+    const container = document.getElementById('voucherContainer');
+
+    if (!card) {
+        alert("Voucher ရှာမတွေ့ပါဘူးဗျာ။");
+        return;
+    }
+
+    // ၁။ ပုံထုတ်မယ့်အချိန်မှာ အကုန်ပေါ်အောင် ခေတ္တပြင်ခြင်း (Logic မဖျက်ထားပါ)
+    const originalHeight = card.style.height;
+    const originalOverflow = container.style.overflowY;
+    
+    card.style.height = 'auto'; 
+    container.style.overflowY = 'visible';
+
+    // ၂။ ပုံထုတ်ခြင်း logic (Resolution ကြည်လင်အောင် Scale မြှင့်ထားသည်)
+    html2canvas(card, {
+        scale: 4, // 2 ကနေ 4 ကိုမြှင့်လိုက်လို့ စာသားတွေ လုံးဝမဝါးတော့ပါဘူး
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        letterRendering: true, // စာလုံးတွေကို ပိုပီသစေပါတယ်
+        imageTimeout: 0 // ပုံတွေ (QR/Texture) load တက်တာ မစောင့်နိုင်ဘဲ ပျက်မသွားစေဖို့
+    }).then(canvas => {
+        const link = document.createElement('a');
+        
+        // Order ID ပါရင် ဖိုင်နာမည်မှာ တစ်ခါတည်းထည့်ခြင်း
+        const orderId = document.getElementById('vOrderID') ? document.getElementById('vOrderID').innerText : 'New';
+        link.download = `IVRT-Receipt-${orderId}.png`;
+        
+        link.href = canvas.toDataURL("image/png", 1.0); // Quality အကောင်းဆုံး (1.0) နဲ့ ထုတ်ခြင်း
+        link.click();
+
+        // ၃။ မူလအတိုင်း ပြန်ပြင်ခြင်း
+        card.style.height = originalHeight;
+        container.style.overflowY = originalOverflow;
+    }).catch(err => {
+        console.error("Voucher Save Error:", err);
+        // Error တက်ရင်လည်း ပုံစံမပျက်အောင် မူလအတိုင်း ပြန်ပြင်ပေးခြင်း
+        card.style.height = originalHeight;
+        container.style.overflowY = originalOverflow;
+        alert("Voucher သိမ်းလို့မရဖြစ်နေပါတယ်။ ခဏနေပြန်ကြိုးစားကြည့်ပါဗျ။");
+    });
+}
+
+function updatePaymentSelect(input) {
+    const paymentLabel = input.value === 'COD' ? 'Cash on Delivery' : 'Mobile Banking (Prepaid)';
+    
+    // Voucher ထဲက PAYMENT နေရာမှာ လှမ်းပြောင်းပေးခြင်း
+    if(document.getElementById('vPayment')) {
+        document.getElementById('vPayment').innerText = paymentLabel;
+    }
+}
+
+// Card ရွေးလိုက်ရင် Active ဖြစ်တဲ့ပုံစံပြောင်းရန်
+function updatePlatformSelect(input) {
+    const allCards = document.querySelectorAll('.platform-card');
+    allCards.forEach(card => {
+        card.style.background = "rgba(255, 255, 255, 0.05)";
+        card.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+        card.style.opacity = "0.6";
+    });
+
+    const selectedCard = input.nextElementSibling;
+    selectedCard.style.background = "rgba(255, 255, 255, 0.1)";
+    selectedCard.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+    selectedCard.style.opacity = "1";
+}
+
+// Platform ဆီသို့ အော်ဒါပို့ရန်
+async function saveAndSendTelegram() {
+    // ၁။ ပုံကို အရင် သိမ်းမယ်
+    if (typeof downloadVoucher === 'function') {
+        try { await downloadVoucher(); } catch (e) { console.log(e); }
+    }
+
+    // ၂။ Telegram Link ပြင်ဆင်မယ်
+    const oID = window.currentOrderID || "IVRT-Order";
+    const text = `🛒 *New Order* (IVRT)%0A🆔 ID: ${oID}%0A%0Aအော်ဒါတင်ထားပါတယ်။ Voucher ပုံလဲ ပို့ပေးထားပါတယ်။`;
+    globalTeleLink = `https://t.me/Samuelmmc?text=${text}`;
+
+    // ၃။ အဟောင်း (Voucher Modal) ကို ပိတ်မယ်
+    const vModal = document.getElementById('voucherModal');
+    if (vModal) vModal.style.display = 'none';
+
+    // ၄။ အသစ် (Liquid Glass Modal) ကို ဖွင့်မယ်
+    const teleModal = document.getElementById('teleRedirectModal');
+    if (teleModal) {
+        teleModal.style.display = 'flex';
+        
+        // ၅။ စက္ကန့် စရေတွက်မယ်
+        let timeLeft = 5;
+        const secDisplay = document.getElementById('countdownSec');
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (secDisplay) secDisplay.innerText = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                goToTeleNow();
+            }
+        }, 1000);
+    }
+}
+
+function goToTeleNow() {
+    if (globalTeleLink) {
+        window.location.href = globalTeleLink;
+    }
+}
+// ၁။ Card ကို ရွေးလိုက်တဲ့အခါ UI ပြောင်းပေးတဲ့ Function
+function updatePlatformUI(input) {
+    const allCards = document.querySelectorAll('.platform-card');
+    allCards.forEach(card => {
+        card.style.background = "rgba(255, 255, 255, 0.05)";
+        card.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+        card.style.opacity = "0.6";
+    });
+
+    const selectedCard = input.nextElementSibling;
+    selectedCard.style.background = "rgba(255, 255, 255, 0.1)";
+    selectedCard.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+    selectedCard.style.opacity = "1";
+}
+
+
+
+// ၁။ Login ခလုတ်အတွက် Function (ပိုမိုသန့်ရှင်းအောင်)
+function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+        const user = result.user;
+        
+        // Database ထဲသို့ User Data ထည့်ခြင်း
+        db.ref('users/' + user.uid).update({
+            name: user.displayName,
+            email: user.email,
+            photo: user.photoURL,
+            lastLogin: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // အောင်မြင်တဲ့အခါ ပေါ်လာမည့် Noti
+        showNoti("အောင်မြင်စွာ Login ဝင်ပြီးပါပြီ! ✨");
+        
+        // Modal ပိတ်ခြင်း
+        document.getElementById('authModal').style.display = 'none';
+        document.body.style.overflow = "auto";
+    })
+    .catch((error) => {
+        // Error ဖြစ်တဲ့အခါ ပေါ်လာမည့် Noti
+        showNoti("Login မအောင်မြင်ပါ: " + error.message);
+        console.error("Login Error:", error.message);
+    });
+}
+
+    // Logout Function
+function logout() {
+    firebase.auth().signOut().then(() => {
+        showNoti("အကောင့်မှ ထွက်လိုက်ပါပြီ။ 👋");
+        // အနည်းငယ်စောင့်ပြီးမှ Refresh လုပ်ပေးပါ (Noti လေး မြင်ရအောင်)
+        setTimeout(() => { window.location.reload(); }, 1500);
+    }).catch((error) => {
+        showNoti("Error: " + error.message);
+    });
+}
+    
+function showMyOrdersModal() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        showNoti("Login အရင်ဝင်ပေးပါ");
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'myOrdersModal';
+    
+    // Background ကို အကြည်ရောင် Blur အပြည့်သုံးထားပါတယ်
+    modal.style.cssText = `
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        background: rgba(255, 255, 255, 0.03); 
+        display: flex; 
+        align-items: center;
+        justify-content: center; 
+        z-index: 9999; 
+        backdrop-filter: blur(35px) saturate(180%);
+        -webkit-backdrop-filter: blur(35px) saturate(180%);
+    `;
+
+    modal.innerHTML = `
+        <div style="
+            background: rgba(255, 255, 255, 0.05); 
+            width: 88%; 
+            max-width: 380px; 
+            padding: 25px; 
+            border-radius: 30px; 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            color: white; 
+            max-height: 80vh; 
+            overflow-y: auto;
+            position: relative;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: 0.5px; color: #fff;">📦 My Orders</h3>
+                <div onclick="this.parentElement.parentElement.parentElement.remove()" style="
+                    cursor: pointer; 
+                    background: rgba(255, 255, 255, 0.1); 
+                    width: 35px; 
+                    height: 35px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    border-radius: 50%; 
+                    font-size: 20px;
+                    transition: 0.3s;
+                ">&times;</div>
+            </div>
+
+            <div id="ordersContainer">
+                <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 13px;">အချက်အလက်များ ဆွဲယူနေသည်...</div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Firebase Data Fetching
+    db.ref('orders').orderByChild('userId').equalTo(user.uid).once('value', (snapshot) => {
+        const container = document.getElementById('ordersContainer');
+        if (!snapshot.exists()) {
+            container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.4); margin-top: 40px; font-size: 13px;">မှာယူထားသော အော်ဒါမရှိသေးပါ။</div>';
+            return;
+        }
+
+        let html = '';
+        const orders = [];
+        snapshot.forEach((child) => {
+            orders.push({ id: child.key, ...child.val() });
+        });
+        
+        orders.reverse().forEach((data) => {
+            const date = new Date(data.timestamp).toLocaleDateString();
+            html += `
+                <div style="
+                    background: rgba(255, 255, 255, 0.05); 
+                    border: 1px solid rgba(255, 255, 255, 0.1); 
+                    padding: 18px; 
+                    border-radius: 20px; 
+                    margin-bottom: 15px;
+                    backdrop-filter: blur(5px);
+                ">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-size: 10px; color: #ffd700; font-weight: bold; background: rgba(255, 215, 0, 0.1); padding: 4px 10px; border-radius: 10px;">${date}</span>
+                        <span style="font-size: 10px; color: #fff; background: rgba(0, 255, 136, 0.2); padding: 4px 10px; border-radius: 10px; text-transform: uppercase;">${data.status}</span>
+                    </div>
+                    <div style="font-size: 14px; color: #fff; font-weight: 500; margin-bottom: 8px; line-height: 1.5;">
+                        ${data.items.map(i => i.name).join(', ')}
+                    </div>
+                    <div style="font-size: 13px; color: #00ff88; font-weight: 600; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; display: flex; justify-content: space-between;">
+                        <span>စုစုပေါင်း</span>
+                        <span>${data.totalAmount.toLocaleString()} MMK</span>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    });
+}
+
+
+
+
+function toggleAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal.style.display === "flex") {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+    } else {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+}
+firebase.auth().onAuthStateChanged((user) => {
+    const profileImg = document.getElementById('profileImg');
+    const profileSection = document.getElementById('profileSection');
+    const modalUserName = document.getElementById('modalUserName');
+    const googleBtn = document.getElementById('googleBtn');
+    const userEmailDisplay = document.getElementById('userEmail'); 
+        
+    if (user) {
+        // ၁။ Google ဆီကရတဲ့ အခြေခံအချက်အလက်တွေ အရင်ပြမယ်
+        if(profileImg) profileImg.src = user.photoURL;
+        if(profileSection) profileSection.style.display = "block";
+        if(modalUserName) modalUserName.innerText = user.displayName;
+        if(googleBtn) googleBtn.style.display = "none";
+        if(userEmailDisplay) userEmailDisplay.innerText = user.email;
+
+        
+        // ၂။ Database ထဲက သိမ်းထားတဲ့ Phone နဲ့ Address ကို ဆွဲထုတ်မယ် (Refresh လုပ်ရင် ပြန်ပေါ်ဖို့)
+        // ဒီအပိုင်းက အသစ်ဖြည့်စွက်လိုက်တဲ့ Logic ပါ
+        db.ref('users/' + user.uid).on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // နာမည်ကို Database ထဲကဟာ ဦးစားပေးသုံးမယ်
+                if(modalUserName) modalUserName.innerText = data.name || user.displayName;
+
+                // Phone နဲ့ Address ကို UI မှာ မပြဘဲ Hidden storage ထဲမှာ သိမ်းထားမယ်
+                const savedPhone = document.getElementById('savedPhone');
+                const savedAddr = document.getElementById('savedAddr');
+                
+                if (savedPhone) savedPhone.innerText = data.phone || "";
+                if (savedAddr) savedAddr.innerText = data.address || "";
+                
+                // Order Count ပြရန်
+                const orderCount = document.getElementById('orderCount');
+                if (orderCount) {
+                    orderCount.innerText = data.orders ? Object.keys(data.orders).length : 0;
+                }
+            }
+        });
+
+    } else {
+        // Login မဝင်ရသေးလျှင်
+        if(profileSection) profileSection.style.display = "none";
+        if(googleBtn) googleBtn.style.display = "flex";
+    }
+});
+
+
+//Product Actions
+function updateQty(id, change) {
+    if (!allProducts || allProducts.length === 0) return; 
+    const p = allProducts.find(x => x.id === id);
+    if (!p) return;
+
+    if (typeof cart === 'undefined') window.cart = {};
+
+    const currentQtyInCart = cart[id] ? cart[id].qty : 0;
+    let nextQty = currentQtyInCart + change;
+    if (nextQty < 0) return; 
+    // Stock စစ်ဆေးခြင်း
+    if (nextQty > p.stock) {
+        showNoti(`လက်ကျန် ${p.stock} ခုသာ ရှိပါတော့တယ်`);
+        return;
+    }
+
+if (nextQty >= 1) {
+    cart[id] = { name: p.name, qty: nextQty, price: p.price };
+    // + ခလုတ်နှိပ်တိုင်း ပေါ်အောင် ဒီနေရာမှာ သေချာခေါ်ပါ
+    showNoti(`${p.name} (${nextQty} ခု) ခြင်းထဲထည့်လိုက်ပါပြီ ✨`);
+} else {
+    if (cart[id]) {
+        delete cart[id];
+        showNoti(`${p.name} ကို ခြင်းထဲမှ ဖယ်ထုတ်လိုက်ပါပြီ 🗑️`);
+    }
+}
+
+    // --- DOM ကို တိုက်ရိုက်ပြင်ခြင်း (အရေးကြီး) ---
+    
+    // ၁။ အရေအတွက်ပြတဲ့ span ကို တိုက်ရိုက်ပြင်ပါ
+    const qtySpan = document.getElementById(`q-val-${id}`);
+    if (qtySpan) qtySpan.innerText = nextQty;
+
+    // ၂။ ခလုတ် (Button) ပုံစံကို တိုက်ရိုက်ပြင်ပါ
+    // သင့် Original Code ထဲက ခလုတ်သည် onclick="openOrder('${p.id}')" ဟု ရေးထားသည်
+    const btn = document.querySelector(`button[onclick="openOrder('${id}')"]`);
+    if (btn) {
+        const isInCart = nextQty > 0;
+        btn.innerText = isInCart ? '🛒' : 'ဝယ်မည်';
+        btn.style.background = isInCart ? 'var(--accent)' : '';
+        btn.style.color = isInCart ? '#000' : '';
+    }
+
+    // ၃။ Cart Badge ကို update လုပ်ပါ
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+}
+
+function openOrder(id) {
+    const p = allProducts.find(x => x.id === id);
+    const qty = cart[id] ? cart[id].qty : 1;
+    
+    // activeOrder ရော checkoutData ပါ တစ်ခါတည်း သတ်မှတ်ပေးရန်
+    activeOrder = { ...p, selectedQty: parseInt(qty) };
+    checkoutData = [{ 
+        id: p.id, 
+        name: p.name, 
+        qty: parseInt(qty), 
+        price: p.price 
+    }];
+    
+    document.getElementById('orderQtyDisplay').innerText = `${p.name} - အရေအတွက် (${qty}) ခု`;
+    document.getElementById('orderModal').style.display = 'flex';
+}
+
+        function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+
+function openCart() {
+            const ids = Object.keys(cart);
+            if (ids.length === 0) { showNoti("ခြင်းထဲမှာ ပစ္စည်းမရှိသေးပါရှင့်"); return; }
+            
+            const list = document.getElementById('liquidCartList');
+            let total = 0;
+            
+            list.innerHTML = ids.map(id => {
+                const item = cart[id];
+                const p = allProducts.find(x => x.id === id);
+                const basePrice = parseInt(item.price.toString().replace(/,/g, ''));
+                const finalPrice = isFlashSale ? Math.floor(basePrice * (1 - discountPct / 100)) : basePrice;
+                total += (finalPrice * item.qty);
+                
+                return `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div style="text-align:left;">
+                        <div style="font-weight:500;">${item.name}</div>
+                        <small style="opacity:0.6;">${finalPrice.toLocaleString()} x ${item.qty}</small>
+                    </div>
+                    <div style="color:var(--accent); font-weight:600;">${(finalPrice * item.qty).toLocaleString()} ကျပ်</div>
+                </div>`;
+            }).join('');
+            
+            document.getElementById('liquidTotal').innerText = total.toLocaleString() + " ကျပ်";
+            document.getElementById('cartModal').style.display = 'flex';
+        }
+
+        function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
+
+        // direct ဝယ်တာရော cart ထဲကဝယ်တာရော နှစ်မျိုးလုံးအတွက် checkoutData ကို ပြောင်းလဲပေးတဲ့ function
+        
+        function showCustomerForm(type, id = null) {
+            closeCart();
+            if (type === 'direct') {
+                const p = allProducts.find(x => x.id === id);
+                const qty = cart[id] ? cart[id].qty : 1;
+                checkoutData = [{ id: p.id, name: p.name, qty: qty, price: p.price }];
+            } else {
+                checkoutData = Object.keys(cart).map(id => ({ id: id, ...cart[id] }));
+            }
+            
+            document.getElementById('orderQtyDisplay').innerText = "ရွေးချယ်ထားသော ပစ္စည်းများ မှာယူရန် အချက်အလက်ဖြည့်ပါ";
+            document.getElementById('orderModal').style.display = 'flex';}
+        
+// Customer ရွေးချယ်လိုက်တဲ့ Platform အလိုက် link ခေါ်ပေးမယ့် function
+async function sendFastOrder(type = 'fast') {
+    // ၁။ Form အချက်အလက်များရယူခြင်း
+    const n = document.getElementById('cName').value.trim();
+    const p = document.getElementById('cPhone').value.trim();
+    const a = document.getElementById('cAddr').value.trim();
+    const nt = document.getElementById('cNote') ? document.getElementById('cNote').value.trim() : "-";
+    
+    if (!n || !p || !a) { 
+        showNoti("အချက်အလက် ပြည့်စုံစွာ ဖြည့်ပါရှင်"); 
+        return; 
+    }
+
+    // ၂။ တန်ဖိုးများတွက်ချက်ခြင်း
+    const oID = generateOrderID();
+    let total = 0;
+    let details = "";
+    let firebaseItems = [];
+
+    if (type === 'cart') {
+        const isFlashActiveCheck = typeof isFlashActive !== 'undefined' ? isFlashActive : false;
+        const discountPctCheck = typeof discountPct !== 'undefined' ? discountPct : 0;
+
+        for (const id in cart) {
+            const item = cart[id];
+            const basePrice = parseInt(item.price.toString().replace(/,/g, ''));
+            const isFlashItem = isFlashActiveCheck && item.flashSale;
+            const finalPrice = isFlashItem ? Math.floor(basePrice * (1 - discountPctCheck / 100)) : basePrice;
+            
+            total += (finalPrice * item.qty);
+            details += `• ${item.name} (${item.qty}ခု)%0A`;
+            firebaseItems.push({ id, name: item.name, qty: item.qty, price: finalPrice });
+        }
+    } else {
+        const price = parseInt(activeOrder.price.toString().replace(/,/g, ''));
+        const qty = activeOrder.selectedQty;
+        total = price * qty;
+        details = `• ${activeOrder.name} (${qty}ခု)%0A`;
+        firebaseItems.push({ name: activeOrder.name, qty: qty, price: price });
+    }
+
+    if (firebaseItems.length === 0) {
+        showNoti("မှာယူမည့် ပစ္စည်းမရှိပါ");
+        return;
+    }
+
+    // ၃။ ဒေတာများကို Window Object တွင်သိမ်းဆည်းခြင်း (Telegram ပို့သည့်အခါ ပြန်သုံးရန်)
+    window.currentOrderID = oID;
+    window.currentCustName = n;
+    window.currentCustPhone = p;
+    window.currentCustAddr = a;
+    window.currentCustNote = nt;
+    window.currentTotal = total;
+    window.currentItems = details;
+
+    try {
+        // ၄။ Firebase (Admin Web) သို့ ပို့ခြင်း
+        await db.ref('orders').push({
+            orderId: oID,
+            orderType: type,
+            name: n,
+            phone: p,
+            address: a,
+            note: nt,
+            items: firebaseItems,
+            total: total,
+            status: 'pending',
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // ၅။ Voucher Modal ကိုပြသခြင်း
+        if (typeof showVoucherModal === 'function') {
+            showVoucherModal(oID); 
+        }
+
+        // ၆။ Cart ရှင်းလင်းခြင်း
+        if (type === 'cart') {
+            cart = {}; 
+            if (typeof updateCartBadge === 'function') updateCartBadge(); 
+            if (typeof renderCart === 'function') renderCart(); 
+        }
+        
+        showNoti("Voucher ထုတ်ပေးပြီးပါပြီ။ ✨");
+
+    } catch (e) { 
+        console.error("Order Error:", e);
+        showNoti("Error: " + e.message); 
+    }
+}
+
+
+function updateCartBadge() {
+            const badge = document.getElementById('cartCountBadge');
+            const totalItems = Object.keys(cart).length;
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    
+    // UI Utilities
+    function showNoti(msg) {
+    const n = document.getElementById('liquidNoti');
+    if (!n) return; // Noti element မရှိရင် ရပ်လိုက်ပါ
+
+    // အရင် ပေါ်နေတဲ့ Noti ကို ချက်ချင်းဖျက်မယ်
+    clearTimeout(notiTimer);
+    n.classList.remove('show');
+    
+    // အသစ်တစ်ခု ပြမယ်
+    n.innerText = msg;
+    n.classList.add('show');
+
+    // ၃ စက္ကန့်ထိ ပြထားမယ် (အခုထက် ပိုကြာချင်ရင် 3000 ကို တိုးပါ)
+    notiTimer = setTimeout(() => {
+        n.classList.remove('show');
+    }, 3000);
+}
+
+
+        function showDetail(id) {
+    const p = allProducts.find(x => x.id === id);
+             if (!p) return;
+    document.getElementById('detailName').innerText = p.name;
+    document.getElementById('detailDesc').innerText = p.description || "ဤပစ္စည်းအတွက် အသေးစိတ်အချက်အလက် မရှိသေးပါ။";
+    document.getElementById('detailModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // နောက်ခံ scroll ပိတ်ရန်
+}
+
+function closeDetail() {
+    document.getElementById('detailModal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // နောက်ခံ scroll ပြန်ဖွင့်ရန်
+}
+
+  function openGallery(id) {
+            const p = allProducts.find(x => x.id === id);
+            if(!p.images) return;
+            const slider = document.getElementById('slider');
+            const dotBox = document.getElementById('dotBox');
+            slider.innerHTML = p.images.map(img => `<div class="slide"><img src="${img}"></div>`).join('');
+            dotBox.innerHTML = p.images.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
+            document.getElementById('galleryModal').style.display = 'flex';
+            slider.onscroll = () => {
+                const i = Math.round(slider.scrollLeft / slider.clientWidth);
+                document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+            };
+        }
+        function closeGallery() { document.getElementById('galleryModal').style.display = 'none'; }
+        
+        function toggleTheme() {
+    const body = document.body;
+    const themeBtn = document.querySelector('#themeBtn .icon');
+    
+    // ရိုးရှင်းစွာ Theme ပြောင်းပါ
+    if (body.getAttribute('data-theme') === 'light') {
+        body.setAttribute('data-theme', 'dark');
+        if(themeBtn) themeBtn.innerText = '☀️';
+    } else {
+        body.setAttribute('data-theme', 'light');
+        if(themeBtn) themeBtn.innerText = '🌙';
+    }
+}
+
+function toggleHub() {
+            const m = document.getElementById('hubMenu');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+// Flash Sale Listener
+        db.ref('flashSaleSettings').on('value', (snap) => {
+    const data = snap.val();
+    const banner = document.getElementById('flashSaleBanner');
+    
+    // Promo Tag နေရာကို ရှာထားမယ်
+    const promoTag = banner ? banner.querySelector('.promo-tag') : null;
+
+    if(data && data.isActive) {
+        isFlashSale = true; 
+        discountPct = data.discountPercent || 0;
+        banner.classList.add('active');
+        document.getElementById('bannerText').innerText = data.promoText || "Flash Sale လျှော့ဈေး";
+
+        /* --- ထပ်တိုးလိုက်တဲ့ Logic (မူရင်းကို မထိခိုက်ပါ) --- */
+        if (promoTag) {
+            if (discountPct > 0) {
+                // Admin က ရာခိုင်နှုန်းထည့်ထားရင် အဲ့ဒီ % ကိုပြမယ်
+                promoTag.innerText = `${discountPct}% လျှော့ဈေး`;
+            } else {
+                // မထည့်ထားရင် မူရင်း FLASH SALE စာသားအတိုင်း ထားမယ်
+                promoTag.innerText = "FLASH SALE";
+            }
+        }
+        /* ------------------------------------------- */
+
+        startCountdown(data.endTime);
+    } else {
+        isFlashSale = false; 
+        banner.classList.remove('active');
+        if (typeof saleTimer !== 'undefined') clearInterval(saleTimer);
+    }
+    render(allProducts);
+});
+
+        
+        function startCountdown(endTime) {
+            clearInterval(saleTimer);
+            saleTimer = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = new Date(endTime).getTime() - now;
+                if (diff < 0) { clearInterval(saleTimer); isFlashSale = false; render(allProducts); return; }
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('countdown').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }, 1000);
+        }
+// Inventory Listener
+db.ref('inventory').on('value', (snap) => {
+    const data = snap.val(); 
+    allProducts = []; 
+    for(let id in data) { 
+        allProducts.push({ id, ...data[id] }); 
+    }
+    render(allProducts);
+    
+    // ပစ္စည်းတွေပေါ်လာပြီး ၀.၂ စက္ကန့်နေရင် Effect စပေးမယ်
+    setTimeout(applyScrollEffect, 200); 
+});
+
+db.ref('shopStatus').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const overlay = document.getElementById('shopOverlay');
+    
+    if (data && data.isClosed) {
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.style.opacity = '1', 10);
+        document.getElementById('reasonDisplay').innerText = data.reason || "ခေတ္တဆိုင်ပိတ်ထားပါသည်။";
+        document.body.classList.add('no-scroll'); 
+    } else {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 500);
+        document.body.classList.remove('no-scroll');
+    }
+});  
+
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loadingScreen');
+    // ပစ္စည်းတွေ Load ပြီးရင် အနည်းငယ်ကြာမှ ပိတ်ပေးတာ ပိုသဘာဝကျပါတယ်
+    setTimeout(() => {
+        loader.style.opacity = '0';
+        loader.style.visibility = 'hidden';
+    }, 1000); // ၁ စက္ကန့်ကြာရင် ပျောက်သွားမယ်
+});
+// Admin ဘက်က 'announcement' လမ်းကြောင်းကို နားထောင်ခြင်း
+db.ref('announcement').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const bar = document.getElementById('warningBar'); // HTML ID
+    const textEl = document.getElementById('warningText'); // HTML ID
+
+    if (data && data.isActive && data.text) {
+        textEl.innerText = data.text; // Admin က .text နဲ့ သိမ်းထားလို့ပါ
+        bar.style.display = 'block'; 
+    } else {
+        bar.style.display = 'none'; 
+    }
+});
+
+
+    </script>
+    <div id="teleRedirectModal">
+    <div class="glass-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="60" style="margin-bottom:20px;">
+        <h2 style="color: #fff; margin-bottom: 15px;">THANK YOU!</h2>
+        <p style="color: #ddd; font-size: 14px; line-height: 1.6;">
+            Voucher ပုံလေးကို ဖုန်းထဲသိမ်းဆည်းပြီးပါပြီ။<br>
+            Telegram ထဲရောက်လျှင် ထိုပုံလေးကို <br> 
+            <span style="color: #0088cc; font-weight: bold;">ပို့ပေးထားပါဦးခင်ဗျာ။</span>
+        </p>
+        
+        <div style="font-size: 30px; font-weight: bold; color: #fff; margin: 20px 0;">
+            <span id="countdownSec">5</span>
+        </div>
+
+        <button onclick="goToTeleNow()" style="background: #0088cc; color: #fff; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer;">
+            ခုချက်ချင်းသွားမည်
+        </button>
+    </div>
+</div>
+
+</body>
+</html>
