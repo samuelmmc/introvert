@@ -1823,7 +1823,7 @@ function closeOrderModal() {
 
 
 // Voucher ကို ပုံအဖြစ် သိမ်းဆည်းရန် (html2canvas library လိုအပ်ပါသည်)
-function downloadVoucher() {
+async function downloadVoucher() {
     const card = document.getElementById('voucherCard');
     const container = document.getElementById('voucherContainer');
 
@@ -1832,43 +1832,56 @@ function downloadVoucher() {
         return;
     }
 
-    // ၁။ ပုံထုတ်မယ့်အချိန်မှာ အကုန်ပေါ်အောင် ခေတ္တပြင်ခြင်း (Logic မဖျက်ထားပါ)
     const originalHeight = card.style.height;
     const originalOverflow = container.style.overflowY;
-    
     card.style.height = 'auto'; 
     container.style.overflowY = 'visible';
 
-    // ၂။ ပုံထုတ်ခြင်း logic (Resolution ကြည်လင်အောင် Scale မြှင့်ထားသည်)
-    html2canvas(card, {
-        scale: 4, // 2 ကနေ 4 ကိုမြှင့်လိုက်လို့ စာသားတွေ လုံးဝမဝါးတော့ပါဘူး
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        letterRendering: true, // စာလုံးတွေကို ပိုပီသစေပါတယ်
-        imageTimeout: 0 // ပုံတွေ (QR/Texture) load တက်တာ မစောင့်နိုင်ဘဲ ပျက်မသွားစေဖို့
-    }).then(canvas => {
-        const link = document.createElement('a');
-        
-        // Order ID ပါရင် ဖိုင်နာမည်မှာ တစ်ခါတည်းထည့်ခြင်း
-        const orderId = document.getElementById('vOrderID') ? document.getElementById('vOrderID').innerText : 'New';
-        link.download = `IVRT-Receipt-${orderId}.png`;
-        
-        link.href = canvas.toDataURL("image/png", 1.0); // Quality အကောင်းဆုံး (1.0) နဲ့ ထုတ်ခြင်း
-        link.click();
+    try {
+        const canvas = await html2canvas(card, {
+            scale: 4,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff"
+        });
 
-        // ၃။ မူလအတိုင်း ပြန်ပြင်ခြင်း
-        card.style.height = originalHeight;
-        container.style.overflowY = originalOverflow;
-    }).catch(err => {
+        const dataUrl = canvas.toDataURL("image/png", 1.0);
+        const orderId = document.getElementById('vOrderID') ? document.getElementById('vOrderID').innerText : 'New';
+        const fileName = `IVRT-Receipt-${orderId}.png`;
+
+        // --- ဒီနေရာက အပြောင်းအလဲပါ ---
+        
+        // Telegram Mini App ထဲမှာပဲ Share Window ကို သုံးမယ်
+        // tg variable က အစ်ကို့ <head> ထဲမှာ ကြေညာထားတာ ရှိရပါမယ်
+        const isTelegram = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "");
+
+        if (isTelegram && navigator.share) {
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], fileName, { type: 'image/png' });
+            
+            await navigator.share({
+                files: [file],
+                title: 'IVRT Voucher',
+                text: 'Voucher သိမ်းဆည်းရန်'
+            });
+        } else {
+            // Web Browser (Chrome/Safari) မှာဆိုရင် အရင်အတိုင်း တန်းပြီး Download ဆွဲမယ်
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    } catch (err) {
         console.error("Voucher Save Error:", err);
-        // Error တက်ရင်လည်း ပုံစံမပျက်အောင် မူလအတိုင်း ပြန်ပြင်ပေးခြင်း
+    } finally {
         card.style.height = originalHeight;
         container.style.overflowY = originalOverflow;
-        alert("Voucher သိမ်းလို့မရဖြစ်နေပါတယ်။ ခဏနေပြန်ကြိုးစားကြည့်ပါဗျ။");
-    });
-}
+    }
+            }
+            
 
 function updatePaymentSelect(input) {
     const paymentLabel = input.value === 'COD' ? 'Cash on Delivery' : 'Mobile Banking (Prepaid)';
