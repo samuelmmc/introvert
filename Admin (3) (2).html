@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVRT | Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-black text-white py-5 px-6 shadow-md flex justify-between items-center sticky top-0 z-40">
+        <div>
+            <h1 class="text-xl font-bold tracking-widest font-serif">IVRT</h1>
+            <p class="text-[10px] tracking-wider text-slate-400 uppercase">Control Center & Inventory</p>
+        </div>
+        <div class="text-sm bg-slate-900 px-4 py-2 rounded-lg border border-slate-800">
+            <i class="fa-solid fa-user-shield text-emerald-400 mr-2"></i>Admin Mode
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Left Side: Add Product Form -->
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 sticky top-24">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                    <i class="fa-solid fa-plus-circle text-black mr-2"></i>ပစ္စည်းအသစ်ထည့်ရန်
+                </h3>
+                
+                <form id="admin-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Phone Case Name</label>
+                        <input type="text" id="input-name" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Compatible Phone Series</label>
+                        <input type="text" id="input-series" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50" placeholder="e.g. iPhone 15 Pro Max">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Price (MMK)</label>
+                            <input type="text" id="input-price" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50" placeholder="25,000 MMK">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock လက်ကျန်</label>
+                            <input type="number" id="input-stock" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Description</label>
+                        <textarea id="input-desc" rows="3" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Images (အများဆုံး ၅ ပုံ)</label>
+                        <input type="file" id="input-images" accept="image/*" multiple class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-black file:text-white cursor-pointer mt-1">
+                        <div id="image-preview-container" class="flex gap-2 mt-2 overflow-x-auto py-1 no-scrollbar"></div>
+                    </div>
+                    <button type="submit" id="btn-submit" class="w-full bg-black text-white py-3 rounded-xl font-medium text-sm hover:bg-slate-800 transition mt-2 cursor-pointer shadow-sm">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Save to Database
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side: Live Inventory & Control -->
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                        <i class="fa-solid fa-boxes-stacked text-black mr-2"></i>လက်ရှိတင်ထားသော ပစ္စည်းများ
+                    </h3>
+                    <span id="product-count" class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Total: 0</span>
+                </div>
+
+                <div id="loading" class="text-center text-slate-400 my-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ဒေတာများ ဆွဲယူနေပါသည်...</div>
+                
+                <!-- Admin Control Grid -->
+                <div id="admin-inventory-list" class="space-y-4"></div>
+            </div>
+        </div>
+
+    </main>
+    
+        <!-- 🌟 Edit Product Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-pen-to-square mr-2"></i>ပစ္စည်းအချက်အလက် ပြင်ဆင်ရန်</h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-black cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <form id="edit-form" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Phone Case Name</label>
+                    <input type="text" id="edit-name" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Compatible Phone Series</label>
+                    <input type="text" id="edit-series" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Price (MMK)</label>
+                        <input type="text" id="edit-price" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock လက်ကျန်</label>
+                        <input type="number" id="edit-stock" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Description</label>
+                    <textarea id="edit-desc" rows="3" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black bg-slate-50"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Images (ပုံအသစ်လဲလိုမှသာ ရွေးပါ - အများဆုံး ၅ ပုံ)</label>
+                    <input type="file" id="edit-images" accept="image/*" multiple class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-black file:text-white cursor-pointer mt-1">
+                    <div id="edit-image-preview-container" class="flex gap-2 mt-2 overflow-x-auto py-1 no-scrollbar"></div>
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-medium text-sm hover:bg-slate-200 transition cursor-pointer">မလုပ်တော့ပါ</button>
+                    <button type="submit" id="btn-edit-submit" class="flex-1 bg-black text-white py-3 rounded-xl font-medium text-sm hover:bg-slate-800 transition cursor-pointer shadow-sm">ပြင်ဆင်ချက်သိမ်းမည်</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // မူရင်း Supabase configuration 
+        const SUPABASE_URL = "https://kapqjzsilmkuzlwcrwvb.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthcHFqenNpbG1rdXpsd2Nyd3ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDAxMTYsImV4cCI6MjA5MDYxNjExNn0.dJLjpBKAuSYx3wGNF81P5bvdLH0uG75vvxSGkGXMgvs";   
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+                let selectedFiles = [];
+        let selectedEditFiles = []; // Edit Form အတွက် ပုံသိမ်းရန်
+        let currentProductData = null; // ပြင်ဆင်မယ့် Product ရဲ့ မူရင်း Data ခေတ္တသိမ်းရန်
+
+
+        // 1. Load Products (ပစ္စည်းစာရင်းနှင့် ဖျက်ရန် ခလုတ်များ ပြသခြင်း)
+        async function loadAdminInventory() {
+            const listContainer = document.getElementById('admin-inventory-list');
+            const loading = document.getElementById('loading');
+            const countBadge = document.getElementById('product-count');
+            
+            listContainer.innerHTML = '';
+            loading.classList.remove('hidden');
+
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error loading products:", error);
+                alert("ဒေတာဆွဲယူရာတွင် အမှားအယွင်းရှိပါသည်။");
+            } else {
+                countBadge.innerText = `Total: ${data.length}`;
+                if(data.length === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-slate-400 text-sm py-10">တင်ထားသော ထုတ်ကုန်ပစ္စည်း မရှိသေးပါ။</p>`;
+                }
+                
+                                data.forEach(item => {
+                    const mainImg = item.images && item.images.length > 0 ? item.images[0] : 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500';
+                    
+                    // JSON Data ကို ခလုတ်ထဲထည့်ရင် အမှားမတက်အောင် String အဖြစ် ပြောင်းလဲခြင်း
+                    const itemDataStr = btoa(unescape(encodeURIComponent(JSON.stringify(item))));
+
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition";
+                    row.innerHTML = `
+                        <div class="flex items-center space-x-4 min-w-0 flex-1">
+                            <img src="${mainImg}" class="w-16 h-16 object-cover rounded-lg border bg-white flex-shrink-0">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-sm text-slate-900 truncate">${item.name}</h4>
+                                <p class="text-xs text-slate-500 truncate">${item.series}</p>
+                                <div class="flex items-center space-x-3 mt-1">
+                                    <span class="text-xs font-semibold text-slate-900">${item.price}</span>
+                                    <span class="text-[11px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Stock: ${item.stock}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-shrink-0 flex items-center space-x-2">
+                            <button onclick="openEditModal('${itemDataStr}')" class="text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-2 rounded-lg transition font-medium cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> ပြင်မည်
+                            </button>
+                            <button onclick="deleteProduct(${item.id}, '${item.name}')" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-2 rounded-lg transition font-medium cursor-pointer">
+                                <i class="fa-solid fa-trash"></i> ဖျက်မည်
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(row);
+                });
+            }
+            loading.classList.add('hidden');
+        }
+
+        // 2. Delete Product Function (Customer Web မှပါ အလိုအလျောက် ပျောက်သွားမည်)
+        async function deleteProduct(id, name) {
+            if (confirm(`"${name}" ကို Database ထဲမှ အပြီးပိုင် ဖျက်လိုပါသလား?`)) {
+                const { error } = await _supabase
+                    .from('products')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert("ဖျက်ရခြင်းမအောင်မြင်ပါ- " + error.message);
+                } else {
+                    alert("ပစ္စည်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။");
+                    loadAdminInventory(); // Refresh list
+                }
+            }
+        }
+
+        // 3. Handle Image Previews
+        document.getElementById('input-images').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('image-preview-container');
+            previewContainer.innerHTML = '';
+            selectedFiles = Array.from(files);
+
+            if (selectedFiles.length > 5) {
+                alert("ပုံကို အများဆုံး ၅ ပုံအထိသာ ရွေးချယ်နိုင်ပါသည်။");
+                this.value = '';
+                selectedFiles = [];
+                return;
+            }
+
+            selectedFiles.forEach(file => {
+                const url = URL.createObjectURL(file);
+                const imgWrapper = document.createElement('div');
+                imgWrapper.className = "relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 flex-shrink-0";
+                imgWrapper.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                previewContainer.appendChild(imgWrapper);
+            });
+        });
+                // 🌟 Edit Modal ဖွင့်ခြင်းနှင့် မူရင်း Data များ ထည့်သွင်းခြင်း
+        function openEditModal(encodedData) {
+            const decodedData = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
+            currentProductData = decodedData;
+
+            document.getElementById('edit-id').value = decodedData.id;
+            document.getElementById('edit-name').value = decodedData.name;
+            document.getElementById('edit-series').value = decodedData.series;
+            document.getElementById('edit-price').value = decodedData.price;
+            document.getElementById('edit-stock').value = decodedData.stock;
+            document.getElementById('edit-desc').value = decodedData.description || '';
+            
+            // Preview နေရာဟောင်းရှင်းလင်းခြင်း
+            const previewContainer = document.getElementById('edit-image-preview-container');
+            previewContainer.innerHTML = '';
+            document.getElementById('edit-images').value = '';
+            selectedEditFiles = [];
+
+            // မူရင်းရှိပြီးသား ပုံဟောင်းများကို Preview ပြထားခြင်း
+            if (decodedData.images && decodedData.images.length > 0) {
+                decodedData.images.forEach(url => {
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = "relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 flex-shrink-0 opacity-70";
+                    imgWrapper.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                    previewContainer.appendChild(imgWrapper);
+                });
+            }
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        // Modal ပြန်ပိတ်ခြင်း
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        // Edit Form အတွက် ပုံရွေးချယ်မှုနှင့် Multi-preview ပြသခြင်း (အများဆုံး ၅ ပုံ)
+        document.getElementById('edit-images').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('edit-image-preview-container');
+            previewContainer.innerHTML = '';
+            selectedEditFiles = Array.from(e.target.files);
+
+            if (selectedEditFiles.length > 5) {
+                alert("ပုံကို အများဆုံး ၅ ပုံအထိသာ တပြိုင်နက် ရွေးချယ်နိုင်ပါသည်။");
+                this.value = ''; selectedEditFiles = []; return;
+            }
+            selectedEditFiles.forEach(file => {
+                const url = URL.createObjectURL(file);
+                const imgWrapper = document.createElement('div');
+                imgWrapper.className = "relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 flex-shrink-0";
+                imgWrapper.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                previewContainer.appendChild(imgWrapper);
+            });
+        });
+
+        // ပြင်ဆင်ထားသည့် ဒေတာများကို Supabase သို့ ပြန်လည် Update လုပ်ခြင်း
+        document.getElementById('edit-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btnEditSubmit = document.getElementById('btn-edit-submit');
+            btnEditSubmit.disabled = true;
+            btnEditSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>ပြင်ဆင်နေပါသည်...`;
+
+            const id = document.getElementById('edit-id').value;
+            let finalUrls = currentProductData.images; // ပုံအသစ်မရွေးရင် မူရင်းပုံဟောင်းအတိုင်း ထားမယ်
+
+            try {
+                // ပုံအသစ် ရွေးချယ်ထားမှသာ Storage ထဲတင်ပြီး ပုံအသစ်ပြောင်းလဲမည်
+                if (selectedEditFiles.length > 0) {
+                    let uploadedUrls = [];
+                    for(let i=0; i < selectedEditFiles.length; i++) {
+                        const file = selectedEditFiles[i];
+                        const fileName = `${Date.now()}_edit_${i}_${file.name}`;
+                        const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
+                        if (uploadError) throw uploadError;
+                        const { data: publicUrlData } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                        uploadedUrls.push(publicUrlData.publicUrl);
+                    }
+                    finalUrls = uploadedUrls;
+                }
+
+                // Database Table ကို Update လုပ်ခြင်း
+                const { error: updateError } = await _supabase
+                    .from('products')
+                    .update({
+                        name: document.getElementById('edit-name').value,
+                        series: document.getElementById('edit-series').value,
+                        price: document.getElementById('edit-price').value,
+                        stock: document.getElementById('edit-stock').value,
+                        description: document.getElementById('edit-desc').value,
+                        images: finalUrls
+                    })
+                    .eq('id', id);
+
+                if (updateError) throw updateError;
+                
+                alert('ပစ္စည်းအချက်အလက် ပြင်ဆင်ပြီးပါပြီ။');
+                closeEditModal();
+                loadAdminInventory(); // စာရင်းပြန်ဆွဲရန်
+            } catch (error) {
+                alert('ပြင်ဆင်ရာတွင် အမှားအယွင်းရှိခဲ့သည်: ' + error.message);
+            } finally {
+                btnEditSubmit.disabled = false;
+                btnEditSubmit.innerHTML = `ပြင်ဆင်ချက်သိမ်းမည်`;
+            }
+        });
+
+        // 4. Submit Form to Supabase (Upload Images & Insert Product Data)
+        document.getElementById('admin-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>သိမ်းဆည်းနေပါသည်...`;
+
+            const name = document.getElementById('input-name').value;
+            const series = document.getElementById('input-series').value;
+            const price = document.getElementById('input-price').value;
+            const stock = document.getElementById('input-stock').value;
+            const desc = document.getElementById('input-desc').value;
+
+            let uploadedUrls = [];
+
+            try {
+                // Upload Images to Supabase Storage Bucket
+                for(let i=0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const fileName = `${Date.now()}_${i}_${file.name}`;
+                    
+                    const { data, error: uploadError } = await _supabase.storage
+                        .from('product-images')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    // Get Public URL
+                    const { data: publicUrlData } = _supabase.storage
+                        .from('product-images')
+                        .getPublicUrl(fileName);
+
+                    uploadedUrls.push(publicUrlData.publicUrl);
+                }
+
+                // Insert Row to Database Table
+                const { error: insertError } = await _supabase
+                    .from('products')
+                    .insert([{
+                        name: name,
+                        series: series,
+                        price: price,
+                        stock: stock,
+                        description: desc,
+                        images: uploadedUrls
+                    }]);
+
+                if (insertError) throw insertError;
+
+                alert('Supabase Database ထဲသို့ ပစ္စည်းအသစ် ထည့်သွင်းအောင်မြင်ပါသည်!');
+                document.getElementById('admin-form').reset();
+                document.getElementById('image-preview-container').innerHTML = '';
+                selectedFiles = [];
+                loadAdminInventory(); // List ကို Update ပြန်လုပ်ရန်
+                
+            } catch (error) {
+                alert('အမှားအယွင်းရှိခဲ့သည်: ' + error.message);
+                console.error(error);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Save to Database`;
+            }
+        });
+
+        // App Initialization
+        window.addEventListener('DOMContentLoaded', loadAdminInventory);
+    </script>
+    
+
+</body>
+</html>
