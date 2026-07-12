@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVRT Phone Case Boutique YGN | Trendy & Stylish Cases</title>
+     <meta name="description" content="IVRT Phone Case Boutique YGN မှာ အရည်အသွေးမြင့် ဖုန်းကာဗာများနှင့် ခေတ်ဆန်သော ဒီဇိုင်းသစ်များကို စျေးနှုန်းသက်သာစွာဖြင့် ဝယ်ယူနိုင်ပါသည်။">
+     
+      <!-- Open Graph (ဒီ Tags တွေက Link share ရင် Logo နဲ့ Text ပေါ်အောင်လုပ်ပေးတာပါ) -->
+    <meta property="og:title" content="IVRT Phone Case Boutique YGN">
+    <meta property="og:description" content="Trendy & Premium Phone Cases in Yangon. Shop the latest styles now!">
+    <meta property="og:image" content="https://i.postimg.cc/VNRfjfGG/copilot-image-1783252200293.png"> <!-- သင့် Logo ပုံ URL ကို ဒီမှာထည့်ပါ -->
+    <meta property="og:url" content="https://your-website-url.com">
+    <meta property="og:type" content="website">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #fafafa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .slider-container { scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .slider-item { scroll-snap-align: start; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .zoom-container { overflow: hidden; position: relative; }
+        .zoom-img { transition: transform 0.2s ease; cursor: zoom-in; max-height: 70vh; }
+    </style>
+</head>
+<body>
+
+        <!-- 🌟 Premium Luxury Signboard Header -->
+    <header class="bg-white/90 backdrop-blur-md text-black py-1 text-center border-b border-neutral-100 sticky top-0 z-40 shadow-xs tracking-wider">
+        <div class="relative max-w-md mx-auto px-4 flex flex-col items-center justify-center">
+            <!-- Luxury Frame/Line Decorations -->
+            <div class="w-12 h-[1px] bg-neutral-300 mb-2.5"></div>
+            
+            <!-- Main Brand Logo -->
+            <h1 class="text-3xl font-extrabold tracking-[0.25em] text-neutral-900 font-serif uppercase">
+                IVRT
+            </h1>
+            
+            <!-- Subtitles -->
+            <p class="text-[10px] tracking-[0.3em] text-neutral-400 uppercase mt-2 font-medium">
+                Phone Case Boutique
+            </p>
+            <div class="flex items-center space-x-1.5 mt-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                <p class="text-[9px] tracking-[0.15em] text-neutral-400 uppercase font-semibold">
+                    Yangon
+                </p>
+            </div>
+
+            <div class="w-12 h-[1px] bg-neutral-300 mt-3"></div>
+        </div>
+    </header>
+
+
+    <main class="max-w-md mx-auto px-4 py-6 mb-20">
+        <div id="loading" class="text-center text-gray-400 my-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ပစ္စည်းများ ဆွဲယူနေပါသည်...</div>
+        
+        <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
+    </main>
+
+    <div id="detail-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-serif font-bold text-lg text-gray-900">Product Details</h2>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="relative w-full bg-gray-100 rounded-2xl overflow-hidden mb-4 zoom-container">
+                <div id="modal-slider" class="slider-container flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar" onscroll="resetAutoSlideTimer()"></div>
+                <div id="slide-indicator" class="absolute bottom-3 left-3 bg-black/60 text-white text-[11px] px-2.5 py-1 rounded-full">1 / 1</div>
+                <div class="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] px-2.5 py-1 rounded-full"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Double-Tap to Zoom</div>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <h3 id="modal-name" class="text-xl font-bold text-gray-900"></h3>
+                    <p id="modal-series" class="text-sm text-gray-500 mt-0.5"></p>
+                </div>
+                <hr class="border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span id="modal-price" class="text-lg font-bold text-gray-900"></span>
+                    <span id="modal-stock" class="text-sm text-orange-600 font-medium"></span>
+                </div>
+                <div>
+                    <h4 class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Description</h4>
+                    <p id="modal-desc" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-4">
+                    <button class="w-full border-2 border-black py-3 rounded-xl font-medium text-sm hover:bg-black hover:text-white" onclick="alert('Cart ထဲထည့်ပြီးပါပြီ')">Add to Cart</button>
+                    <button class="w-full bg-black text-white py-3 rounded-xl font-medium text-sm hover:bg-gray-800" onclick="alert('ဝယ်ယူမှု အောင်မြင်ပါသည်')">ဝယ်မည်</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl my-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <h3 class="text-lg font-bold text-gray-900"><i class="fa-solid fa-user-gear mr-2"></i>IVRT Admin Panel</h3>
+                <button onclick="toggleModal('admin-modal', false)" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="admin-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Phone Case Name</label>
+                    <input type="text" id="input-name" required class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Compatible Phone Series</label>
+                    <input type="text" id="input-series" required class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black" placeholder="e.g. iPhone 15 Pro Max">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Price (MMK)</label>
+                        <input type="text" id="input-price" required class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black" placeholder="25,000 MMK">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock လက်ကျန်</label>
+                        <input type="number" id="input-stock" required class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Product Description</label>
+                    <textarea id="input-desc" rows="2" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-black"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Product Images (အများဆုံး ၅ ပုံ)</label>
+                    <input type="file" id="input-images" accept="image/*" multiple class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-black file:text-white cursor-pointer">
+                    <div id="image-preview-container" class="flex gap-2 mt-2 overflow-x-auto py-1"></div>
+                </div>
+                <button type="submit" id="btn-submit" class="w-full bg-black text-white py-3 rounded-xl font-medium text-sm hover:bg-gray-800 transition mt-2">သိမ်းဆည်းမည် (Save to Database)</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white py-8 text-center text-xs text-gray-400 border-t border-gray-100 mt-12">
+        <span onclick="triggerAdmin()" class="cursor-pointer select-none hover:text-gray-600">© 2026 IVRT PHONE CASE BOUTIQUE YGN.</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ⚠️ ပြင်ဆင်ရန်- သင်၏ Supabase Project Settings > API မှ အချက်အလက်များကို ဤနေရာတွင် အစားထိုးပါ
+        const SUPABASE_URL = "https://kapqjzsilmkuzlwcrwvb.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthcHFqenNpbG1rdXpsd2Nyd3ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDAxMTYsImV4cCI6MjA5MDYxNjExNn0.dJLjpBKAuSYx3wGNF81P5bvdLH0uG75vvxSGkGXMgvs";   
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let selectedFiles = [];
+        window.autoSlideInterval = null;
+        window.currentSlideIndex = 0;
+        window.totalSlides = 0;
+
+        // Load Products From Supabase Table
+        async function loadProducts() {
+            const grid = document.getElementById('product-grid');
+            const loading = document.getElementById('loading');
+            grid.innerHTML = '';
+            loading.classList.remove('hidden');
+
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error loading products:", error);
+                alert("ဒေတာဆွဲယူရာတွင် အမှားအယွင်းရှိပါသည်။");
+            } else {
+                if(data.length === 0) {
+                    grid.innerHTML = `<p class="col-span-2 text-center text-gray-400 text-sm py-10">ထုတ်ကုန်ပစ္စည်း မရှိသေးပါ။</p>`;
+                }
+                data.forEach(item => {
+                    const mainImg = item.images && item.images.length > 0 ? item.images[0] : 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500';
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-xl overflow-hidden shadow-xs border border-gray-100 flex flex-col justify-between cursor-pointer";
+                    card.innerHTML = `
+                        <div class="relative aspect-square bg-gray-50">
+                            <img src="${mainImg}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 left-2 bg-black text-white text-[10px] px-2 py-0.5 rounded-full font-medium">In Stock</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-bold text-sm text-gray-800 truncate">${item.name}</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">${item.series}</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-sm font-semibold text-gray-900">${item.price}</span>
+                                <span class="text-[11px] text-gray-400">Stock: ${item.stock}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 mt-3">
+                                <button class="text-[11px] border border-black py-1.5 rounded-md" onclick="event.stopPropagation(); alert('Cart ထဲထည့်ပြီးပါပြီ')">Add to Cart</button>
+                                <button class="text-[11px] bg-black text-white py-1.5 rounded-md" onclick="event.stopPropagation(); alert('ဝယ်ယူမှု အောင်မြင်ပါသည်')">ဝယ်မည်</button>
+                            </div>
+                        </div>
+                    `;
+                    card.onclick = () => openDetailModal(item.name, item.series, item.price, item.stock, item.description, item.images);
+                    grid.appendChild(card);
+                });
+            }
+            loading.classList.add('hidden');
+        }
+
+        // Handle Image Previews
+        document.getElementById('input-images').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('image-preview-container');
+            previewContainer.innerHTML = '';
+            selectedFiles = Array.from(files);
+
+            if (selectedFiles.length > 5) {
+                alert("ပုံကို အများဆုံး ၅ ပုံအထိသာ ရွေးချယ်နိုင်ပါသည်။");
+                this.value = '';
+                selectedFiles = [];
+                return;
+            }
+
+            selectedFiles.forEach(file => {
+                const url = URL.createObjectURL(file);
+                const imgWrapper = document.createElement('div');
+                imgWrapper.className = "relative w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0";
+                imgWrapper.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                previewContainer.appendChild(imgWrapper);
+            });
+        });
+
+        // Submit Form to Supabase (Upload & Save Data)
+        document.getElementById('admin-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "သိမ်းဆည်းနေပါသည်...";
+
+            const name = document.getElementById('input-name').value;
+            const series = document.getElementById('input-series').value;
+            const price = document.getElementById('input-price').value;
+            const stock = document.getElementById('input-stock').value;
+            const desc = document.getElementById('input-desc').value;
+
+            let uploadedUrls = [];
+
+            try {
+                // 1. Upload Images to Supabase Storage Bucket
+                for(let i=0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const fileName = `${Date.now()}_${i}_${file.name}`;
+                    
+                    const { data, error: uploadError } = await _supabase.storage
+                        .from('product-images')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    // Get Public URL
+                    const { data: publicUrlData } = _supabase.storage
+                        .from('product-images')
+                        .getPublicUrl(fileName);
+
+                    uploadedUrls.push(publicUrlData.publicUrl);
+                }
+
+                // 2. Insert Row to Database Table
+                const { error: insertError } = await _supabase
+                    .from('products')
+                    .insert([{
+                        name: name,
+                        series: series,
+                        price: price,
+                        stock: stock,
+                        description: desc,
+                        images: uploadedUrls
+                    }]);
+
+                if (insertError) throw insertError;
+
+                alert('Supabase Database ထဲသို့ ထည့်သွင်းအောင်မြင်ပါသည်!');
+                document.getElementById('admin-form').reset();
+                document.getElementById('image-preview-container').innerHTML = '';
+                selectedFiles = [];
+                toggleModal('admin-modal', false);
+                loadProducts(); // Reload Grid
+                
+            } catch (error) {
+                alert('အမှားအယွင်းရှိခဲ့သည်: ' + error.message);
+                console.error(error);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "သိမ်းဆည်းမည် (Save to Database)";
+            }
+        });
+
+        // UI Logic functions
+        function toggleModal(id, show) {
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        }
+
+      
+
+        function openDetailModal(name, series, price, stock, desc, images) {
+            document.getElementById('modal-name').innerText = name;
+            document.getElementById('modal-series').innerText = series;
+            document.getElementById('modal-price').innerText = price;
+            document.getElementById('modal-stock').innerText = `လက်ကျန်: ${stock} ခု`;
+            document.getElementById('modal-desc').innerText = desc;
+
+            const slider = document.getElementById('modal-slider');
+            slider.innerHTML = '';
+            
+            const imgList = images && images.length > 0 ? images : ['https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500'];
+            window.totalSlides = imgList.length;
+            window.currentSlideIndex = 0;
+            updateIndicator();
+
+            imgList.forEach((url) => {
+                const div = document.createElement('div');
+                div.className = 'slider-item min-w-full flex justify-center items-center bg-gray-50';
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'zoom-img w-full object-contain';
+                
+                let isZoomed = false;
+                img.addEventListener('click', (e) => {
+                    if (e.detail === 2) {
+                        if (!isZoomed) {
+                            img.style.transform = 'scale(2)';
+                            clearInterval(window.autoSlideInterval);
+                        } else {
+                            img.style.transform = 'scale(1)';
+                            startAutoSlide();
+                        }
+                        isZoomed = !isZoomed;
+                    }
+                });
+                div.appendChild(img);
+                slider.appendChild(div);
+            });
+
+            toggleModal('detail-modal', true);
+            startAutoSlide();
+
+            slider.onscroll = () => {
+                window.currentSlideIndex = Math.round(slider.scrollLeft / slider.clientWidth);
+                updateIndicator();
+            };
+        }
+
+        function closeDetailModal() {
+            toggleModal('detail-modal', false);
+            clearInterval(window.autoSlideInterval);
+        }
+
+        function updateIndicator() {
+            document.getElementById('slide-indicator').innerText = `${window.currentSlideIndex + 1} / ${window.totalSlides}`;
+        }
+
+        function startAutoSlide() {
+            clearInterval(window.autoSlideInterval);
+            if (window.totalSlides <= 1) return;
+            window.autoSlideInterval = setInterval(() => {
+                const slider = document.getElementById('modal-slider');
+                window.currentSlideIndex = (window.currentSlideIndex + 1) % window.totalSlides;
+                slider.scrollTo({ left: window.currentSlideIndex * slider.clientWidth, behavior: 'smooth' });
+                updateIndicator();
+            }, 4000);
+        }
+
+        function resetAutoSlideTimer() {
+            clearInterval(window.autoSlideInterval);
+            clearTimeout(window.slideTimeout);
+            window.slideTimeout = setTimeout(startAutoSlide, 3000);
+        }
+
+        // App Initialization
+        window.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html>
+    
