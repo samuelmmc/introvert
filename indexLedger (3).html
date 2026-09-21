@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phone Cover Sales Ledger - Mobile Deluxe Edition</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #141414;
+            --border-color: #2a2a2a;
+            --accent-white: #ffffff;
+            --text-muted: #888888;
+            --hover-bg: #1f1f1f;
+            --success-color: #81c784;
+            --warning-color: #e57373;
+            --return-color: #ffb74d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--accent-white);
+            padding: 12px;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .action-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+
+        .date-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .date-filter-bar label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .main-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-section, .table-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 500;
+            color: var(--accent-white);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--accent-white);
+            border-radius: 6px;
+            font-size: 16px; /* Prevents auto-zoom on iOS */
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--accent-white);
+        }
+
+        .btn {
+            background-color: var(--accent-white);
+            color: var(--bg-color);
+            border: 1px solid var(--accent-white);
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 6px;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent-white);
+            border: 1px solid var(--border-color);
+            padding: 8px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-outline.active {
+            background-color: var(--accent-white);
+            color: var(--bg-color);
+        }
+
+        .filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .filter-scroll {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobile Card View List */
+        .record-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .record-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s ease;
+        }
+
+        .record-card.paid { border-left-color: var(--success-color); }
+        .record-card.pending { border-left-color: var(--warning-color); }
+        .record-card.returned { border-left-color: var(--return-color); opacity: 0.7; }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 12px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            display: inline-block;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .status-badge.paid { background: rgba(129, 199, 132, 0.2); color: var(--success-color); }
+        .status-badge.pending { background: rgba(229, 115, 115, 0.2); color: var(--warning-color); }
+        .status-badge.returned { background: rgba(255, 183, 77, 0.2); color: var(--return-color); }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 16px;
+        }
+
+        .voucher-card, .edit-modal-card {
+            background: #ffffff;
+            color: #111111;
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .edit-modal-card {
+            background: var(--card-bg);
+            color: var(--accent-white);
+            border: 1px solid var(--border-color);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .voucher-header {
+            text-align: center;
+            border-bottom: 2px solid #111;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+        }
+
+        .voucher-title {
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .voucher-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .voucher-total {
+            border-top: 2px dashed #ccc;
+            margin-top: 12px;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .voucher-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .voucher-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #111;
+            background: #111;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .voucher-btn.close {
+            background: transparent;
+            color: #111;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 24px; }
+            .container { max-width: 1200px; }
+            header { flex-direction: row; justify-content: space-between; }
+            .action-bar { width: auto; display: flex; }
+            .stats-grid { grid-template-columns: repeat(5, 1fr); }
+            .main-grid { display: grid; grid-template-columns: 320px 1fr; }
+        }
+
+        /* Status Selection Modal Styling */
+        .status-select-card {
+            background: #181818;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 320px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .status-modal-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--accent-white);
+            letter-spacing: 0.5px;
+        }
+
+        .status-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .status-opt-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .status-opt-btn.paid:hover, .status-opt-btn.paid { border-color: var(--success-color); color: var(--success-color); }
+        .status-opt-btn.pending:hover, .status-opt-btn.pending { border-color: var(--warning-color); color: var(--warning-color); }
+        .status-opt-btn.returned:hover, .status-opt-btn.returned { border-color: var(--return-color); color: var(--return-color); }
+
+        .status-opt-btn:active {
+            transform: scale(0.98);
+        }
+
+        .status-cancel-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <div class="brand-title">IVRT PHONE CASE BOUTIQUE YGN LEDGER</div>
+            <div class="brand-subtitle">Mobile Ledger System</div>
+        </div>
+        <div class="action-bar">
+            <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
+            <button class="btn-outline" onclick="backupData()">Backup</button>
+            <button class="btn-outline" onclick="document.getElementById('importFile').click()">Restore</button>
+            <input type="file" id="importFile" style="display:none" onchange="restoreData(event)" accept=".json">
+        </div>
+    </header>
+
+    <div class="date-filter-bar">
+        <label>Period:</label>
+        <button class="btn-outline active" id="timeAll" onclick="setTimeFilter('all')">All Time</button>
+        <button class="btn-outline" id="timeToday" onclick="setTimeFilter('today')">Today</button>
+        <button class="btn-outline" id="timeMonth" onclick="setTimeFilter('month')">This Month</button>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Valid Orders</div>
+            <div class="stat-value" id="statOrders">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Revenue</div>
+            <div class="stat-value" id="statTotal">0 Ks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Paid Profit</div>
+            <div class="stat-value" id="statPaidProfit" style="color: var(--success-color);">0 Ks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending Profit</div>
+            <div class="stat-value" id="statPendingProfit" style="color: var(--warning-color);">0 Ks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Paid Orders</div>
+            <div class="stat-value" id="statPaidCount" style="color: var(--success-color);">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending Orders</div>
+            <div class="stat-value" id="statPendingCount" style="color: var(--warning-color);">0</div>
+        </div>
+
+        <div class="stat-card" style="grid-column: span 2;">
+            <div class="stat-label">Returned Orders</div>
+            <div class="stat-value" id="statReturnedCount" style="color: var(--return-color);">0</div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <!-- New Entry Form -->
+        <div class="form-section">
+            <div class="section-title">New Entry</div>
+            <form id="ledgerForm">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="name" placeholder="Customer Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Ph No.</label>
+                    <input type="tel" id="phNo" placeholder="09xxxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="address" rows="2" placeholder="Township / Address"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Item / Model</label>
+                    <input type="text" id="item" placeholder="e.g. iPhone 15 Pro Leather" required>
+                </div>
+                <div class="form-group">
+                    <label>Deli Name & ID</label>
+                    <input type="text" id="deliId" placeholder="Royal / ID-12345">
+                </div>
+                <div class="form-group">
+                    <label>Total Price (Ks)</label>
+                    <input type="number" id="total" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Profit (Ks)</label>
+                    <input type="number" id="profit" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Order Status</label>
+                    <select id="status">
+                        <option value="pending">Pending (မရှင်းရသေး)</option>
+                        <option value="paid">Paid (ရှင်းပြီး)</option>
+                        <option value="returned">Returned (ပစ္စည်းပြန်အပ်)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Remark</label>
+                    <input type="text" id="returnReason" placeholder="Remark / Reason">
+                </div>
+                <button type="submit" class="btn">Save Record</button>
+            </form>
+        </div>
+
+        <!-- History Section (Mobile Card View) -->
+        <div class="table-section">
+            <div class="filter-container">
+                <div class="section-title" style="margin:0;">Records History</div>
+                <div class="filter-scroll">
+                    <button class="btn-outline active" id="filterAll" onclick="setStatusFilter('all')">All</button>
+                    <button class="btn-outline" id="filterPending" onclick="setStatusFilter('pending')">Pending</button>
+                    <button class="btn-outline" id="filterPaid" onclick="setStatusFilter('paid')">Paid</button>
+                    <button class="btn-outline" id="filterReturned" onclick="setStatusFilter('returned')">Returned</button>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search name, phone, item, deli, address..." 
+                       style="background: var(--bg-color); border: 1px solid var(--border-color); color: white; padding: 10px; font-size: 14px; border-radius: 6px; width: 100%;"
+                       onkeyup="renderRecords()">
+            </div>
+
+            <div class="record-list" id="recordList">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="voucherModal">
+    <div class="voucher-card">
+        <div class="voucher-header">
+            <div class="voucher-title">TikTok Cover Shop</div>
+            <div style="font-size: 11px; color: #666; margin-top: 2px;">Sales Voucher</div>
+        </div>
+        <div id="voucherContent"></div>
+        <div class="voucher-actions">
+            <button class="voucher-btn close" onclick="closeVoucher()">Close</button>
+            <button class="voucher-btn" onclick="window.print()">Print / PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- Status Selector Modal -->
+<div class="modal-overlay" id="statusModal" onclick="closeStatusModal(event)">
+    <div class="status-select-card">
+        <div class="status-modal-title">Change Order Status</div>
+        <div class="status-options">
+            <button class="status-opt-btn paid" onclick="selectStatus('paid')">✓ PAID (ရှင်းပြီး)</button>
+            <button class="status-opt-btn pending" onclick="selectStatus('pending')">✕ PENDING (မရှင်းရသေး)</button>
+            <button class="status-opt-btn returned" onclick="selectStatus('returned')">↩ RETURNED (ပြန်အပ်)</button>
+        </div>
+        <button class="status-cancel-btn" onclick="document.getElementById('statusModal').style.display='none'">Cancel</button>
+    </div>
+</div>
+
+<!-- Edit Record Modal -->
+<div class="modal-overlay" id="editModal" onclick="closeEditModal(event)">
+    <div class="edit-modal-card">
+        <div class="section-title" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Edit Record</div>
+      <form id="editForm" onsubmit="saveEditRecord(event)">
+            <input type="hidden" id="editRecordId">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="editDate" required>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+                <label>Ph No.</label>
+                <input type="tel" id="editPhNo" required>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea id="editAddress" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Item / Model</label>
+                <input type="text" id="editItem" required>
+            </div>
+            <div class="form-group">
+                <label>Deli Name & ID</label>
+                <input type="text" id="editDeliId">
+            </div>
+            <div class="form-group">
+                <label>Total Price (Ks)</label>
+                <input type="number" id="editTotal" required>
+            </div>
+            <div class="form-group">
+                <label>Profit (Ks)</label>
+                <input type="number" id="editProfit" required>
+            </div>
+            <div class="form-group">
+                <label>Remark</label>
+                <input type="text" id="editReturnReason">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button type="submit" class="btn" style="background:var(--success-color); color:#000;">Save</button>
+                <button type="button" class="btn" style="background:transparent; color:#fff; border-color:var(--border-color);" onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let records = JSON.parse(localStorage.getItem('tiktok_cover_sales')) || [];
+    let currentStatusFilter = 'all';
+    let currentTimeFilter = 'all';
+
+    document.getElementById('date').valueAsDate = new Date();
+
+    const form = document.getElementById('ledgerForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const record = {
+            id: Date.now(),
+            date: document.getElementById('date').value,
+            name: document.getElementById('name').value,
+            phNo: document.getElementById('phNo').value,
+            address: document.getElementById('address').value,
+            item: document.getElementById('item').value,
+            deliId: document.getElementById('deliId').value,
+            total: Number(document.getElementById('total').value),
+            profit: Number(document.getElementById('profit').value),
+            status: document.getElementById('status').value,
+            returnReason: document.getElementById('returnReason').value
+        };
+
+        records.unshift(record);
+        saveData();
+        renderRecords();
+        
+        form.reset();
+        document.getElementById('date').valueAsDate = new Date();
+    });
+
+    function saveData() {
+        localStorage.setItem('tiktok_cover_sales', JSON.stringify(records));
+    }
+
+    let selectedRecordId = null;
+
+    function openStatusModal(id) {
+        selectedRecordId = id;
+        document.getElementById('statusModal').style.display = 'flex';
+    }
+
+    function closeStatusModal(e) {
+        if (e.target.id === 'statusModal') {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+    }
+
+    function selectStatus(newStatus) {
+        if (!selectedRecordId) return;
+
+        const index = records.findIndex(r => r.id === selectedRecordId);
+        if (index !== -1) {
+            if (newStatus === 'returned') {
+                const reason = prompt('Return အကြောင်းအရင်း ရေးပါ:', records[index].returnReason || '');
+                records[index].returnReason = reason || 'Returned';
+            } else {
+                records[index].returnReason = '';
+            }
+
+            records[index].status = newStatus;
+            saveData();
+            renderRecords();
+        }
+
+        document.getElementById('statusModal').style.display = 'none';
+        selectedRecordId = null;
+    }
+
+    function deleteRecord(id) {
+        if(confirm('ဒီစာရင်းကို ဖျက်ရန် သေချာပါသလား?')) {
+            records = records.filter(item => item.id !== id);
+            saveData();
+            renderRecords();
+        }
+    }
+
+    /* Edit Feature Functions */
+    function openEditModal(id) {
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        document.getElementById('editRecordId').value = record.id;
+        document.getElementById('editDate').value = record.date || '';
+        document.getElementById('editName').value = record.name || '';
+        document.getElementById('editPhNo').value = record.phNo || '';
+        document.getElementById('editAddress').value = record.address || '';
+        document.getElementById('editItem').value = record.item || '';
+        document.getElementById('editDeliId').value = record.deliId || '';
+        document.getElementById('editTotal').value = record.total || 0;
+        document.getElementById('editProfit').value = record.profit || 0;
+        document.getElementById('editReturnReason').value = record.returnReason || '';
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal(e) {
+        if (e.target.id === 'editModal') {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    }
+
+    function saveEditRecord(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById('editRecordId').value);
+        const index = records.findIndex(r => r.id === id);
+
+        if (index !== -1) {
+            records[index].date = document.getElementById('editDate').value;
+            records[index].name = document.getElementById('editName').value;
+            records[index].phNo = document.getElementById('editPhNo').value;
+            records[index].address = document.getElementById('editAddress').value;
+            records[index].item = document.getElementById('editItem').value;
+            records[index].deliId = document.getElementById('editDeliId').value;
+            records[index].total = Number(document.getElementById('editTotal').value) || 0;
+            records[index].profit = Number(document.getElementById('editProfit').value) || 0;
+            records[index].returnReason = document.getElementById('editReturnReason').value;
+
+            saveData();
+            renderRecords();
+            document.getElementById('editModal').style.display = 'none';
+        }
+    }
+
+    function setStatusFilter(filter) {
+        currentStatusFilter = filter;
+        document.querySelectorAll('.filter-scroll .btn-outline').forEach(b => b.classList.remove('active'));
+        if(filter === 'all') document.getElementById('filterAll').classList.add('active');
+        if(filter === 'pending') document.getElementById('filterPending').classList.add('active');
+        if(filter === 'paid') document.getElementById('filterPaid').classList.add('active');
+        if(filter === 'returned') document.getElementById('filterReturned').classList.add('active');
+        renderRecords();
+    }
+
+    function setTimeFilter(filter) {
+        currentTimeFilter = filter;
+        document.querySelectorAll('.date-filter-bar .btn-outline').forEach(b => b.classList.remove('active'));
+        if(filter === 'all') document.getElementById('timeAll').classList.add('active');
+        if(filter === 'today') document.getElementById('timeToday').classList.add('active');
+        if(filter === 'month') document.getElementById('timeMonth').classList.add('active');
+        renderRecords();
+    }
+
+    function renderRecords() {
+        const listContainer = document.getElementById('recordList');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        listContainer.innerHTML = '';
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const currentMonthStr = new Date().toISOString().slice(0, 7);
+
+        let filteredRecords = records.filter(r => {
+            const matchesSearch = 
+                (r.name && r.name.toLowerCase().includes(search)) || 
+                (r.phNo && r.phNo.toLowerCase().includes(search)) || 
+                (r.item && r.item.toLowerCase().includes(search)) ||
+                (r.address && r.address.toLowerCase().includes(search)) ||
+                (r.deliId && r.deliId.toLowerCase().includes(search)) ||
+                (r.returnReason && r.returnReason.toLowerCase().includes(search)) ||
+                (r.date && r.date.toLowerCase().includes(search));
+            
+            const matchesStatus = currentStatusFilter === 'all' || (r.status || 'pending') === currentStatusFilter;
+
+            let matchesTime = true;
+            if (currentTimeFilter === 'today') {
+                matchesTime = (r.date === todayStr);
+            } else if (currentTimeFilter === 'month') {
+                matchesTime = (r.date && r.date.startsWith(currentMonthStr));
+            }
+
+            return matchesSearch && matchesStatus && matchesTime;
+        });
+
+        let totalRevenue = 0, paidProfit = 0, pendingProfit = 0, validOrdersCount = 0, returnedCount = 0;
+        let paidCount = 0, pendingCount = 0;
+
+        filteredRecords.forEach(r => {
+            if (r.status === 'returned') {
+                returnedCount += 1;
+            } else {
+                validOrdersCount += 1;
+                totalRevenue += r.total;
+                if(r.status === 'paid') {
+                    paidProfit += r.profit;
+                    paidCount += 1;
+                } else {
+                    pendingProfit += r.profit;
+                    pendingCount += 1;
+                }
+            }
+        });
+
+        updateStats(validOrdersCount, totalRevenue, paidProfit, pendingProfit, returnedCount, paidCount, pendingCount);
+
+        if (filteredRecords.length === 0) {
+            listContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">No records found.</div>`;
+            return;
+        }
+
+        filteredRecords.forEach(r => {
+            const status = r.status || 'pending';
+            let badgeClass = status === 'paid' ? 'paid' : (status === 'returned' ? 'returned' : 'pending');
+            let badgeText = status === 'paid' ? '✓ PAID' : (status === 'returned' ? '↩ RETURN' : '✕ PENDING');
+
+            const card = document.createElement('div');
+            card.className = `record-card ${status}`;
+
+            card.innerHTML = `
+                <div class="card-header-row">
+                    <div>
+                        <div class="card-title">${escapeHtml(r.name)}</div>
+                        <div class="card-subtitle">${escapeHtml(r.phNo)} | ${r.date}</div>
+                    </div>
+                    <span class="status-badge ${badgeClass}" onclick="openStatusModal(${r.id})">${badgeText}</span>
+                </div>
+                <div style="font-size: 13px; color: #ddd;">📦 ${escapeHtml(r.item)}</div>
+                <div class="card-details">
+                    <div>Total: <strong style="color:#fff;">${r.total.toLocaleString()} Ks</strong></div>
+                    <div>Profit: <strong style="color:var(--success-color);">${r.profit.toLocaleString()} Ks</strong></div>
+                    ${r.deliId ? `<div style="grid-column: span 2;">Deli: ${escapeHtml(r.deliId)}</div>` : ''}
+                    ${r.returnReason ? `<div style="grid-column: span 2; color: var(--return-color);">Remark: ${escapeHtml(r.returnReason)}</div>` : ''}
+                </div>
+                <div class="card-actions">
+                    <span style="color: var(--accent-white); cursor: pointer;" onclick="openVoucher(${r.id})">🧾 Voucher</span>
+                    <span style="color: #4da6ff; cursor: pointer;" onclick="openEditModal(${r.id})">✏️ Edit</span>
+                    <span style="color: var(--warning-color); cursor: pointer;" onclick="deleteRecord(${r.id})">🗑 Delete</span>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    function updateStats(count, total, paidProfit, pendingProfit, returnedCount, paidCount, pendingCount) {
+        document.getElementById('statOrders').innerText = count.toLocaleString();
+        document.getElementById('statTotal').innerText = total.toLocaleString() + ' Ks';
+        document.getElementById('statPaidProfit').innerText = paidProfit.toLocaleString() + ' Ks';
+        document.getElementById('statPendingProfit').innerText = pendingProfit.toLocaleString() + ' Ks';
+        
+        document.getElementById('statPaidCount').innerText = paidCount.toLocaleString();
+        document.getElementById('statPendingCount').innerText = pendingCount.toLocaleString();
+
+        document.getElementById('statReturnedCount').innerText = returnedCount.toLocaleString();
+    }
+
+    function openVoucher(id) {
+        const record = records.find(r => r.id === id);
+        if(!record) return;
+
+        const content = document.getElementById('voucherContent');
+        content.innerHTML = `
+            <div class="voucher-row"><span>Date:</span><span>${record.date}</span></div>
+            <div class="voucher-row"><span>Customer:</span><span>${escapeHtml(record.name)}</span></div>
+            <div class="voucher-row"><span>Phone:</span><span>${escapeHtml(record.phNo)}</span></div>
+            <div class="voucher-row"><span>Item:</span><span>${escapeHtml(record.item)}</span></div>
+            <div class="voucher-row"><span>Status:</span><span style="text-transform:uppercase;">${record.status}</span></div>
+            <div class="voucher-total">
+                <span>TOTAL:</span>
+                <span>${record.total.toLocaleString()} Ks</span>
+            </div>
+        `;
+        document.getElementById('voucherModal').style.display = 'flex';
+    }
+
+    function closeVoucher() {
+        document.getElementById('voucherModal').style.display = 'none';
+    }
+
+    function escapeHtml(str) {
+        return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+    }
+
+    function exportCSV() {
+        if(records.length === 0) return alert('No data to export!');
+        let csv = 'Status,Date,Name,Ph No,Address,Item,Deli & ID,Total,Profit,Remark\n';
+        records.forEach(r => {
+            csv += `"${r.status || 'pending'}","${r.date}","${r.name}","${r.phNo}","${r.address}","${r.item}","${r.deliId}",${r.total},${r.profit},"${r.returnReason || ''}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `sales_ledger_${new Date().toISOString().slice(0,10)}.csv`);
+        a.click();
+    }
+
+    function backupData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records));
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", `ledger_backup_${new Date().toISOString().slice(0,10)}.json`);
+        a.click();
+    }
+
+    function restoreData(event) {
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+            try {
+                const parsed = JSON.parse(fileReader.result);
+                if (Array.isArray(parsed)) {
+                    records = parsed.map(r => ({ ...r, status: r.status || 'pending' }));
+                    saveData();
+                    renderRecords();
+                    alert('Data restored successfully!');
+                }
+            } catch(e) {
+                alert('Invalid JSON file');
+            }
+        };
+        fileReader.readAsText(event.target.files[0]);
+    }
+
+    renderRecords();
+</script>
+</body>
+</html>
