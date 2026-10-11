@@ -1,0 +1,3181 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Luxury Stock & Sales Analytics</title>
+    <style>
+        :root {
+            --bg-color: #08080a;
+            --card-bg: #121216;
+            --card-border: #23232b;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-glow: rgba(255, 255, 255, 0.15);
+            --accent-white: #ffffff;
+            --danger-red: #ff453a;
+            --warning-yellow: #ffd60a;
+            --success-green: #30d158;
+            --edit-blue: #0a84ff;
+            --nav-height: 65px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a24 0%, #08080a 70%);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: calc(var(--nav-height) + 20px);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(18, 18, 22, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success-green);
+        }
+
+        .main-content {
+            padding: 16px;
+            flex-grow: 1;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .card-header::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 14px;
+            background: var(--text-primary);
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        /* Analytics Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .stat-card .value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-card .sub-value {
+            font-size: 10px;
+            color: var(--success-green);
+            margin-top: 4px;
+        }
+
+        /* Leaderboard Items */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            background: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+        }
+
+        .rank {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--warning-yellow);
+            width: 28px;
+        }
+
+        .lb-info {
+            flex-grow: 1;
+        }
+
+        .lb-title {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .lb-sales {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* Camera Layout */
+        .camera-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 14px 0;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .scanner-guide {
+            display: none;
+            position: absolute;
+            inset: 25px;
+            border: 1.5px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 14px;
+            pointer-events: none;
+            box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.35);
+        }
+
+        .scanner-line {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            box-shadow: 0 0 15px #ffffff;
+            animation: scanAnim 2.2s infinite linear;
+        }
+
+        @keyframes scanAnim {
+            0% { top: 5%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 95%; opacity: 0; }
+        }
+
+        .cam-placeholder-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            align-self: center;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+            user-select: text;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--accent-white);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        button, .btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-white);
+            color: #000000;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:active, .btn:active {
+            transform: scale(0.98);
+            background: #e0e0e0;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        .search-bar {
+            margin-bottom: 16px;
+        }
+
+        .stock-item {
+            display: flex;
+            align-items: center;
+            background: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stock-item img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .stock-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .stock-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stock-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .qty-control-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .qty-btn:active {
+            background: var(--accent-white);
+            color: #000;
+        }
+
+        .qty-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 8px;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 28px;
+            padding: 0;
+            font-size: 11px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-action.btn-edit {
+            background: rgba(10, 132, 255, 0.15);
+            color: var(--edit-blue);
+            border-color: rgba(10, 132, 255, 0.3);
+        }
+
+        .btn-action.btn-del {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--danger-red);
+            border-color: rgba(255, 69, 58, 0.3);
+        }
+
+        .highlight {
+            border: 2px solid var(--accent-white) !important;
+            background-color: #1a1a20 !important;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .match-badge { display: none; background: var(--accent-white); color: #000; }
+        .highlight .match-badge { display: block; }
+
+                .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 99999; /* အလွှာအပေါ်ဆုံးသို့ ရောက်စေရန် z-index မြင့်ထားသည် */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { 
+            display: flex !important; 
+            animation: fadeIn 0.2s ease-out; 
+        }
+
+
+        .modal-content {
+            width: 100%; max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        }
+
+        .modal-close { background: transparent; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; }
+
+        .scan-status {
+            font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 10px; min-height: 18px;
+        }
+
+                .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 480px;
+            height: var(--nav-height);
+            background: rgba(18, 18, 22, 0.92);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--text-secondary); text-decoration: none; font-size: 9px; letter-spacing: 0.5px;
+            gap: 4px; width: 20%; height: 100%; cursor: pointer; /* 5 ခုခွဲရန် 20% သို့ပြောင်းသည် */
+        }
+
+
+        .nav-item svg { width: 18px; height: 18px; fill: currentColor; }
+        .nav-item.active { color: var(--accent-white); }
+
+        canvas { display: none; }
+
+/* Space 3D Multi-Axis Random Rotations & Motions */
+@keyframes randomSpaceFloat1 {
+    0%   { transform: translate(0px, 0px) rotate(15deg) scale(0.85); }
+    25%  { transform: translate(16px, -12px) rotate(120deg) scale(1); }
+    50%  { transform: translate(-10px, 15px) rotate(210deg) scale(0.9); }
+    75%  { transform: translate(12px, -8px) rotate(310deg) scale(1.05); }
+    100% { transform: translate(0px, 0px) rotate(375deg) scale(0.85); }
+}
+
+@keyframes randomSpaceFloat2 {
+    0%   { transform: translate(0px, 0px) rotate(-140deg) scale(0.95); }
+    30%  { transform: translate(-18px, 14px) rotate(-40deg) scale(1.08); }
+    60%  { transform: translate(12px, -18px) rotate(80deg) scale(0.88); }
+    80%  { transform: translate(-8px, 10px) rotate(190deg) scale(1.02); }
+    100% { transform: translate(0px, 0px) rotate(220deg) scale(0.95); }
+}
+
+@keyframes randomSpaceFloat3 {
+    0%   { transform: translate(0px, 0px) rotate(80deg) scale(0.9); }
+    33%  { transform: translate(20px, 10px) rotate(-60deg) scale(1.02); }
+    66%  { transform: translate(-15px, -15px) rotate(-180deg) scale(0.85); }
+    100% { transform: translate(0px, 0px) rotate(-280deg) scale(0.9); }
+}
+
+@keyframes randomSpaceFloat4 {
+    0%   { transform: translate(0px, 0px) rotate(195deg) scale(1.05); }
+    25%  { transform: translate(-14px, -16px) rotate(85deg) scale(0.88); }
+    50%  { transform: translate(18px, 12px) rotate(-35deg) scale(0.98); }
+    75%  { transform: translate(-10px, 8px) rotate(-150deg) scale(1.1); }
+    100% { transform: translate(0px, 0px) rotate(-165deg) scale(1.05); }
+}
+
+/* Header Canvas Area */
+.app-header {
+    position: relative;
+    overflow: hidden;
+    background: #090a0f !important;
+}
+
+.space-cases-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.38;
+    z-index: 1;
+}
+
+/* Floating Case Image Base Style */
+.real-floating-case {
+    position: absolute;
+    width: 25px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+    filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.18));
+}
+
+/* ကာဗာ ၁၀ ခုလုံး၏ မတူညီသော သီးသန့် Angle, Position & Infinite Motion */
+.rfc-1  { top: 5%;  left: 3%;  animation: randomSpaceFloat1 18s ease-in-out infinite; }
+.rfc-2  { top: 40%; left: 20%; animation: randomSpaceFloat2 24s ease-in-out infinite; }
+.rfc-3  { top: 8%;  left: 38%; animation: randomSpaceFloat3 20s ease-in-out infinite; }
+.rfc-4  { top: 48%; left: 58%; animation: randomSpaceFloat4 26s ease-in-out infinite; }
+.rfc-5  { top: 10%; left: 78%; animation: randomSpaceFloat1 22s ease-in-out infinite; }
+
+.rfc-6  { top: 55%; left: 8%;  animation: randomSpaceFloat3 25s ease-in-out infinite; }
+.rfc-7  { top: 15%; left: 28%; animation: randomSpaceFloat4 19s ease-in-out infinite; }
+.rfc-8  { top: 50%; left: 45%; animation: randomSpaceFloat2 23s ease-in-out infinite; }
+.rfc-9  { top: 12%; left: 68%; animation: randomSpaceFloat1 21s ease-in-out infinite; }
+.rfc-10 { top: 52%; left: 86%; animation: randomSpaceFloat3 27s ease-in-out infinite; }
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.preview-card {
+    background: #1e1e24;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.preview-card input, .preview-card select {
+    background: #121212;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 6px;
+    font-size: 11px;
+    border-radius: 4px;
+}
+
+/* Container Wrapper */
+.swipe-item-wrapper {
+    position: relative;
+    width: 100%;
+    height: 48px; /* Fixed Height ပေးထား၍ မထပ်တော့ပါ */
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: #ff3b30; /* Slide ဆွဲမှ ပေါ်မည့် အနီရောင် BG */
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Background Delete Text */
+.swipe-delete-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 13px;
+    z-index: 1;
+}
+
+/* Item Button (စာသားအလယ်တည့်တည့်ကျစေရန်) */
+.swipe-item-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #2c2c2e;
+    color: #ffffff;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    box-sizing: border-radius;
+    transition: transform 0.2s ease-out;
+    margin: 0;
+    padding: 0 15px;
+}
+
+/* Stock 0 ဖြစ်လျှင် မှိန်သွားစေမည့် Style */
+.stock-item.out-of-stock {
+    opacity: 0.45;
+    filter: grayscale(70%);
+}
+
+/* Stock 0 ဖြစ်နေချိန် ခလုတ်များ နှိပ်မရအောင် တားဆီးခြင်း */
+.stock-item.out-of-stock .qty-btn,
+.stock-item.out-of-stock .btn-action {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+        /* Inventory List အတွက် Standard Smooth Scroll */
+        #stock-list {
+            max-height: 550px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* ဖုန်းများတွင် ပိုမိုချောမွေ့စေရန် */
+        }
+
+        /* Multi-Select Action Bar */
+        #multi-action-bar {
+            display: none;
+            background: #1c1c1e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+   
+
+    </style>
+</head>
+<body>
+
+<!-- Selection Pop-up Modal -->
+<div id="selection-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:#1c1c1e; padding:20px; border-radius:12px; width:90%; max-width:360px; text-align:left; color:#fff; border:1px solid #333;">
+        <h3 id="selection-modal-title" style="margin-top:0; margin-bottom:15px; font-size:16px; color:#ffd60a;">Select Option</h3>
+        
+        <!-- ရွေးချယ်နိုင်သော စာရင်းများ ပေါ်မည့်နေရာ -->
+        <div id="selection-list" style="max-height:200px; overflow-y:auto; margin-bottom:15px; display:flex; flex-direction:column; gap:8px;"></div>
+
+        <!-- ➕ Add New Button -->
+        <button type="button" onclick="switchToCustomInput()" style="width:100%; padding:10px; background:#30d158; color:#000; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:10px;">➕ Add New</button>
+
+        <button type="button" onclick="closeSelectionModal()" style="width:100%; padding:8px; background:#3a3a3c; color:#fff; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
+    </div>
+</div>
+
+<!-- Add New Custom Text Input Modal -->
+<div id="custom-input-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10001; justify-content:center; align-items:center;">
+    <div style="background:#1c1c1e; padding:20px; border-radius:12px; width:90%; max-width:340px; text-align:left; color:#fff; border:1px solid #333;">
+        <h3 id="custom-modal-title" style="margin-top:0; margin-bottom:12px; font-size:15px; color:#ffd60a;">Type New Entry</h3>
+        <input type="text" id="custom-text-field" placeholder="Enter new value..." style="width:100%; padding:10px; background:#2c2c2e; border:1px solid #444; color:#fff; border-radius:6px; font-size:14px; box-sizing:border-box; margin-bottom:15px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" onclick="closeCustomInputModal()" style="background:#3a3a3c; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Cancel</button>
+            <button type="button" onclick="saveCustomInputValue()" style="background:#0a84ff; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer;">Save</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="app-container">
+    <header class="app-header">
+    <!-- ဇောက်ထိုး၊ စောင်းစောင်း နှင့် Random Space Angles များဖြင့် လွင့်မျောနေမည့် Canvas -->
+    <div class="space-cases-canvas">
+        <img src="https://cdn.phototourl.com/free/2026-09-20-ea6487e9-a822-466b-a63d-b46e03d5fa84.png" class="real-floating-case rfc-1" alt="Case 1">
+        <img src="https://cdn.phototourl.com/free/2026-09-20-99b98133-9af2-4a1d-9dbb-aea4fc4f8edf.png" class="real-floating-case rfc-2" alt="Case 2">
+        <img src="https://cdn.phototourl.com/free/2026-09-20-cfec0c25-ef09-4f90-aa8f-5a4efe62b719.png" class="real-floating-case rfc-3" alt="Case 3">
+        <img src="https://cdn.phototourl.com/free/2026-09-20-b27bd99a-6e76-4496-ae1a-0c5cd35a3c1d.png" class="real-floating-case rfc-4" alt="Case 4">
+        <img src="https://cdn.phototourl.com/free/2026-09-20-7a0e53c2-cf33-4675-bf04-d6505dcbf8a4.png" class="real-floating-case rfc-5" alt="Case 5">
+
+        <img src="https://cdn.phototourl.com/member/2026-09-20-c8df96c2-0a15-4821-978f-dae4bc2f7aa4.png" class="real-floating-case rfc-6" alt="Case 6">
+        <img src="https://cdn.phototourl.com/member/2026-09-20-d4ee1934-7579-430f-a489-03581b25ddb6.png" class="real-floating-case rfc-7" alt="Case 7">
+        <img src="https://cdn.phototourl.com/member/2026-09-20-4cf23d52-e23c-4a90-b2f7-74b1444ff56d.png" class="real-floating-case rfc-8" alt="Case 8">
+        <img src="https://cdn.phototourl.com/member/2026-09-20-fdb81c24-a46d-4715-b095-2a9eb0301938.png" class="real-floating-case rfc-9" alt="Case 9">
+        <img src="https://cdn.phototourl.com/member/2026-09-20-a2ac0766-6434-414e-b7f5-4675b9a88d07.png" class="real-floating-case rfc-10" alt="Case 10">
+    </div>
+
+    <!-- မူရင်း Header Title နှင့် Status Indicator (Layout လုံးဝမပျက်ပါ) -->
+    <div class="app-title" style="position: relative; z-index: 2;">IVRT PHONE CASE BOUTIQUE YGN Stock Management</div>
+    <div class="status-dot" style="position: relative; z-index: 2;"></div>
+</header>
+
+
+
+
+    <main class="main-content">
+    <!-- Ledger View -->
+    <section id="view-ledger" class="view-section">
+        <div class="card" style="padding: 16px;">
+            <div class="card-header" style="margin-bottom: 12px;"><h3>Business Ledger (စာရင်းဇယား)</h3></div>
+            
+            <!-- Revenue & Profit Stats Grid -->
+            <div class="stats-grid" style="gap: 8px; margin-bottom: 12px;">
+                <div class="stat-card" style="padding: 10px 12px;">
+                    <span class="label" style="font-size: 9px;">Total Revenue</span>
+                    <span id="ledger-total-revenue" class="value" style="font-size: 13px;">0 MMK</span>
+                </div>
+                <div class="stat-card" style="padding: 10px 12px;">
+                    <span class="label" style="font-size: 9px;">Collected Revenue</span>
+                    <span id="ledger-collected-revenue" class="value" style="font-size: 13px; color: var(--success-green);">0 MMK</span>
+                </div>
+                <div class="stat-card" style="grid-column: span 2; padding: 10px 12px;">
+                    <span class="label" style="font-size: 9px;">Total Net Profit (အသားတင်အမြတ်)</span>
+                    <span id="ledger-total-profit" class="value" style="font-size: 14px; color: var(--success-green);">0 MMK</span>
+                </div>
+            </div>
+
+            <!-- 📊 Status Summary Count Cards (Deli အပ် -> ပို့ -> ငွေရှင်း) -->
+            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 600;">Order Status Summary</div>
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;">
+                <div class="stat-card" style="padding: 8px; text-align: center;">
+                    <span class="label" style="font-size: 8px;">🛵 Deli အပ် / မအပ်</span>
+                    <span id="count-delidrop" class="value" style="font-size: 11px; margin-top: 2px;">0 / 0</span>
+                </div>
+                <div class="stat-card" style="padding: 8px; text-align: center;">
+                    <span class="label" style="font-size: 8px;">📦 ပို့ပြီး / မပို့ရသေး</span>
+                    <span id="count-delivery" class="value" style="font-size: 11px; margin-top: 2px;">0 / 0</span>
+                </div>
+                <div class="stat-card" style="padding: 8px; text-align: center;">
+                    <span class="label" style="font-size: 8px;">💰 ငွေရှင်း / မရှင်း</span>
+                    <span id="count-payment" class="value" style="font-size: 11px; margin-top: 2px;">0 / 0</span>
+                </div>
+            </div>
+
+            <!-- Smart Search Bar -->
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="ledger-search-input" class="search-bar" placeholder="🔍 Search customer, phone, date, status..." oninput="filterLedgerSales()" style="margin-bottom: 0; padding: 10px 12px; font-size: 12px;">
+            </div>
+
+            <!-- Sales Ledger History List -->
+            <div style="border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 4px;">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600;">Sales History</div>
+                <div id="ledger-sales-list"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+
+        <!-- View 1: Analytics Dashboard -->
+        <section id="view-analytics" class="view-section active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Inventory Overview</h3>
+                </div>
+               <div class="stats-grid">
+    <div class="stat-card">
+        <span class="label">Total Series</span>
+        <span id="stat-total-series" class="value">0</span>
+    </div>
+    <div class="stat-card">
+        <span class="label">Stock Selling Value</span>
+        <span id="stat-total-value" class="value">0 MMK</span>
+    </div>
+    <!-- ထပ်တိုးထားသည့် ကွက်လပ် (၂) ခု -->
+    <div class="stat-card">
+        <span class="label">Total Cost (ရင်းဈေး)</span>
+        <span id="stat-total-cost" class="value" style="color: var(--warning-yellow);">0 MMK</span>
+    </div>
+    <div class="stat-card">
+        <span class="label">Est. Profit (ခန့်မှန်းအမြတ်)</span>
+        <span id="stat-total-profit" class="value" style="color: var(--success-green);">0 MMK</span>
+    </div>
+    <!-- Remaining Breakeven Target Card (အမြဲပေါ်နေမည်) -->
+<div class="stat-card" id="card-breakeven">
+    <span class="label">Remaining Breakeven Target (ရင်းကျေရန် ကျန်ရှိပမာဏ)</span>
+    <span id="stat-breakeven-amount" class="value" style="color: #4A90E2;">0 MMK</span>
+</div>
+<div class="stat-card">
+    <span class="label">TOTAL STOCK QTY (စုစုပေါင်း ပစ္စည်း)</span>
+    <span id="stat-total-qty" class="value" style="color: #a855f7;">0 Pcs</span>
+</div>
+</div>
+
+<div class="card">
+    <!-- Card Header (ခေါင်းစဉ်နှင့် Date Picker ကို ညာဘက်ထောင့်စွန်းတွင် ယှဉ်ပြထားသည်) -->
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0;">Sales Analytics</h3>
+        
+        <!-- Header ညာဘက်ထောင့်စွန်း Mini Date Filter -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="date" id="sales-header-date" onchange="filterSalesByHeaderDate()" 
+                   style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; outline: none; cursor: pointer; color-scheme: dark;">
+            <button type="button" id="btn-reset-header-date" onclick="resetHeaderSalesDate()" 
+                    style="display: none; background: rgba(255, 255, 255, 0.1); border: none; color: #aaa; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; line-height: 20px; text-align: center;" title="Clear Date">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <!-- Date ရွေးလိုက်ပါက ပေါ်လာမည့် Selected Date Info Bar -->
+    <div id="header-date-sales-info" style="display: none; background: rgba(74, 144, 226, 0.12); border: 1px solid rgba(74, 144, 226, 0.3); border-radius: 8px; padding: 8px 12px; margin: 10px 0 5px 0; justify-content: space-between; align-items: center;">
+        <span id="hdr-selected-date-lbl" style="font-size: 11px; color: #4A90E2; font-weight: 500;"></span>
+        <span id="hdr-selected-date-val" style="font-size: 12px; color: #2ed573; font-weight: bold;"></span>
+    </div>
+
+    <div class="stats-grid" style="margin-top: 10px;">
+        <div class="stat-card">
+            <span class="label">Daily Sales</span>
+            <span id="stat-daily-sales" class="value">0 MMK</span>
+            <span id="stat-daily-qty" class="sub-value">0 Sold Today</span>
+        </div>
+        <div class="stat-card">
+            <span class="label">Monthly Sales</span>
+            <span id="stat-monthly-sales" class="value">0 MMK</span>
+            <span id="stat-monthly-qty" class="sub-value">0 Sold This Month</span>
+        </div>
+    </div>
+</div>
+
+
+           <div class="card">
+    <div class="card-header">
+        <h3>Top Selling Leaderboard</h3>
+    </div>
+    <div id="leaderboard-list"></div>
+</div> <!-- ဤနေရာတွင် Card ကို ပိတ်ပေးရန် လိုအပ်ပါသည် -->
+
+<div class="card">
+    <div class="card-header">
+        <h3>Recent Sales (အရောင်းမှတ်တမ်း)</h3>
+    </div>
+    <div id="sales-history-list"></div>
+</div>
+
+        </section>
+
+        <!-- View 2: Scan Matcher -->
+        <section id="view-scan" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Smart Cover Matcher</h3>
+                </div>
+                <button id="toggle-cam-btn" class="btn-secondary" onclick="toggleCamera()">Open Camera</button>
+                <div class="camera-wrapper">
+                    <video id="video" autoplay playsinline muted></video>
+                    <div id="scanner-guide" class="scanner-guide"><div id="scanner-line" class="scanner-line"></div></div>
+                    <span id="cam-placeholder" class="cam-placeholder-text">Camera Standby</span>
+                </div>
+                <button id="capture-btn" style="display:none;" onclick="captureAndSearch()">Scan & Find Match</button>
+                <div id="scan-status" class="scan-status">Tap "Open Camera" to start</div>
+                <canvas id="canvas"></canvas>
+            </div>
+        </section>
+
+                <section id="view-inventory" class="view-section">
+            <div class="card">
+                <div class="card-header"><h3>Stock Inventory</h3></div>
+                <input type="text" id="search-input" class="search-bar" placeholder="Search..." oninput="filterStock()">
+                
+            <!-- Multi-Select Action Control Bar (Stock Inventory ထဲတွင် ထည့်ရန်) -->
+<div id="multi-action-bar" style="display: none; background: #1c1c1e; padding: 10px; border-radius: 8px; margin-bottom: 12px; align-items: center; justify-content: space-between;">
+    <span id="selected-count-lbl" style="font-size: 12px; color: var(--warning-yellow); font-weight: bold;">0 selected</span>
+    <div style="display: flex; gap: 8px;">
+        <button type="button" onclick="openCustomerInfoModal()" style="background: var(--success-green); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; width: auto; font-weight: bold; cursor: pointer;">✅ Confirm Sale</button>
+        <button type="button" onclick="bulkDeleteSelected()" style="background: var(--danger-red); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; width: auto; font-weight: bold; cursor: pointer;">🗑️ Delete</button>
+    </div>
+</div>
+
+<!-- Customer Info Modal (Multi-select ပြီးပါက ပေါ်လာမည့် Form) -->
+<div id="customer-modal" class="modal-overlay">
+    <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <span style="font-size:12px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">Customer Information</span>
+            <button class="modal-close" onclick="closeCustomerModal()">&times;</button>
+        </div>
+        <div id="selected-items-preview" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; background: #000; padding: 8px; border-radius: 6px;"></div>
+        <form id="customer-form" onsubmit="saveCustomerSale(event)">
+            <div class="form-group"><label>Date (ရက်စွဲ)</label><input type="date" id="cust-date" required></div>
+            <div class="form-group"><label>Name (ဝယ်သူအမည်)</label><input type="text" id="cust-name" placeholder="Customer Name" required></div>
+            <div class="form-group"><label>Ph No. (ဖုန်းနံပါတ်)</label><input type="text" id="cust-phone" placeholder="Phone Number" required></div>
+            <div class="form-group"><label>Address (လိပ်စာ)</label><input type="text" id="cust-address" placeholder="Delivery Address" required></div>
+            <div class="form-group"><label>Deli & ID (ပို့ခနှင့် ယာဉ်အမှတ်/ID)</label><input type="text" id="cust-deli" placeholder="e.g. Royal Express / 12345"></div>
+            <button type="submit" style="margin-top: 10px; background: var(--accent-white); color: #000; font-weight: bold;">Confirm & Save to Ledger</button>
+        </form>
+    </div>
+</div>
+
+                <div id="stock-list"></div>
+            </div>
+        </section>
+
+
+
+
+        <!-- View 4: Add Item -->
+        <section id="view-add" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3>New Stock Entry</h3>
+                </div>
+                <form id="stock-form">
+                    <div class="form-group" style="margin-bottom: 12px;">
+        <label>Brand</label>
+        <input type="text" id="brand" placeholder="Select or Add Brand" readonly onclick="openSelectionModal('brand', 'Brand')" required style="cursor: pointer; background: #2c2c2e; color: #fff;">
+    </div>
+    <div class="form-group" style="margin-bottom: 12px;">
+        <label>Series</label>
+        <input type="text" id="series" placeholder="Select or Add Series" readonly onclick="openSelectionModal('series', 'Series')" required style="cursor: pointer; background: #2c2c2e; color: #fff;">
+    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <input type="text" id="type" placeholder="e.g. Leather Case" required>
+                    </div>
+                    <div class="form-group">
+    <label>Cost Price (ရင်းဈေး MMK)</label>
+    <input type="number" id="cost" placeholder="e.g. 10000" required>
+</div>
+                    <div class="form-group">
+                        <label>Price (MMK)</label>
+                        <input type="number" id="price" placeholder="e.g. 15000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="qty" placeholder="e.g. 50" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cover Photo</label>
+                        <input type="file" id="image" accept="image/*" required>
+                    </div>
+                    <button type="submit" style="margin-top: 10px;">Save Stock Item</button>
+                </form>
+            </div>
+    
+    <div class="card">
+    <h3>📦 Multiple Items Stock Entry</h3>
+    
+    <!-- ပုံများစွာ တစ်ပြိုင်နက် ရွေးရန် Input -->
+    <div class="form-group">
+        <label>Select Multiple Images (ပုံများကို တစ်ပြိုင်နက် ရွေးပါ):</label>
+        <input type="file" id="multi-image-input" accept="image/*" multiple onchange="handleImageSelection(event)">
+    </div>
+
+    <!-- ရွေးလိုက်သော ပုံများနှင့် Info Form များ လာပေါ်မည့် နေရာ -->
+    <div id="image-preview-container" class="preview-grid"></div>
+
+    <!-- ပုံများ၊ Info များ ဖြည့်ပြီးပါက နှိပ်ရန် Confirm Button -->
+    <button type="button" id="save-all-btn" onclick="saveAllImagesToStock()" style="display:none; background:var(--ledger-gold, #f1c40f); color:#000; font-weight:bold; margin-top:15px;">
+        💾 Save All Selected Items to Stock
+    </button>
+</div>
+        
+        <!-- Inventory Overview Section ထဲတွင် ထည့်ရန် -->
+<div class="card" style="margin-bottom: 15px;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0;">General Packaging & Shipping Costs (အထွေထွေ စရိတ်များ)</h3>
+        <!-- စရိတ်များကို ပြန်ဖျက်မည့် ခလုတ် -->
+        <button type="button" onclick="clearGlobalCosts()" style="background: #ff4757; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer;">
+            Reset Expenses (ဖျက်မည်)
+        </button>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 10px 0;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 11px;">Total Kg Cost (စုစုပေါင်း Kg သယ်ယူစရိတ် MMK)</label>
+            <input type="number" id="global-kg-cost" value="0" placeholder="0" oninput="saveAndCalculateCosts()">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 11px;">Total Box Cost (စုစုပေါင်း ဘူးဖိုး MMK)</label>
+            <input type="number" id="global-box-cost" value="0" placeholder="0" oninput="saveAndCalculateCosts()">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 11px;">Total Bag Cost (စုစုပေါင်း အိတ်ဖိုး MMK)</label>
+            <input type="number" id="global-bag-cost" value="0" placeholder="0" oninput="saveAndCalculateCosts()">
+        </div>
+    </div>
+</div>
+
+<!-- Backup & Restore Section -->
+<div class="card" style="margin-top: 20px; background: #1c1c1e; padding: 15px; border-radius: 10px; color: #fff;">
+    <h3 style="margin-top: 0;">💾 Data Backup & Restore</h3>
+    <p style="font-size: 12px; color: #aaa; margin-bottom: 12px;">
+        Stock စာရင်းများ၊ Top Selling Leaderboard၊ Recent Sales နှင့် Brand/Series အချက်အလက်အားလုံးကို Backup ပြုလုပ်၍ ပြန်လည် Restore လုပ်နိုင်ပါသည်။
+    </p>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <!-- Backup ခလုတ် -->
+        <button type="button" onclick="exportFullDataBackup()" style="background: #2ed573; color: #000; font-weight: bold; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer;">
+            📥 Full Backup (ဒေတာအားလုံး သိမ်းမည်)
+        </button>
+
+        <!-- Restore ခလုတ် -->
+        <label style="background: #4a90e2; color: #fff; font-weight: bold; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; display: inline-block;">
+            📤 Restore Data (ဒေတာ ပြန်ယူမည်)
+            <input type="file" id="full-restore-file-input" accept=".json" onchange="importFullDataRestore(event)" style="display: none;">
+        </label>
+    </div>
+</div>
+
+
+        </section>
+    </main>
+
+<!-- Ledger Item Details View Modal (အသေးစိတ်ကြည့်ရန်၊ ပြင်ဆင်ရန်နှင့် Status သတ်မှတ်ရန်) -->
+<div id="ledger-detail-modal" class="modal-overlay">
+    <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <span style="font-size:12px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; color: var(--warning-yellow);">Order Details & Status</span>
+            <button class="modal-close" onclick="closeLedgerDetailModal()">&times;</button>
+        </div>
+        <form id="ledger-edit-form" onsubmit="saveLedgerEdit(event)">
+            <input type="hidden" id="edit-sale-id">
+            <div class="form-group"><label>Date (ရက်စွဲ)</label><input type="date" id="ledger-edit-date" required></div>
+            <div class="form-group"><label>Customer Name (ဝယ်သူအမည်)</label><input type="text" id="ledger-edit-name" required></div>
+            <div class="form-group"><label>Phone No. (ဖုန်းနံပါတ်)</label><input type="text" id="ledger-edit-phone" required></div>
+            <div class="form-group"><label>Address (လိပ်စာ)</label><input type="text" id="ledger-edit-address" required></div>
+            <div class="form-group"><label>Deli & ID (ပို့ခနှင့် ယာဉ်အမှတ်)</label><input type="text" id="ledger-edit-deli"></div>
+            
+            <!-- Status သတ်မှတ်မည့် Input များနှင့် Pop-up ခလုတ်များ -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Delivery Status (ပို့ဆောင်မှု)</label>
+                    <input type="text" id="ledger-status-delivery" readonly onclick="openStatusSelectionModal('delivery', 'Delivery Status')" style="cursor: pointer; background: #2c2c2e; color: #fff;" value="မပို့ရသေး">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Payment Status (ငွေရှင်းမှု)</label>
+                    <input type="text" id="ledger-status-payment" readonly onclick="openStatusSelectionModal('payment', 'Payment Status')" style="cursor: pointer; background: #2c2c2e; color: #fff;" value="ငွေမရှင်းရသေး">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Deli Drop Status (ဒေလီအပ်ပြီး/မပြီး)</label>
+                    <input type="text" id="ledger-status-deli" readonly onclick="openStatusSelectionModal('deli', 'Deli Drop Status')" style="cursor: pointer; background: #2c2c2e; color: #fff;" value="Deli မအပ်ရသေး">
+                </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-secondary); margin: 10px 0 6px 0; text-transform: uppercase;">Purchased Items (ဝယ်ယူခဲ့သည့် ပစ္စည်းများ):</div>
+            <div id="ledger-edit-items-container" style="background: #000; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 11px; color: #fff;"></div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="background: var(--success-green); color: #000; font-weight: bold; flex: 1;">💾 Update Order</button>
+                <button type="button" onclick="deleteSaleOrder()" style="background: var(--danger-red); color: #fff; font-weight: bold; width: auto; padding: 0 15px;">🗑️ Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Status Selection Pop-up Modal -->
+<div id="status-selection-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100000; justify-content:center; align-items:center;">
+    <div style="background:#1c1c1e; padding:20px; border-radius:12px; width:90%; max-width:320px; text-align:left; color:#fff; border:1px solid #333;">
+        <h3 id="status-modal-title" style="margin-top:0; margin-bottom:15px; font-size:15px; color:#ffd60a;">Select Status</h3>
+        <div id="status-options-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;"></div>
+        <button type="button" onclick="closeStatusSelectionModal()" style="width:100%; padding:8px; background:#3a3a3c; color:#fff; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
+    </div>
+</div>
+
+
+    <!-- Modal for Editing Stock Item -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-size:12px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">Edit Item</span>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-form">
+    <input type="hidden" id="edit-id">
+    
+    <div class="form-group" style="margin-bottom: 12px;">
+        <label>Brand</label>
+        <input type="text" id="edit-brand" placeholder="Select or Add Brand" readonly onclick="openSelectionModal('edit-brand', 'Brand')" required style="cursor: pointer; background: #2c2c2e; color: #fff;">
+    </div>
+    
+    <div class="form-group" style="margin-bottom: 12px;">
+        <label>Series</label>
+        <input type="text" id="edit-series" placeholder="Select or Add Series" readonly onclick="openSelectionModal('edit-series', 'Series')" required style="cursor: pointer; background: #2c2c2e; color: #fff;">
+    </div>
+                <div class="form-group"><label>Type</label><input type="text" id="edit-type" required></div>
+                <div class="form-group">
+    <label>Cost Price (ရင်းဈေး MMK)</label>
+    <input type="number" id="edit-cost" required>
+</div>
+
+                <div class="form-group"><label>Price (MMK)</label><input type="number" id="edit-price" required></div>
+                <div class="form-group"><label>Quantity</label><input type="number" id="edit-qty" required></div>
+                <div class="form-group">
+                    <label>Change Photo</label>
+                    <input type="file" id="edit-image" accept="image/*">
+                </div>
+                <button type="submit" style="margin-top: 10px;">Update Details</button>
+            </form>
+        </div>
+    </div>
+
+       <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchView('view-analytics', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" onclick="switchView('view-scan', this)">
+            <svg viewBox="0 0 24 24"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm8.5 1.5v3h-3v-3h3M20 5h-6v6h6V5zM9.5 16v3h-3v-3h3M11 14.5H5v6h6v-6zm5.5.5h1.5v1.5h-1.5V15zm1.5 1.5H20V18h-1.5v-1.5zM14.5 15H16v1.5h-1.5V15zm0 3H16v1.5h-1.5V18zm1.5 1.5H20V21h-2.5v-1.5z"/></svg>
+            <span>Scan</span>
+        </div>
+        <!-- ထပ်တိုးလိုက်သည့် Ledger Button -->
+        <div class="nav-item" onclick="switchView('view-ledger', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span>Ledger</span>
+        </div>
+        <div class="nav-item" onclick="switchView('view-inventory', this)">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+            <span>Stock</span>
+        </div>
+        <div class="nav-item" onclick="switchView('view-add', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Add Item</span>
+        </div>
+    </nav>
+
+
+<script>
+    let db;
+    // Version သို့မဟုတ် Database Name အသစ်ပြောင်း၍ Schema အသစ်ပြန်ဆောက်ပါမည်
+    const request = indexedDB.open("LuxuryStockDB_V10", 1);
+
+    request.onupgradeneeded = function(e) {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("stocks")) {
+            db.createObjectStore("stocks", { keyPath: "id" });
+        }
+        if (!db.objectStoreNames.contains("sales")) {
+            db.createObjectStore("sales", { keyPath: "id" });
+        }
+    };
+
+    request.onsuccess = function(e) {
+        db = e.target.result;
+            loadAllData();
+    };
+
+        function loadAllData() {
+        loadSavedCosts();
+        loadStockData();
+        calculateAnalytics();
+        calculateLedgerData(); // Ledger အချက်အလက်များ အမြဲ Update ဖြစ်နေစေရန်
+    }
+
+
+    
+        /* Stock Management Functions */
+    function loadStockData(highlightId = null) {
+        if (!db) return;
+        const transaction = db.transaction(["stocks"], "readonly");
+        const store = transaction.objectStore("stocks");
+        const req = store.getAll();
+
+        req.onsuccess = function() {
+            displayStock(req.result, highlightId);
+        };
+    }
+
+
+            let selectedStockIds = new Set();
+
+        // Checkbox နှင့် Delete ခလုတ်များ အစုံပါဝင်သော displayStock Function တစ်ခုတည်းကိုသာ ထားပါ
+        function displayStock(items, highlightId = null) {
+        const listContainer = document.getElementById('stock-list');
+        if (!listContainer) return;
+
+        if (!items || items.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-secondary); font-size:12px; padding:30px 0;">NO ITEMS IN STOCK</p>';
+            return;
+        }
+
+        // ကုန်သွားသော ပစ္စည်းများ (qty = 0) ကို အောက်ဆုံးသို့ ရောက်စေရန် Sort လုပ်ခြင်း
+        items.sort((a, b) => {
+            let qtyA = parseInt(a.qty, 10) || 0;
+            let qtyB = parseInt(b.qty, 10) || 0;
+            if (qtyA === 0 && qtyB > 0) return 1;
+            if (qtyA > 0 && qtyB === 0) return -1;
+            return 0;
+        });
+
+                let htmlBuffer = '';
+        items.forEach(item => {
+            const isHighlight = item.id === highlightId ? 'highlight' : '';
+            const isOutOfStock = parseInt(item.qty, 10) === 0;
+            const isChecked = selectedStockIds.has(item.id) ? 'checked' : '';
+
+            // Stock ထည့်ပြီး ဘယ်နှစ်ရက်အတွင်း ရောင်းထွက်သွားကြောင်း တွက်ချက်ခြင်း (သီးသန့်နေရာအတွက်)
+            let speedBadgeHtml = '';
+            if (isOutOfStock) {
+                let addedDate = item.dateAdded ? new Date(item.dateAdded) : new Date(item.id);
+                let soldDate = item.soldOutDate ? new Date(item.soldOutDate) : new Date();
+                let diffTime = Math.abs(soldDate - addedDate);
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays === 0) diffDays = 1;
+                speedBadgeHtml = `<div style="font-size:10px; color:#ffa500; background:rgba(255,165,0,0.1); padding:3px 6px; border-radius:4px; margin-top:4px; display:inline-block; font-weight:bold;">⚡ Sold out in ${diffDays} days</div>`;
+            }
+
+            htmlBuffer += `
+                <div id="item-${item.id}" class="stock-item ${isHighlight} ${isOutOfStock ? 'out-of-stock' : ''}" style="gap: 10px;">
+                    <input type="checkbox" value="${item.id}" ${isChecked} onchange="toggleSelectStock(${item.id})" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-white);">
+                    <img src="${item.image}" alt="cover">
+                    <div class="stock-info">
+                        <h4>${item.brand} ${item.series}</h4>
+                        <p>TYPE: ${item.type}</p>
+                        <p>PRICE: ${Number(item.price).toLocaleString()} MMK</p>
+                        ${speedBadgeHtml}
+                        <div class="qty-control-box">
+                            <span style="font-size:10px; color:var(--text-secondary);">QTY:</span>
+                            <button type="button" class="qty-btn" onclick="adjustQty(${item.id}, -1)">-</button>
+                            <span class="qty-val">${item.qty}</span>
+                            <button type="button" class="qty-btn" onclick="adjustQty(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="action-group">
+                        <button type="button" class="btn-action btn-edit" onclick="openEditModal(${item.id})">EDIT</button>
+                        <button type="button" class="btn-action btn-del" onclick="deleteStock(${item.id})">×</button>
+                    </div>
+                </div>
+            `;
+        });
+        listContainer.innerHTML = htmlBuffer;
+        updateMultiActionBar();
+    }
+
+
+    function toggleSelectStock(id) {
+        if (selectedStockIds.has(id)) selectedStockIds.delete(id);
+        else selectedStockIds.add(id);
+        updateMultiActionBar();
+    }
+
+    function updateMultiActionBar() {
+        const bar = document.getElementById('multi-action-bar');
+        const lbl = document.getElementById('selected-count-lbl');
+        if (selectedStockIds.size > 0) {
+            bar.style.display = 'flex';
+            lbl.innerText = `${selectedStockIds.size} items selected`;
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    function openCustomerInfoModal() {
+        if (selectedStockIds.size === 0) return alert("ပစ္စည်း ရွေးချယ်ပေးပါ။");
+        
+        const tx = db.transaction(["stocks"], "readonly");
+        const store = tx.objectStore("stocks");
+        let previewHtml = "<b>Selected Items:</b><br>";
+        
+        document.getElementById('cust-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('cust-name').value = '';
+        document.getElementById('cust-phone').value = '';
+        document.getElementById('cust-address').value = '';
+        document.getElementById('cust-deli').value = '';
+
+        let fetchedCount = 0;
+        selectedStockIds.forEach(id => {
+            store.get(Number(id)).onsuccess = function(e) {
+                const item = e.target.result;
+                if (item) {
+                    previewHtml += `- ${item.brand} ${item.series} (${item.price.toLocaleString()} MMK)<br>`;
+                }
+                fetchedCount++;
+                if (fetchedCount === selectedStockIds.size) {
+                    document.getElementById('selected-items-preview').innerHTML = previewHtml;
+                    document.getElementById('customer-modal').classList.add('active');
+                }
+            };
+        });
+    }
+
+    function closeCustomerModal() {
+        document.getElementById('customer-modal').classList.remove('active');
+    }
+
+    // Customer Form ဖြည့်ပြီး Confirm လုပ်ပါက Ledger သို့ Sale Order အဖြစ် သိမ်းဆည်းခြင်း
+    function saveCustomerSale(event) {
+        event.preventDefault();
+        if (!db) return;
+
+        const customerInfo = {
+            date: document.getElementById('cust-date').value,
+            name: document.getElementById('cust-name').value,
+            phone: document.getElementById('cust-phone').value,
+            address: document.getElementById('cust-address').value,
+            deli: document.getElementById('cust-deli').value || '-'
+        };
+
+        const tx = db.transaction(["stocks", "sales"], "readwrite");
+        const stockStore = tx.objectStore("stocks");
+        const salesStore = tx.objectStore("sales");
+
+        let purchasedItems = [];
+        let totalRevenue = 0;
+        let totalProfit = 0;
+        let processed = 0;
+
+        selectedStockIds.forEach(id => {
+            stockStore.get(Number(id)).onsuccess = function(e) {
+                const item = e.target.result;
+                if (item && parseInt(item.qty, 10) > 0) {
+                    item.qty -= 1; // Stock 1 ခု လျော့မည်
+                    if (parseInt(item.qty, 10) === 0) {
+                        item.soldOutDate = new Date().toISOString().split('T')[0];
+                    }
+                    item.salesCount = (parseInt(item.salesCount, 10) || 0) + 1;
+                    stockStore.put(item);
+
+                    purchasedItems.push({
+                        brand: item.brand,
+                        series: item.series,
+                        type: item.type,
+                        price: Number(item.price),
+                        cost: Number(item.cost || 0)
+                    });
+
+                    totalRevenue += Number(item.price);
+                    totalProfit += (Number(item.price) - Number(item.cost || 0));
+                }
+                processed++;
+
+                if (processed === selectedStockIds.size) {
+                    const saleRecord = {
+                        id: "SALE_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+                        timestamp: Date.now(),
+                        dateStr: customerInfo.date,
+                        customer: customerInfo,
+                        items: purchasedItems,
+                        price: totalRevenue,
+                        profit: totalProfit
+                    };
+                    salesStore.add(saleRecord);
+                }
+            };
+        });
+
+        tx.oncomplete = function() {
+            alert("အရောင်းအဝယ် အောင်မြင်စွာ မှတ်တမ်းတင်ပြီးပါပြီ။");
+            selectedStockIds.clear();
+            closeCustomerModal();
+            loadAllData();
+            switchView('view-ledger', document.querySelectorAll('.nav-item')[2]);
+        };
+    }
+
+        // Ledger View ထဲတွင် Order တစ်ခုချင်းစီကို ပြသခြင်းနှင့် Status Count များ တွက်ချက်ခြင်း
+        function calculateLedgerData() {
+        if (!db) {
+            setTimeout(calculateLedgerData, 200);
+            return;
+        }
+        
+        const transaction = db.transaction(["sales"], "readwrite");
+        const store = transaction.objectStore("sales");
+        const req = store.getAll();
+
+        req.onsuccess = function(e) {
+            const sales = e.target.result || [];
+            let totalRev = sales.reduce((sum, item) => sum + Number(item.price || 0), 0);
+            
+            let collectedRev = sales.reduce((sum, item) => {
+                if (item.paymentStatus === 'ငွေရှင်းပြီး') {
+                    return sum + Number(item.price || 0);
+                }
+                return sum;
+            }, 0);
+
+            let totalProfit = sales.reduce((sum, item) => {
+                if (item.profit !== undefined) {
+                    return sum + Number(item.profit);
+                }
+                if (item.items && Array.isArray(item.items)) {
+                    return sum + item.items.reduce((iSum, i) => iSum + (Number(i.price || 0) - Number(i.cost || 0)), 0);
+                }
+                return sum + (Number(item.price || 0) - Number(item.cost || 0));
+            }, 0);
+
+            if (document.getElementById('ledger-total-revenue')) {
+                document.getElementById('ledger-total-revenue').innerText = totalRev.toLocaleString() + " MMK";
+            }
+            if (document.getElementById('ledger-collected-revenue')) {
+                document.getElementById('ledger-collected-revenue').innerText = collectedRev.toLocaleString() + " MMK";
+            }
+            if (document.getElementById('ledger-total-profit')) {
+                document.getElementById('ledger-total-profit').innerText = totalProfit.toLocaleString() + " MMK";
+            }
+
+            let sentCount = 0, unsentCount = 0;
+            let paidCount = 0, unpaidCount = 0;
+            let deliDropCount = 0, deliUndropCount = 0;
+
+            let needsUpdate = false;
+            sales.forEach(sale => {
+                if (!sale.deliveryStatus) { sale.deliveryStatus = 'မပို့ရသေး'; needsUpdate = true; }
+                if (!sale.paymentStatus) { sale.paymentStatus = 'ငွေမရှင်းရသေး'; needsUpdate = true; }
+                if (!sale.deliDropStatus) { sale.deliDropStatus = 'Deli မအပ်ရသေး'; needsUpdate = true; }
+
+                if (needsUpdate) {
+                    store.put(sale);
+                }
+
+                if (sale.deliveryStatus === 'ပို့ပြီး') sentCount++;
+                else unsentCount++;
+
+                if (sale.paymentStatus === 'ငွေရှင်းပြီး') paidCount++;
+                else unpaidCount++;
+
+                if (sale.deliDropStatus === 'Deli အပ်ပြီး') deliDropCount++;
+                else deliUndropCount++;
+            });
+
+            if (document.getElementById('count-delivery')) {
+                document.getElementById('count-delivery').innerHTML = `<span style="color:var(--success-green);">${sentCount}</span> / <span style="color:var(--danger-red);">${unsentCount}</span>`;
+            }
+            if (document.getElementById('count-payment')) {
+                document.getElementById('count-payment').innerHTML = `<span style="color:var(--success-green);">${paidCount}</span> / <span style="color:var(--danger-red);">${unpaidCount}</span>`;
+            }
+            if (document.getElementById('count-delidrop')) {
+                document.getElementById('count-delidrop').innerHTML = `<span style="color:var(--success-green);">${deliDropCount}</span> / <span style="color:var(--danger-red);">${deliUndropCount}</span>`;
+            }
+
+            const listContainer = document.getElementById('ledger-sales-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+
+            if (sales.length === 0) {
+                listContainer.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">အရောင်းစာရင်း မရှိသေးပါ။</p>';
+                return;
+            }
+
+            sales.slice().reverse().forEach(sale => {
+                const cust = sale.customer || { name: 'Guest', phone: '-', address: '-' };
+                const deliStat = sale.deliveryStatus || 'မပို့ရသေး';
+                const payStat = sale.paymentStatus || 'ငွေမရှင်းရသေး';
+                const deliDropStat = sale.deliDropStatus || 'Deli မအပ်ရသေး';
+
+                const deliColor = deliStat === 'ပို့ပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+                const payColor = payStat === 'ငွေရှင်းပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+                const deliDropColor = deliDropStat === 'Deli အပ်ပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+
+                const el = document.createElement('div');
+                el.className = 'leaderboard-item';
+                el.style.display = 'flex';
+                el.style.flexDirection = 'column';
+                el.style.gap = '8px';
+                
+                el.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div class="lb-info" id="info-area-${sale.id}" style="cursor: pointer; flex-grow: 1;">
+                            <div class="lb-title">👤 ${cust.name} (${cust.phone})</div>
+                            <div class="lb-sales">📅 ${sale.dateStr} • Total: ${Number(sale.price).toLocaleString()} MMK</div>
+                        </div>
+                        <button type="button" class="ledger-view-btn" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; width: auto;">View ➔</button>
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+                        <button type="button" onclick="quickToggleStatus('${sale.id}', 'delivery')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${deliColor}; color: ${deliColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">📦 ${deliStat}</button>
+                        <button type="button" onclick="quickToggleStatus('${sale.id}', 'payment')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${payColor}; color: ${payColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">💰 ${payStat}</button>
+                        <button type="button" onclick="quickToggleStatus('${sale.id}', 'deliDrop')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${deliDropColor}; color: ${deliDropColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">🛵 ${deliDropStat}</button>
+                    </div>
+                `;
+                
+                // View ခလုတ်ကို နှိပ်မှသာ Edit မိုဒယ်လ် ပွင့်မည်
+                const viewBtn = el.querySelector('.ledger-view-btn');
+                viewBtn.onclick = function(event) {
+                    event.stopPropagation();
+                    openLedgerDetail(sale);
+                };
+
+                // နာမည်နှင့် ဖုန်းနံပါတ်ပါသော စာသားအကွက်ကို နှိပ်လျှင်လည်း Edit ပွင့်မည်
+                const infoArea = el.querySelector(`#info-area-${sale.id}`);
+                infoArea.onclick = function(event) {
+                    event.stopPropagation();
+                    openLedgerDetail(sale);
+                };
+
+                listContainer.appendChild(el);
+            });
+        };
+    }
+           
+    /* Fully Fixed Adjust Quantity Function (Status များ အလိုအလျောက် ပါဝင်စေရန်) */
+    function adjustQty(id, change) {
+        if (!db) return;
+        
+        const transaction = db.transaction(["stocks", "sales"], "readwrite");
+        const stockStore = transaction.objectStore("stocks");
+        const salesStore = transaction.objectStore("sales");
+
+        const req = stockStore.get(Number(id));
+        
+        req.onsuccess = function() {
+            const item = req.result;
+            if (!item) return;
+
+            let currentQty = parseInt(item.qty, 10) || 0;
+
+            if (change === -1) {
+                if (currentQty > 0) {
+                    item.qty = currentQty - 1;
+                    if (parseInt(item.qty, 10) === 0) {
+                        item.soldOutDate = new Date().toISOString().split('T')[0];
+                    }
+                    item.salesCount = (parseInt(item.salesCount, 10) || 0) + 1;
+
+                    const saleId = "SALE_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+
+                    salesStore.add({
+                        id: saleId,
+                        itemId: item.id,
+                        customer: { name: "Quick Sale", phone: "-", address: "-" },
+                        brand: item.brand || "",
+                        series: item.series || "",
+                        type: item.type || "",
+                        price: Number(item.price) || 0,
+                        timestamp: new Date().getTime(),
+                        dateStr: new Date().toISOString().split('T')[0],
+                        deliveryStatus: "မပို့ရသေး",
+                        paymentStatus: "ငွေမရှင်းရသေး",
+                        deliDropStatus: "Deli မအပ်ရသေး"
+                    });
+                } else {
+                    return;
+                }
+            } else if (change === 1) {
+                item.qty = currentQty + 1;
+                if (item.qty > 0) {
+                    delete item.soldOutDate;
+                }
+            }
+            stockStore.put(item);
+        };
+
+        transaction.oncomplete = function() {
+            loadAllData();
+        };
+
+        transaction.onerror = function(event) {
+            console.error("Transaction Error Details:", event.target.error);
+        };
+    }
+
+
+    let currentEditingSale = null;
+
+    function openLedgerDetail(sale) {
+        currentEditingSale = sale;
+        const cust = sale.customer || {};
+
+        document.getElementById('edit-sale-id').value = sale.id;
+        document.getElementById('ledger-edit-date').value = sale.dateStr || new Date().toISOString().split('T')[0];
+        document.getElementById('ledger-edit-name').value = cust.name || '';
+        document.getElementById('ledger-edit-phone').value = cust.phone || '';
+        document.getElementById('ledger-edit-address').value = cust.address || '';
+        document.getElementById('ledger-edit-deli').value = cust.deli || '';
+        
+        document.getElementById('ledger-status-delivery').value = sale.deliveryStatus || 'မပို့ရသေး';
+        document.getElementById('ledger-status-payment').value = sale.paymentStatus || 'ငွေမရှင်းရသေး';
+        document.getElementById('ledger-status-deli').value = sale.deliDropStatus || 'Deli မအပ်ရသေး';
+
+        let itemsHtml = "";
+        if (sale.items && sale.items.length > 0) {
+            sale.items.forEach((i, idx) => {
+                itemsHtml += `<div style="margin-bottom: 4px; border-bottom: 1px solid #222; padding-bottom: 4px;">
+                    <b>${idx+1}. ${i.brand} ${i.series}</b> (${i.type})<br>
+                    Price: <span style="color:var(--warning-yellow);">${Number(i.price).toLocaleString()} MMK</span>
+                </div>`;
+            });
+        } else {
+            itemsHtml = `Price: ${Number(sale.price).toLocaleString()} MMK`;
+        }
+
+        document.getElementById('ledger-edit-items-container').innerHTML = itemsHtml;
+
+        const modalElem = document.getElementById('ledger-detail-modal');
+        if (modalElem) {
+            modalElem.style.display = 'flex';
+            modalElem.classList.add('active');
+        }
+    }
+
+    function closeLedgerDetailModal() {
+        const modalElem = document.getElementById('ledger-detail-modal');
+        if (modalElem) {
+            modalElem.style.display = 'none';
+            modalElem.classList.remove('active');
+        }
+        currentEditingSale = null;
+    }
+
+    // Status Pop-up Selection Functions
+    let activeStatusFieldId = '';
+    const statusChoices = {
+        delivery: ['ပို့ပြီး', 'မပို့ရသေး'],
+        payment: ['ငွေရှင်းပြီး', 'ငွေမရှင်းရသေး'],
+        deli: ['Deli အပ်ပြီး', 'Deli မအပ်ရသေး']
+    };
+
+    function openStatusSelectionModal(fieldType, titleText) {
+        activeStatusFieldId = fieldType;
+        document.getElementById('status-modal-title').innerText = titleText;
+        const listDiv = document.getElementById('status-options-list');
+        listDiv.innerHTML = '';
+
+        const options = statusChoices[fieldType] || [];
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.innerText = opt;
+            btn.style.cssText = "width:100%; padding:12px; background:#2c2c2e; color:#fff; border:1px solid #444; border-radius:8px; font-weight:bold; cursor:pointer;";
+            btn.onclick = function() {
+                if (fieldType === 'delivery') document.getElementById('ledger-status-delivery').value = opt;
+                if (fieldType === 'payment') document.getElementById('ledger-status-payment').value = opt;
+                if (fieldType === 'deli') document.getElementById('ledger-status-deli').value = opt;
+                closeStatusSelectionModal();
+            };
+            listDiv.appendChild(btn);
+        });
+
+        document.getElementById('status-selection-modal').style.display = 'flex';
+    }
+
+    function closeStatusSelectionModal() {
+        document.getElementById('status-selection-modal').style.display = 'none';
+    }
+
+    // Order အချက်အလက်နှင့် Status များကို သိမ်းဆည်းခြင်း
+    function saveLedgerEdit(event) {
+        event.preventDefault();
+        if (!db || !currentEditingSale) return;
+
+        const updatedCustomer = {
+            date: document.getElementById('ledger-edit-date').value,
+            name: document.getElementById('ledger-edit-name').value,
+            phone: document.getElementById('ledger-edit-phone').value,
+            address: document.getElementById('ledger-edit-address').value,
+            deli: document.getElementById('ledger-edit-deli').value || '-'
+        };
+
+        currentEditingSale.dateStr = updatedCustomer.date;
+        currentEditingSale.customer = updatedCustomer;
+        currentEditingSale.deliveryStatus = document.getElementById('ledger-status-delivery').value;
+        currentEditingSale.paymentStatus = document.getElementById('ledger-status-payment').value;
+        currentEditingSale.deliDropStatus = document.getElementById('ledger-status-deli').value;
+
+        const tx = db.transaction(["sales"], "readwrite");
+        const store = tx.objectStore("sales");
+        store.put(currentEditingSale);
+
+        tx.oncomplete = function() {
+            alert("အော်ဒါ အချက်အလက်နှင့် Status များကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ။");
+            closeLedgerDetailModal();
+            loadAllData();
+        };
+    }
+
+    function deleteSaleOrder() {
+        if (!confirm("ဤအရောင်းအဝယ် မှတ်တမ်းကို အပြီးတိုင် ဖျက်မှာ သေချာပါသလား?")) return;
+        if (!db || !currentEditingSale) return;
+
+        const tx = db.transaction(["sales"], "readwrite");
+        const store = tx.objectStore("sales");
+        store.delete(currentEditingSale.id);
+
+        tx.oncomplete = function() {
+            alert("အရောင်းမှတ်တမ်းကို ဖျက်ပြီးပါပြီ။");
+            closeLedgerDetailModal();
+            loadAllData();
+        };
+    }
+
+
+    function bulkDeleteSelected() {
+        if (!confirm(`ရွေးချယ်ထားသော Items (${selectedStockIds.size}) ခုကို အပြီးတိုင် ဖျက်မှာ သေချာပါသလား?`)) return;
+        const tx = db.transaction(["stocks"], "readwrite");
+        const store = tx.objectStore("stocks");
+        selectedStockIds.forEach(id => store.delete(id));
+        tx.oncomplete = function() {
+            selectedStockIds.clear();
+            loadAllData();
+        };
+    }
+
+    // switchView ထဲတွင် view-ledger ဝင်ရောက်ချိန် calculateLedgerData လုပ်ဆောင်ရန်
+            function switchView(viewId, element) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(viewId).classList.add('active');
+        element.classList.add('active');
+
+        if (viewId !== 'view-scan') stopCamera();
+        if (viewId === 'view-analytics') calculateAnalytics();
+        
+        // Ledger tab ကို နှိပ်ပြီး ဝင်လိုက်တာနဲ့ စာရင်းတွေ ချက်ချင်းပေါ်လာစေရန်
+        if (viewId === 'view-ledger') {
+            calculateLedgerData();
+        }
+    }
+
+    
+function filterStock() {
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
+    
+    if (!db) return;
+    const tx = db.transaction(['stocks'], 'readonly');
+    const store = tx.objectStore('stocks');
+    const req = store.getAll();
+
+    req.onsuccess = function() {
+        const allItems = req.result || [];
+        
+        // Search Filter စစ်ဆေးခြင်း
+        const filtered = allItems.filter(item => {
+            const brandMatch = item.brand && item.brand.toLowerCase().includes(query);
+            const seriesMatch = item.series && item.series.toLowerCase().includes(query);
+            const typeMatch = item.type && item.type.toLowerCase().includes(query);
+            return brandMatch || seriesMatch || typeMatch;
+        });
+
+        // Virtual Scroll စနစ်သို့ Data အသစ်ပြန်ပို့ပေးခြင်း
+        displayStock(filtered);
+    };
+}
+
+
+/* Analytics / Inventory Overview Calculator */
+function calculateAnalytics() {
+    if (!db) return;
+
+    // Overview ထဲမှ Kg စရိတ်၊ ဘူးဖိုး နှင့် အိတ်ဖိုး ကုန်ကျစရိတ်များကို ရယူခြင်း
+    const globalKgCost = Number(document.getElementById('global-kg-cost')?.value) || 0;
+    const globalBoxCost = Number(document.getElementById('global-box-cost')?.value) || 0;
+    const globalBagCost = Number(document.getElementById('global-bag-cost')?.value) || 0;
+    
+    // အထွေထွေ စရိတ်ပေါင်း (Kg ခ + ဘူးဖိုး + အိတ်ဖိုး)
+    const totalExtraCosts = globalKgCost + globalBoxCost + globalBagCost;
+
+    const stockTx = db.transaction(["stocks"], "readonly");
+    const stockStore = stockTx.objectStore("stocks");
+    
+    stockStore.getAll().onsuccess = function(e) {
+        const items = e.target.result || [];
+        const uniqueSeries = new Set(items.map(i => (i.series || '').toLowerCase().trim()));
+        const totalQty = items.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+        // ၁။ စုစုပေါင်း ရောင်းရမည့် တန်ဖိုး (Selling Value)
+        const totalVal = items.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.qty || 0)), 0);
+
+        // ၂။ ပစ္စည်းများ၏ မူရင်း ရင်းဈေးသီးသန့် (Direct Stock Cost Only)
+        const totalItemsCost = items.reduce((sum, item) => {
+            const itemUnitCost = Number(item.cost || 0);
+            return sum + (itemUnitCost * Number(item.qty || 0));
+        }, 0);
+
+        // ၃။ မူရင်း အမြတ်စစ်စစ် (Profit - Total Cost နှင့် Profit အပေါ် သက်ရောက်မှု မရှိစေရန်)
+        const netProfit = totalVal - totalItemsCost;
+
+        // UI တွင် ကိန်းဂဏန်းများ ထည့်သွင်းပြသခြင်း
+        document.getElementById('stat-total-series').innerText = uniqueSeries.size;
+        document.getElementById('stat-total-value').innerText = totalVal.toLocaleString() + " MMK";
+        
+        // Total Cost တွင် မူရင်း ရင်းဈေးအတိုင်းသာ ပြမည်
+        document.getElementById('stat-total-cost').innerText = totalItemsCost.toLocaleString() + " MMK";
+        
+        // Profit တွင် မူရင်း အမြတ်အတိုင်းသာ ပြမည်
+        document.getElementById('stat-total-profit').innerText = netProfit.toLocaleString() + " MMK";
+
+        // Leaderboard တွက်ချက်မှု အပိုင်း
+        const sortedBySales = [...items].sort((a, b) => (Number(b.salesCount) || 0) - (Number(a.salesCount) || 0));
+        const leaderboardList = document.getElementById('leaderboard-list');
+        leaderboardList.innerHTML = '';
+
+        sortedBySales.slice(0, 5).forEach((item, index) => {
+            if ((Number(item.salesCount) || 0) > 0) {
+                const typeText = item.type ? ` (${item.type})` : '';
+                const lbEl = document.createElement('div');
+                lbEl.className = 'leaderboard-item';
+                lbEl.innerHTML = `
+                    <span class="rank">#${index + 1}</span>
+                    <div class="lb-info">
+                        <div class="lb-title">${item.brand} ${item.series}${typeText}</div>
+                        <div class="lb-sales">Total Sales: ${item.salesCount} pcs</div>
+                    </div>
+                `;
+                leaderboardList.appendChild(lbEl);
+            }
+        });
+
+        if (leaderboardList.innerHTML === '') {
+            leaderboardList.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">No sales recorded yet.</p>';
+            
+        }
+        if (document.getElementById('stat-total-qty')) {
+    document.getElementById('stat-total-qty').innerText = totalQty.toLocaleString() + " Pcs";
+}
+    };
+
+    // Sales History တွက်ချက်မှု နှင့် Breakeven Target Dynamic တွက်ချက်သည့် အပိုင်း
+    const salesTx = db.transaction(["sales"], "readonly");
+    const salesStore = salesTx.objectStore("sales");
+    salesStore.getAll().onsuccess = function(e) {
+        const sales = e.target.result || [];
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        let dailyTotal = 0, dailyQty = 0;
+        let monthlyTotal = 0, monthlyQty = 0;
+        let totalEarnedProfit = 0; // ရရှိပြီးသော စုစုပေါင်း ရောင်းရအမြတ်
+
+        sales.forEach(sale => {
+            const saleDate = new Date(sale.timestamp);
+            const salePrice = Number(sale.price || 0);
+            const saleCost = Number(sale.cost || 0);
+
+            // ရောင်းရသမျှ အမြတ်များကို ပေါင်းယူခြင်း (ရောင်းဈေး - ရင်းဈေး)
+            totalEarnedProfit += (salePrice - saleCost);
+            
+            if (sale.dateStr === todayStr) {
+                dailyTotal += salePrice;
+                dailyQty += 1;
+            }
+
+            if (saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear) {
+                monthlyTotal += salePrice;
+                monthlyQty += 1;
+            }
+        });
+
+        // ၄။ Breakeven Target ကို Dynamic တွက်ချက်ပြီး UI တွင် ပြသခြင်း
+        const breakevenElem = document.getElementById('stat-breakeven-amount');
+        if (breakevenElem) {
+            if (totalExtraCosts === 0) {
+                // အထွေထွေ စရိတ်မဖြည့်ရသေးပါက 0 MMK ဟု အမြဲပြမည်
+                breakevenElem.innerText = "0 MMK";
+                breakevenElem.style.color = "#4A90E2";
+            } else {
+                // ရင်းကျေရန် ကျန်ရှိသည့် ပမာဏ = (အထွေထွေစရိတ်ပေါင်း - ရရှိပြီးသော ရောင်းရအမြတ်)
+                let remainingBreakeven = totalExtraCosts - totalEarnedProfit;
+
+                if (remainingBreakeven <= 0) {
+                    // စရိတ်ဖြည့်ထားပြီး အမြတ်ဖြင့် ရင်းကျေသွားပါက
+                    breakevenElem.innerText = "FULLY RECOVERED (ရင်းကျေပါပြီ)";
+                    breakevenElem.style.color = "var(--success-green)";
+                } else {
+                    // စရိတ်ဖြည့်ထားပြီး ကျန်ရှိနေသေးသော ရင်းကျေရန် ပမာဏ
+                    breakevenElem.innerText = remainingBreakeven.toLocaleString() + " MMK";
+                    breakevenElem.style.color = "#4A90E2";
+                }
+            }
+        }
+
+        document.getElementById('stat-daily-sales').innerText = dailyTotal.toLocaleString() + " MMK";
+        document.getElementById('stat-daily-qty').innerText = `${dailyQty} Sold Today`;
+
+        document.getElementById('stat-monthly-sales').innerText = monthlyTotal.toLocaleString() + " MMK";
+        document.getElementById('stat-monthly-qty').innerText = `${monthlyQty} Sold This Month`;
+
+        if (typeof loadSalesHistory === "function") {
+            loadSalesHistory();
+        }
+    };
+}
+
+
+    /* အရောင်းမှတ်တမ်းများကို ဖော်ပြပေးသည့် Function */
+function loadSalesHistory() {
+    if (!db) return;
+    const salesTx = db.transaction(["sales"], "readonly");
+    const salesStore = salesTx.objectStore("sales");
+    
+    salesStore.getAll().onsuccess = function(e) {
+        const sales = e.target.result || [];
+        const historyContainer = document.getElementById('sales-history-list');
+        historyContainer.innerHTML = '';
+
+        if (sales.length === 0) {
+            historyContainer.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">အရောင်းမှတ်တမ်း မရှိသေးပါ။</p>';
+            return;
+        }
+
+        sales.reverse().slice(0, 10).forEach(sale => {
+            const saleDate = new Date(sale.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Type ပါဝင်မှု မရှိပါက ကွက်လပ်ဖြစ်မသွားအောင် စစ်ဆေးပေးခြင်း
+            const typeText = sale.type ? ` (${sale.type})` : '';
+
+            const saleEl = document.createElement('div');
+            saleEl.className = 'leaderboard-item';
+            saleEl.style.justifyContent = 'space-between';
+            saleEl.innerHTML = `
+                <div class="lb-info">
+                    <!-- Brand Series နှင့် Type ကို တွဲပြထားပါသည် -->
+                    <div class="lb-title">${sale.brand} ${sale.series}${typeText}</div>
+                    <div class="lb-sales">${sale.price.toLocaleString()} MMK • ${saleDate}</div>
+                </div>
+                <button type="button" class="btn-action btn-del" onclick="undoSale('${sale.id}', ${sale.itemId})" style="width: auto; padding: 4px 8px; font-size: 10px;">
+                    Undo
+                </button>
+            `;
+            historyContainer.appendChild(saleEl);
+        });
+    };
+}
+
+/* မှားရောင်းမိပါက အရောင်းကို ဖျက်ပြီး Stock ပြန်တိုးပေးသည့် Function */
+function undoSale(saleId, itemId) {
+    if (!confirm("ဒီအရောင်းမှတ်တမ်းကို ဖျက်ပြီး Stock ထဲ ၁ ခု ပြန်ပေါင်းမှာ သေချာပါသလား?")) return;
+
+    const transaction = db.transaction(["stocks", "sales"], "readwrite");
+    const stockStore = transaction.objectStore("stocks");
+    const salesStore = transaction.objectStore("sales");
+
+    // ၁။ Sales Record မှ ဖျက်မည်
+    salesStore.delete(saleId);
+
+    // ၂။ Stock Qty နှင့် SalesCount ကို ပြန်ပြင်မည်
+    const req = stockStore.get(Number(itemId));
+    req.onsuccess = function() {
+        const item = req.result;
+        if (item) {
+            item.qty = (parseInt(item.qty, 10) || 0) + 1; // Stock +1 ပြန်ပေါင်းမည်
+            item.salesCount = Math.max(0, (parseInt(item.salesCount, 10) || 0) - 1); // Sales count -1 လျှော့မည်
+            stockStore.put(item);
+        }
+    };
+
+    transaction.oncomplete = function() {
+        loadAllData(); // Data အားလုံး Refresh လုပ်မည်
+    };
+}
+
+    /* Save New Item */
+        document.getElementById('stock-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('image');
+    if (!fileInput.files[0]) return;
+
+    // ပုံကို compress လုပ်ခြင်း
+    const compressedImage = await compressImage(fileInput.files[0], 400, 0.7);
+
+            const newItem = {
+            id: Date.now(),
+            brand: document.getElementById('brand').value.toUpperCase(),
+            series: document.getElementById('series').value,
+            type: document.getElementById('type').value,
+            cost: Number(document.getElementById('cost').value) || 0,
+            price: Number(document.getElementById('price').value),
+            qty: parseInt(document.getElementById('qty').value, 10),
+            salesCount: 0,
+            image: compressedImage,
+            dateAdded: new Date().toISOString().split('T')[0] // 👈 ဤလိုင်းကို ထည့်ပေးရန်
+        };
+
+    const transaction = db.transaction(["stocks"], "readwrite");
+    transaction.objectStore("stocks").add(newItem);
+
+    transaction.oncomplete = function() {
+        loadAllData();
+        document.getElementById('stock-form').reset();
+        switchView('view-inventory', document.querySelectorAll('.nav-item')[2]);
+    };
+});
+
+
+    /* Edit Modal Functions */
+    function openEditModal(id) {
+        const transaction = db.transaction(["stocks"], "readonly");
+        const req = transaction.objectStore("stocks").get(Number(id));
+
+        req.onsuccess = function() {
+            const item = req.result;
+            if (item) {
+                document.getElementById('edit-id').value = item.id;
+                document.getElementById('edit-brand').value = item.brand;
+                document.getElementById('edit-series').value = item.series;
+                document.getElementById('edit-type').value = item.type;
+                document.getElementById('edit-price').value = item.price;
+                document.getElementById('edit-qty').value = item.qty;
+                document.getElementById('edit-modal').classList.add('active');
+                document.getElementById('edit-cost').value = item.cost || 0;
+            }
+        };
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.remove('active');
+        document.getElementById('edit-form').reset();
+    }
+
+    document.getElementById('edit-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const id = Number(document.getElementById('edit-id').value);
+    const fileInput = document.getElementById('edit-image');
+
+    const transaction = db.transaction(["stocks"], "readwrite");
+    const store = transaction.objectStore("stocks");
+    const req = store.get(id);
+
+    req.onsuccess = async function() {
+        const existingData = req.result;
+        if (existingData) {
+            existingData.brand = document.getElementById('edit-brand').value.toUpperCase();
+            existingData.series = document.getElementById('edit-series').value;
+            existingData.type = document.getElementById('edit-type').value;
+            existingData.price = Number(document.getElementById('edit-price').value);
+            existingData.qty = parseInt(document.getElementById('edit-qty').value, 10);
+            existingData.cost = Number(document.getElementById('edit-cost').value) || 0;
+
+            if (fileInput.files[0]) {
+                // Edit လုပ်ချိန်တွင် ပုံအသစ်တင်ပါက compress လုပ်မည်
+                existingData.image = await compressImage(fileInput.files[0], 400, 0.7);
+            }
+
+            store.put(existingData);
+            transaction.oncomplete = function() {
+                closeEditModal();
+                loadAllData();
+            };
+        }
+    };
+});
+
+                
+
+    function deleteStock(id) {
+        if (confirm("Delete this item?")) {
+            const transaction = db.transaction(["stocks"], "readwrite");
+            transaction.objectStore("stocks").delete(Number(id));
+            transaction.oncomplete = function() {
+                loadAllData();
+            };
+        }
+    }
+
+    /* ပြင်ဆင်ထားသည့် Universal Search Function */
+function filterStock() {
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
+    const transaction = db.transaction(["stocks"], "readonly");
+    const req = transaction.objectStore("stocks").getAll();
+
+    req.onsuccess = function() {
+        if (!query) {
+            displayStock(req.result);
+            return;
+        }
+
+        const filtered = req.result.filter(item => {
+            const id       = (item.id || '').toString().toLowerCase();
+            const barcode  = (item.barcode || '').toString().toLowerCase();
+            const brand    = (item.brand || '').toString().toLowerCase();
+            const series   = (item.series || '').toString().toLowerCase();
+            const type     = (item.type || '').toString().toLowerCase();
+            const price    = (item.price || '').toString().toLowerCase();
+            const cost     = (item.cost || '').toString().toLowerCase();
+
+            // Barcode, Brand, Series, Type, Price, Cost စသည့် မည်သည့် စာသား/နံပါတ်မဆို ပါဝင်ပါက Filter လုပ်ပေးမည်
+            return id.includes(query) ||
+                   barcode.includes(query) ||
+                   brand.includes(query) ||
+                   series.includes(query) ||
+                   type.includes(query) ||
+                   price.includes(query) ||
+                   cost.includes(query);
+        });
+        displayStock(filtered);
+    };
+}
+
+    /* Camera Matcher Functions */
+    let videoStream = null;
+
+    async function toggleCamera() {
+        if (videoStream) stopCamera();
+        else startCamera();
+    }
+
+    async function startCamera() {
+        const video = document.getElementById('video');
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: { ideal: "environment" }, aspectRatio: { ideal: 0.75 } }
+            });
+            video.srcObject = videoStream;
+            video.style.display = 'block';
+            document.getElementById('scanner-guide').style.display = 'block';
+            document.getElementById('scanner-line').style.display = 'block';
+            document.getElementById('cam-placeholder').style.display = 'none';
+            document.getElementById('capture-btn').style.display = 'flex';
+            document.getElementById('toggle-cam-btn').innerText = "Close Camera";
+            document.getElementById('scan-status').innerText = "Align cover vertically in frame";
+        } catch (err) {
+            document.getElementById('scan-status').innerText = "Camera access error";
+        }
+    }
+
+    function stopCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+        document.getElementById('video').style.display = 'none';
+        document.getElementById('scanner-guide').style.display = 'none';
+        document.getElementById('scanner-line').style.display = 'none';
+        document.getElementById('cam-placeholder').style.display = 'block';
+        document.getElementById('capture-btn').style.display = 'none';
+        document.getElementById('toggle-cam-btn').innerText = "Open Camera";
+        document.getElementById('scan-status').innerText = "Camera Standby";
+    }
+
+    function captureAndSearch() {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!video.videoWidth) return;
+
+        canvas.width = 60; canvas.height = 80;
+        ctx.drawImage(video, 0, 0, 60, 80);
+        const capturedData = ctx.getImageData(0, 0, 60, 80);
+        stopCamera();
+
+        document.getElementById('scan-status').innerText = "Analyzing image...";
+        findMatchingStock(capturedData);
+    }
+
+    function findMatchingStock(capturedImageData) {
+        const transaction = db.transaction(["stocks"], "readonly");
+        const req = transaction.objectStore("stocks").getAll();
+
+        req.onsuccess = function() {
+            const stockData = req.result;
+            if (!stockData || stockData.length === 0) return;
+
+            let bestMatchId = null;
+            let lowestScore = Infinity;
+            let processedCount = 0;
+
+            stockData.forEach(item => {
+                const img = new Image();
+                img.src = item.image;
+                img.onload = function() {
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = 60; tempCanvas.height = 80;
+                    tempCtx.drawImage(img, 0, 0, 60, 80);
+
+                    const itemImageData = tempCtx.getImageData(0, 0, 60, 80);
+                    const diffScore = calculateAdvancedDiff(capturedImageData.data, itemImageData.data);
+
+                    if (diffScore < lowestScore) {
+                        lowestScore = diffScore;
+                        bestMatchId = item.id;
+                    }
+
+                    processedCount++;
+                    if (processedCount === stockData.length && bestMatchId) {
+                        switchView('view-inventory', document.querySelectorAll('.nav-item')[2]);
+                        loadStockData(bestMatchId);
+                        setTimeout(() => {
+                            const targetEl = document.getElementById(`item-${bestMatchId}`);
+                            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                };
+            });
+        };
+    }
+
+    function calculateAdvancedDiff(data1, data2) {
+        let pixelDiff = 0, luminanceDiff = 0;
+        for (let i = 0; i < data1.length; i += 4) {
+            const r1 = data1[i], g1 = data1[i+1], b1 = data1[i+2];
+            const r2 = data2[i], g2 = data2[i+1], b2 = data2[i+2];
+            pixelDiff += Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+            luminanceDiff += Math.abs(((0.299*r1)+(0.587*g1)+(0.114*b1)) - ((0.299*r2)+(0.587*g2)+(0.114*b2)));
+        }
+        return (pixelDiff * 0.7) + (luminanceDiff * 0.3);
+    }
+    
+    /* ၁။ ရိုက်ထည့်လိုက်သော စရိတ်များကို LocalStorage ထဲတွင် Auto Save လုပ်ပြီး Analytics ပြန်တွက်သည့် Function */
+function saveAndCalculateCosts() {
+    const kgCost = document.getElementById('global-kg-cost')?.value || 0;
+    const boxCost = document.getElementById('global-box-cost')?.value || 0;
+    const bagCost = document.getElementById('global-bag-cost')?.value || 0;
+
+    // Browser ထဲတွင် အလိုအလျောက် သိမ်းဆည်းခြင်း
+    localStorage.setItem('global_kg_cost', kgCost);
+    localStorage.setItem('global_box_cost', boxCost);
+    localStorage.setItem('global_bag_cost', bagCost);
+
+    // Analytics ကို ပြန်လည်တွက်ချက်ခြင်း
+    calculateAnalytics();
+}
+
+/* ၂။ App စဖွင့်ချိန်/ဝင်ချိန်တွင် သိမ်းဆည်းထားသော စရိတ်များကို ပြန်လည်ဖော်ပြပေးသည့် Function */
+function loadSavedCosts() {
+    const savedKg = localStorage.getItem('global_kg_cost');
+    const savedBox = localStorage.getItem('global_box_cost');
+    const savedBag = localStorage.getItem('global_bag_cost');
+
+    if (savedKg !== null && document.getElementById('global-kg-cost')) {
+        document.getElementById('global-kg-cost').value = savedKg;
+    }
+    if (savedBox !== null && document.getElementById('global-box-cost')) {
+        document.getElementById('global-box-cost').value = savedBox;
+    }
+    if (savedBag !== null && document.getElementById('global-bag-cost')) {
+        document.getElementById('global-bag-cost').value = savedBag;
+    }
+}
+
+/* ၃။ စရိတ်များကို ပြန်လည်ဖျက်ထုတ်/ရှင်းထုတ်မည့် (Reset) Function */
+function clearGlobalCosts() {
+    if (confirm("အထွေထွေစရိတ်များ (Kg၊ ဘူးဖိုး၊ အိတ်ဖိုး) အားလုံးကို ဖျက်ပစ်မှာ သေချာပါသလား?")) {
+        localStorage.removeItem('global_kg_cost');
+        localStorage.removeItem('global_box_cost');
+        localStorage.removeItem('global_bag_cost');
+
+        if (document.getElementById('global-kg-cost')) document.getElementById('global-kg-cost').value = 0;
+        if (document.getElementById('global-box-cost')) document.getElementById('global-box-cost').value = 0;
+        if (document.getElementById('global-bag-cost')) document.getElementById('global-bag-cost').value = 0;
+
+        calculateAnalytics();
+    }
+}
+
+/* Header Date Picker ဖြင့် Sales စစ်ဆေးသည့် Function */
+function filterSalesByHeaderDate() {
+    if (!db) return;
+
+    const dateVal = document.getElementById('sales-header-date')?.value;
+    const resetBtn = document.getElementById('btn-reset-header-date');
+    const infoBar = document.getElementById('header-date-sales-info');
+
+    if (!dateVal) {
+        if (resetBtn) resetBtn.style.display = 'none';
+        if (infoBar) infoBar.style.display = 'none';
+        return;
+    }
+
+    if (resetBtn) resetBtn.style.display = 'inline-block';
+
+    const salesTx = db.transaction(["sales"], "readonly");
+    const salesStore = salesTx.objectStore("sales");
+
+    salesStore.getAll().onsuccess = function(e) {
+        const sales = e.target.result || [];
+        let totalVal = 0;
+        let totalQty = 0;
+
+        sales.forEach(sale => {
+            const saleDate = sale.dateStr || (sale.timestamp ? new Date(sale.timestamp).toISOString().split('T')[0] : '');
+            if (saleDate === dateVal) {
+                totalVal += Number(sale.price || 0);
+                totalQty += 1;
+            }
+        });
+
+        // ရွေးချယ်ထားသော ရက်စွဲ၏ အရောင်းရလဒ်ပြသခြင်း
+        if (infoBar) {
+            infoBar.style.display = 'flex';
+            document.getElementById('hdr-selected-date-lbl').innerText = `📅 ${dateVal} Sales:`;
+            document.getElementById('hdr-selected-date-val').innerText = `${totalVal.toLocaleString()} MMK (${totalQty} pcs)`;
+        }
+    };
+}
+
+/* Date Selection ပြန်ဖျက်သည့် Function */
+function resetHeaderSalesDate() {
+    const dateInput = document.getElementById('sales-header-date');
+    const resetBtn = document.getElementById('btn-reset-header-date');
+    const infoBar = document.getElementById('header-date-sales-info');
+
+    if (dateInput) dateInput.value = '';
+    if (resetBtn) resetBtn.style.display = 'none';
+    if (infoBar) infoBar.style.display = 'none';
+}
+
+/* Data များကို JSON File အဖြစ် Download လုပ်ရန် (Backup) */
+function exportData() {
+    if (!db) return;
+
+    const transaction = db.transaction(["stocks", "sales"], "readonly");
+    const stockStore = transaction.objectStore("stocks");
+    const salesStore = transaction.objectStore("sales");
+
+    const backupData = {
+        stocks: [],
+        sales: []
+    };
+
+    stockStore.getAll().onsuccess = function(e1) {
+        backupData.stocks = e1.target.result || [];
+
+        salesStore.getAll().onsuccess = function(e2) {
+            backupData.sales = e2.target.result || [];
+
+            // JSON String အဖြစ် ပြောင်းပြီး File Download ပြုလုပ်ခြင်း
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            
+            const today = new Date().toISOString().split('T')[0];
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `LuxuryStock_Backup_${today}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert("Backup ဖိုင်ကို အောင်မြင်စွာ Download ဆွဲပြီးပါပြီ။");
+        };
+    };
+}
+
+/* JSON Backup File မှ Data များကို Database ထဲ ပြန်ထည့်ရန် (Restore) */
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!confirm("ယခင်ရှိပြီးသား Data များပေါ်သို့ Backup ဖိုင်ထဲမှ Data များ အစားထိုးထည့်သွင်းမှာ သေချာပါသလား?")) {
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+
+            if (!importedData.stocks || !importedData.sales) {
+                alert("မှားယွင်းနေသော Backup File ပုံစံ ဖြစ်နေပါသည်။");
+                return;
+            }
+
+            const transaction = db.transaction(["stocks", "sales"], "readwrite");
+            const stockStore = transaction.objectStore("stocks");
+            const salesStore = transaction.objectStore("sales");
+
+            // Database ဟောင်းများ အကုန်ရှင်းထုတ်ခြင်း
+            stockStore.clear();
+            salesStore.clear();
+
+            // Stocks Data များ ပြန်ထည့်ခြင်း
+            importedData.stocks.forEach(item => {
+                stockStore.put(item);
+            });
+
+            // Sales Data များ ပြန်ထည့်ခြင်း
+            importedData.sales.forEach(sale => {
+                salesStore.put(sale);
+            });
+
+            transaction.oncomplete = function() {
+                alert("Data များကို အောင်မြင်စွာ ပြန်လည် ထည့်သွင်းပြီးပါပြီ။");
+                loadAllData();
+            };
+
+        } catch (err) {
+            alert("ဖိုင်ကို ဖတ်၍ မရပါ သို့မဟုတ် ဖိုင်ပျက်စီးနေပါသည်။");
+            console.error(err);
+        }
+    };
+
+    reader.readAsText(file);
+    event.target.value = ''; // Input ကို Reset ပြန်လုပ်ပေးခြင်း
+}
+
+// ၁။ Stock ထဲမှ ပုံများမပါဘဲ Item Info များကိုသာ JSON File အဖြစ် Backup ထုတ်ယူခြင်း
+function backupStockInfoOnly() {
+    if (!db) {
+        alert("Database ချိတ်ဆက်ထားခြင်း မရှိပါ။");
+        return;
+    }
+
+    const transaction = db.transaction(["stocks"], "readonly");
+    const store = transaction.objectStore("stocks");
+    const req = store.getAll();
+
+    req.onsuccess = function() {
+        const allItems = req.result || [];
+        if (allItems.length === 0) {
+            alert("Backup လုပ်ရန် Stock Data မရှိပါ။");
+            return;
+        }
+
+        // image field ကို ဖယ်ထုတ်ပြီး သာမန် Info များကိုသာ Array အဖြစ် ခွဲထုတ်ခြင်း
+        const infoOnlyData = allItems.map(item => {
+            const { image, ...cleanInfo } = item; // image ကို ဖယ်လိုက်ခြင်း
+            return cleanInfo;
+        });
+
+        // JSON String သို့ ပြောင်းလဲခြင်း
+        const jsonString = JSON.stringify(infoOnlyData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+
+        // Android WebView အပါအဝင် ဒေါင်းလုဒ်ဆွဲနိုင်ရန် Base64 ပြောင်း၍ ထုတ်ယူခြင်း
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = function() {
+            const base64data = reader.result;
+            const link = document.createElement("a");
+            link.setAttribute("href", base64data);
+            link.setAttribute("download", `Stock_Info_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    };
+}
+
+// ၂။ JSON Backup File ကို ရွေးချယ်ပြီး Stock ထဲသို့ ပုံမပါဘဲ ပြန်လည် Restore သွင်းခြင်း
+function restoreStockInfoOnly(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredItems = JSON.parse(e.target.result);
+
+            if (!Array.isArray(restoredItems)) {
+                alert("မှားယွင်းနေသော Backup File ပုံစံ ဖြစ်ပါသည်။");
+                return;
+            }
+
+            if (!confirm(`Item စုစုပေါင်း (${restoredItems.length}) ခု၏ Info များကို Restore လုပ်မှာ သေချာပါသလား?`)) {
+                return;
+            }
+
+            const transaction = db.transaction(["stocks"], "readwrite");
+            const store = transaction.objectStore("stocks");
+
+            restoredItems.forEach(item => {
+                // Restore သွင်းစဉ် ပုံမပါလာပါက အလွတ် (သို့မဟုတ်) placeholder အဖြစ် သတ်မှတ်မည်
+                item.image = item.image || ""; 
+                store.put(item); // ID တူပါက Overwrite လုပ်မည်၊ မတူပါက အသစ်ထည့်မည်
+            });
+
+            transaction.oncomplete = function() {
+                alert("Stock Info များကို အောင်မြင်စွာ Restore ပြုလုပ်ပြီးပါပြီ။");
+                document.getElementById('restore-file-input').value = ''; // Input Reset လုပ်မည်
+                
+                // UI Data များ ပြန်လည် Reload ပြုလုပ်မည်
+                if (typeof loadAllData === 'function') loadAllData();
+            };
+
+        } catch (err) {
+            alert("File ဖတ်ရှုရာတွင် အမှားအယွင်း ရှိနေပါသည်။ JSON File အမှန် ဖြစ်ကြောင်း စစ်ဆေးပေးပါ။");
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+let selectedImagesBase64 = []; // ရွေးချယ်ထားသော ပုံများနှင့် Info များကို ခေတ္တသိမ်းဆည်းမည့် Array
+
+// ၁။ ပုံများစွာကို ရွေးချယ်လိုက်ပါက Form ပြသပေးသည့် Function
+async function handleImageSelection(event) {
+    const files = Array.from(event.target.files);
+    const container = document.getElementById('image-preview-container');
+    const saveBtn = document.getElementById('save-all-btn');
+    
+    container.innerHTML = '';
+    selectedImagesBase64 = [];
+
+    if (files.length === 0) {
+        saveBtn.style.display = 'none';
+        return;
+    }
+
+    for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        
+        // ပုံတစ်ခုချင်းစီကို အလိုအလျောက် Size လျှော့ချခြင်း
+        const compressedBase64 = await compressImage(file, 400, 0.7);
+        
+        selectedImagesBase64.push({
+            index: index,
+            image: compressedBase64
+        });
+
+        const card = document.createElement('div');
+        card.className = 'preview-card';
+        card.id = `card-${index}`;
+        card.innerHTML = `
+            <img src="${compressedBase64}">
+            <input type="text" id="brand-${index}" placeholder="Brand (e.g. Gucci)" required>
+            <input type="text" id="series-${index}" placeholder="Series/Model">
+            <input type="text" id="type-${index}" placeholder="Type (Bag, Watch...)">
+            <input type="number" id="cost-${index}" placeholder="Original Cost (ရင်းနှီးစျေး)" value="0">
+            <input type="number" id="price-${index}" placeholder="Selling Price (ရောင်းစျေး)" value="0">
+            <input type="number" id="qty-${index}" placeholder="Quantity" value="1">
+            <button type="button" onclick="removeSelectedImage(${index})" style="background:#ff4757; color:#fff; border:none; padding:4px; font-size:10px; border-radius:4px; cursor:pointer;">× Remove</button>
+        `;
+        container.appendChild(card);
+    }
+
+    saveBtn.style.display = 'block';
+}
+
+
+// ၂။ ရွေးထားသော ပုံများထဲမှ မလိုချင်သည်ကို ပြန်ဖြုတ်သည့် Function
+function removeSelectedImage(index) {
+    selectedImagesBase64 = selectedImagesBase64.filter(item => item.index !== index);
+    const card = document.getElementById(`card-${index}`);
+    if (card) card.remove();
+
+    if (selectedImagesBase64.length === 0) {
+        document.getElementById('save-all-btn').style.display = 'none';
+    }
+}
+
+// ၃။ ပုံများ နှင့် Info များ အားလုံးကို Stock DB ထဲသို့ တစ်ပြိုင်နက် သိမ်းဆည်းသည့် Function
+function saveAllImagesToStock() {
+    if (!db) {
+        alert("Database ချိတ်ဆက်ထားခြင်း မရှိပါ။");
+        return;
+    }
+
+    if (selectedImagesBase64.length === 0) {
+        alert("ပုံများ ရွေးချယ်ပေးပါဦး။");
+        return;
+    }
+
+    const transaction = db.transaction(["stocks"], "readwrite");
+    const stockStore = transaction.objectStore("stocks");
+
+    selectedImagesBase64.forEach(item => {
+        const idx = item.index;
+        const brand = document.getElementById(`brand-${idx}`).value.trim() || 'Unknown';
+        const series = document.getElementById(`series-${idx}`).value.trim() || '';
+        const type = document.getElementById(`type-${idx}`).value.trim() || 'General';
+        const cost = Number(document.getElementById(`cost-${idx}`).value) || 0;
+        const price = Number(document.getElementById(`price-${idx}`).value) || 0;
+        const qty = Number(document.getElementById(`qty-${idx}`).value) || 1;
+
+        // Stock Entry Data Object
+        const newStockItem = {
+            id: Date.now() + Math.floor(Math.random() * 1000), // Unique ID
+            brand: brand,
+            series: series,
+            type: type,
+            cost: cost,
+            price: price,
+            qty: qty,
+            salesCount: 0,
+            image: item.image, // Base64 Image string
+            dateAdded: new Date().toISOString().split('T')[0]
+        };
+
+        stockStore.add(newStockItem);
+    });
+
+    transaction.oncomplete = function() {
+        alert("ရွေးချယ်ထားသော Items များ အားလုံးကို Stock ထဲသို့ အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ။");
+        
+        // Reset လုပ်ခြင်း
+        document.getElementById('multi-image-input').value = '';
+        document.getElementById('image-preview-container').innerHTML = '';
+        document.getElementById('save-all-btn').style.display = 'none';
+        selectedImagesBase64 = [];
+
+        // UI Data များ ပြန်လည် Reload ပြုလုပ်မည်
+        if (typeof loadAllData === 'function') loadAllData();
+    };
+}
+
+
+// Default Array များ
+let brandOptions = JSON.parse(localStorage.getItem('savedBrandOptions')) || [];
+let seriesOptions = JSON.parse(localStorage.getItem('savedSeriesOptions')) || [];
+
+let activeInputId = '';
+let activeType = '';
+
+// ၁။ Input Box ကို နှိပ်ပါက Pop-up မိုဒယ် ပွင့်လာရန်
+function openSelectionModal(inputId, typeLabel) {
+    activeInputId = inputId;
+    activeType = typeLabel;
+
+    document.getElementById('selection-modal-title').innerText = `Select ${typeLabel}`;
+    renderSelectionList();
+
+    document.getElementById('selection-modal').style.display = 'flex';
+}
+
+// Data များကို Render လုပ်ပေးသည့် Function (Swipe Delete ပါဝင်သည်)
+function renderSelectionList() {
+    const listContainer = document.getElementById('selection-list');
+    listContainer.innerHTML = '';
+
+    const currentList = (activeType === 'Brand') ? brandOptions : seriesOptions;
+
+    if (currentList.length === 0) {
+        listContainer.innerHTML = `<div style="color: #888; text-align: center; padding: 20px;">မရှိသေးပါ။ ➕ Add New မှတစ်ဆင့် အသစ်ထည့်ပါ။</div>`;
+        return;
+    }
+
+    currentList.forEach((item, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'swipe-item-wrapper';
+
+        const deleteBg = document.createElement('div');
+        deleteBg.className = 'swipe-delete-bg';
+        deleteBg.innerText = '🗑️ Delete';
+
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'swipe-item-btn';
+        itemBtn.innerText = item;
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        // Touch events
+        itemBtn.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            currentX = startX;
+            isDragging = true;
+            itemBtn.style.transition = 'none';
+        }, { passive: true });
+
+        itemBtn.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            let diffX = currentX - startX;
+
+            if (diffX < 0 && diffX > -100) {
+                itemBtn.style.transform = `translateX(${diffX}px)`;
+            }
+        }, { passive: true });
+
+        itemBtn.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            itemBtn.style.transition = 'transform 0.2s ease-out';
+            
+            let diffX = currentX - startX;
+
+            if (diffX < -50) {
+                itemBtn.style.transform = `translateX(-80px)`;
+                setTimeout(() => {
+                    deleteOptionItem(index);
+                }, 100);
+            } else {
+                itemBtn.style.transform = `translateX(0px)`;
+            }
+        });
+
+        // Click Event (Select)
+        itemBtn.onclick = function() {
+            let diffX = Math.abs(currentX - startX);
+            if (diffX < 10 || startX === 0) {
+                if (activeInputId) {
+                    document.getElementById(activeInputId).value = item;
+                }
+                closeSelectionModal();
+            }
+        };
+
+        wrapper.appendChild(deleteBg);
+        wrapper.appendChild(itemBtn);
+        listContainer.appendChild(wrapper);
+    });
+}
+
+function closeSelectionModal() {
+    document.getElementById('selection-modal').style.display = 'none';
+}
+
+// ၂။ ➕ Add New ကို နှိပ်ပါက Custom Modal သို့ ပြောင်းလဲခြင်း
+function switchToCustomInput() {
+    // Selection Modal ကို ဖျောက်မည် (activeInputId နှင့် activeType ကို မဖျက်ပါ)
+    document.getElementById('selection-modal').style.display = 'none';
+    
+    document.getElementById('custom-modal-title').innerText = `➕ Add New ${activeType}`;
+    const textField = document.getElementById('custom-text-field');
+    textField.value = '';
+    
+    document.getElementById('custom-input-modal').style.display = 'flex';
+    setTimeout(() => textField.focus(), 150);
+}
+
+function closeCustomInputModal() {
+    document.getElementById('custom-input-modal').style.display = 'none';
+}
+
+// ၃။ စာသားသစ်ကို Save လုပ်၍ LocalStorage နှင့် Input Box တွင် ထည့်သွင်းပေးခြင်း
+function saveCustomInputValue() {
+    const textField = document.getElementById('custom-text-field');
+    const newVal = textField.value.trim();
+
+    if (!newVal) {
+        alert("ကျေးဇူးပြု၍ စာသား ရိုက်ထည့်ပါ။");
+        return;
+    }
+
+    // Brand သို့မဟုတ် Series စာရင်းထဲသို့ ထည့်သွင်းခြင်း
+    if (activeType === 'Brand') {
+        if (!brandOptions.includes(newVal)) {
+            brandOptions.push(newVal);
+            localStorage.setItem('savedBrandOptions', JSON.stringify(brandOptions));
+        }
+    } else {
+        if (!seriesOptions.includes(newVal)) {
+            seriesOptions.push(newVal);
+            localStorage.setItem('savedSeriesOptions', JSON.stringify(seriesOptions));
+        }
+    }
+
+    // ရွေးချယ်ထားသော Input Field (brand, series, edit-brand, edit-series) ထဲသို့ Value ဖြည့်ပေးခြင်း
+    if (activeInputId) {
+        const targetInput = document.getElementById(activeInputId);
+        if (targetInput) {
+            targetInput.value = newVal;
+        }
+    }
+
+    closeCustomInputModal();
+}
+
+// စာရင်းထဲမှ Slide ဖျက်သည့် Function
+function deleteOptionItem(index) {
+    if (confirm("ဒီ Item ကို စာရင်းထဲမှ အပြီးဖျက်မှာ သေချာပါသလား?")) {
+        if (activeType === 'Brand') {
+            brandOptions.splice(index, 1);
+            localStorage.setItem('savedBrandOptions', JSON.stringify(brandOptions));
+        } else {
+            seriesOptions.splice(index, 1);
+            localStorage.setItem('savedSeriesOptions', JSON.stringify(seriesOptions));
+        }
+        renderSelectionList();
+    } else {
+        renderSelectionList();
+    }
+}
+
+// ၁။ Top Selling, Recent Sales အပါအဝင် ဒေတာအားလုံးကို Backup (JSON) ထုတ်ယူခြင်း
+// ၁။ App ထဲရှိ ဒေတာအားလုံး (IndexedDB နှင့် LocalStorage အကုန်) ကို Backup ထုတ်ယူခြင်း
+function exportFullDataBackup() {
+    if (!db) {
+        alert("Database ချိတ်ဆက်ထားခြင်း မရှိပါ။");
+        return;
+    }
+
+    const transaction = db.transaction(["stocks", "sales"], "readonly");
+    const stockStore = transaction.objectStore("stocks");
+    const salesStore = transaction.objectStore("sales");
+
+    const backupData = {
+        stocks: [],
+        sales: [],
+        settings: {
+            globalKgCost: localStorage.getItem('global_kg_cost') || 0,
+            globalBoxCost: localStorage.getItem('global_box_cost') || 0,
+            globalBagCost: localStorage.getItem('global_bag_cost') || 0,
+            brandOptions: JSON.parse(localStorage.getItem('savedBrandOptions')) || [],
+            seriesOptions: JSON.parse(localStorage.getItem('savedSeriesOptions')) || []
+        },
+        backupDate: new Date().toLocaleString()
+    };
+
+    stockStore.getAll().onsuccess = function(e1) {
+        backupData.stocks = e1.target.result || [];
+
+        salesStore.getAll().onsuccess = function(e2) {
+            backupData.sales = e2.target.result || [];
+
+            // JSON File အဖြစ် ပြောင်းလဲ၍ Download ဆွဲခြင်း
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            
+            const today = new Date().toISOString().split('T')[0];
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `LuxuryStock_Full_Backup_${today}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert("ဒေတာအားလုံး (Stock၊ အရောင်း၊ စရိတ်များနှင့် Brand/Series များ) ကို အောင်မြင်စွာ Backup လုပ်ပြီးပါပြီ။");
+        };
+    };
+}
+
+// ၂။ Backup ဖိုင်မှ ဒေတာအားလုံးကို Database နှင့် LocalStorage ထဲသို့ အပြည့်အစုံ ပြန်လည်ထည့်သွင်းခြင်း
+function importFullDataRestore(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!confirm("ယခင်ရှိပြီးသား ဒေတာများအားလုံးကို ဖျက်ပြီး Backup ဖိုင်ထဲမှ ဒေတာများဖြင့် အစားထိုးမှာ သေချာပါသလား?")) {
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+
+            if (!importedData.stocks || !importedData.sales) {
+                alert("မှားယွင်းနေသော Backup File ပုံစံ ဖြစ်နေပါသည်။");
+                event.target.value = '';
+                return;
+            }
+
+            // IndexedDB တွင် Stocks နှင့် Sales များကို Write လုပ်ရန် Transaction ဖွင့်ခြင်း
+            const transaction = db.transaction(["stocks", "sales"], "readwrite");
+            const stockStore = transaction.objectStore("stocks");
+            const salesStore = transaction.objectStore("sales");
+
+            // ဒေတာအဟောင်းများ ရှင်းထုတ်ခြင်း
+            stockStore.clear();
+            salesStore.clear();
+
+            // Stocks Data များ ပြန်ထည့်ခြင်း
+            importedData.stocks.forEach(item => {
+                stockStore.put(item);
+            });
+
+            // Sales Data များ ပြန်ထည့်ခြင်း
+            importedData.sales.forEach(sale => {
+                salesStore.put(sale);
+            });
+
+            transaction.oncomplete = function() {
+                // LocalStorage Settings များကို ပြန်လည်သိမ်းဆည်းခြင်း
+                if (importedData.settings) {
+                    localStorage.setItem('global_kg_cost', importedData.settings.globalKgCost || 0);
+                    localStorage.setItem('global_box_cost', importedData.settings.globalBoxCost || 0);
+                    localStorage.setItem('global_bag_cost', importedData.settings.globalBagCost || 0);
+                    localStorage.setItem('savedBrandOptions', JSON.stringify(importedData.settings.brandOptions || []));
+                    localStorage.setItem('savedSeriesOptions', JSON.stringify(importedData.settings.seriesOptions || []));
+                }
+
+                alert("ဒေတာအားလုံးကို အောင်မြင်စွာ Restore လုပ်ပြီးပါပြီ။ Page ကို Refresh ပြုလုပ်ပါမည်။");
+                location.reload(); // အပြောင်းအလဲများ ချက်ချင်းပေါ်လာစေရန် Reload လုပ်မည်
+            };
+
+        } catch (err) {
+            alert("ဖိုင်ကို ဖတ်၍ မရပါ သို့မဟုတ် ဖိုင်ပျက်စီးနေပါသည်။");
+            console.error(err);
+        }
+    };
+
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+
+// ပုံ၏ File Size ကို Compress လုပ်ပေးမည့် Function
+function compressImage(file, maxWidth = 400, quality = 0.7) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+        };
+    });
+}
+
+// ကလစ်တစ်ချက်နှိပ်တိုင်း Status များကို အလှည့်ကျ ပြောင်းလဲပေးမည့် Function
+function quickToggleStatus(saleId, statusType) {
+    if (!db) return;
+
+    const transaction = db.transaction(["sales"], "readwrite");
+    const store = transaction.objectStore("sales");
+    const req = store.get(saleId);
+
+    req.onsuccess = function() {
+        let sale = req.result;
+        if (!sale) return;
+
+        if (statusType === 'delivery') {
+            sale.deliveryStatus = (sale.deliveryStatus === 'ပို့ပြီး') ? 'မပို့ရသေး' : 'ပို့ပြီး';
+        } else if (statusType === 'payment') {
+            sale.paymentStatus = (sale.paymentStatus === 'ငွေရှင်းပြီး') ? 'ငွေမရှင်းရသေး' : 'ငွေရှင်းပြီး';
+        } else if (statusType === 'deliDrop') {
+            sale.deliDropStatus = (sale.deliDropStatus === 'Deli အပ်ပြီး') ? 'Deli မအပ်ရသေး' : 'Deli အပ်ပြီး';
+        }
+
+        store.put(sale);
+    };
+
+    transaction.oncomplete = function() {
+        calculateLedgerData(); // ချက်ချင်း Update ဖြစ်စေရန် ပြန်ခေါ်မည်
+    };
+}
+
+    let allLedgerSales = [];
+
+    function calculateLedgerData() {
+        if (!db) {
+            setTimeout(calculateLedgerData, 200);
+            return;
+        }
+        
+        const transaction = db.transaction(["sales"], "readwrite");
+        const store = transaction.objectStore("sales");
+        const req = store.getAll();
+
+        req.onsuccess = function(e) {
+            const sales = e.target.result || [];
+            allLedgerSales = sales;
+            renderLedgerSalesList(sales);
+            
+            let totalRev = sales.reduce((sum, item) => sum + Number(item.price || 0), 0);
+            
+            let collectedRev = sales.reduce((sum, item) => {
+                if (item.paymentStatus === 'ငွေရှင်းပြီး') {
+                    return sum + Number(item.price || 0);
+                }
+                return sum;
+            }, 0);
+
+            let totalProfit = sales.reduce((sum, item) => {
+                if (item.profit !== undefined) {
+                    return sum + Number(item.profit);
+                }
+                if (item.items && Array.isArray(item.items)) {
+                    return sum + item.items.reduce((iSum, i) => iSum + (Number(i.price || 0) - Number(i.cost || 0)), 0);
+                }
+                return sum + (Number(item.price || 0) - Number(item.cost || 0));
+            }, 0);
+
+            if (document.getElementById('ledger-total-revenue')) {
+                document.getElementById('ledger-total-revenue').innerText = totalRev.toLocaleString() + " MMK";
+            }
+            if (document.getElementById('ledger-collected-revenue')) {
+                document.getElementById('ledger-collected-revenue').innerText = collectedRev.toLocaleString() + " MMK";
+            }
+            if (document.getElementById('ledger-total-profit')) {
+                document.getElementById('ledger-total-profit').innerText = totalProfit.toLocaleString() + " MMK";
+            }
+
+            let sentCount = 0, unsentCount = 0;
+            let paidCount = 0, unpaidCount = 0;
+            let deliDropCount = 0, deliUndropCount = 0;
+
+            sales.forEach(sale => {
+                let needsUpdate = false;
+                if (!sale.deliveryStatus) { sale.deliveryStatus = 'မပို့ရသေး'; needsUpdate = true; }
+                if (!sale.paymentStatus) { sale.paymentStatus = 'ငွေမရှင်းရသေး'; needsUpdate = true; }
+                if (!sale.deliDropStatus) { sale.deliDropStatus = 'Deli မအပ်ရသေး'; needsUpdate = true; }
+
+                if (needsUpdate) {
+                    store.put(sale);
+                }
+
+                if (sale.deliveryStatus === 'ပို့ပြီး') sentCount++;
+                else unsentCount++;
+
+                if (sale.paymentStatus === 'ငွေရှင်းပြီး') paidCount++;
+                else unpaidCount++;
+
+                if (sale.deliDropStatus === 'Deli အပ်ပြီး') deliDropCount++;
+                else deliUndropCount++;
+            });
+
+            if (document.getElementById('count-delivery')) {
+                document.getElementById('count-delivery').innerHTML = `<span style="color:var(--success-green);">${sentCount}</span> / <span style="color:var(--danger-red);">${unsentCount}</span>`;
+            }
+            if (document.getElementById('count-payment')) {
+                document.getElementById('count-payment').innerHTML = `<span style="color:var(--success-green);">${paidCount}</span> / <span style="color:var(--danger-red);">${unpaidCount}</span>`;
+            }
+            if (document.getElementById('count-delidrop')) {
+                document.getElementById('count-delidrop').innerHTML = `<span style="color:var(--success-green);">${deliDropCount}</span> / <span style="color:var(--danger-red);">${deliUndropCount}</span>`;
+            }
+        };
+    }
+
+        function renderLedgerSalesList(sales) {
+        const listContainer = document.getElementById('ledger-sales-list');
+        if (!listContainer) return;
+        listContainer.innerHTML = '';
+
+        if (!sales || sales.length === 0) {
+            listContainer.innerHTML = '<p style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">အရောင်းစာရင်း မရှိသေးပါ။</p>';
+            return;
+        }
+
+        sales.slice().reverse().forEach(sale => {
+            const cust = sale.customer || { name: 'Guest', phone: '-', address: '-' };
+            const deliStat = sale.deliveryStatus || 'မပို့ရသေး';
+            const payStat = sale.paymentStatus || 'ငွေမရှင်းရသေး';
+            const deliDropStat = sale.deliDropStatus || 'Deli မအပ်ရသေး';
+
+            const deliColor = deliStat === 'ပို့ပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+            const payColor = payStat === 'ငွေရှင်းပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+            const deliDropColor = deliDropStat === 'Deli အပ်ပြီး' ? 'var(--success-green)' : 'var(--danger-red)';
+
+            const el = document.createElement('div');
+            el.className = 'leaderboard-item';
+            el.style.display = 'flex';
+            el.style.flexDirection = 'column';
+            el.style.gap = '8px';
+            
+            el.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                    <div class="lb-info" id="info-area-${sale.id}" style="cursor: pointer; flex-grow: 1;">
+                        <div class="lb-title">👤 ${cust.name} (${cust.phone})</div>
+                        <div class="lb-sales">📅 ${sale.dateStr} • Total: ${Number(sale.price).toLocaleString()} MMK</div>
+                    </div>
+                    <button type="button" class="ledger-view-btn" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; width: auto;">View ➔</button>
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+                    <button type="button" onclick="quickToggleStatus('${sale.id}', 'deliDrop')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${deliDropColor}; color: ${deliDropColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">🛵 ${deliDropStat}</button>
+                    <button type="button" onclick="quickToggleStatus('${sale.id}', 'delivery')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${deliColor}; color: ${deliColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">📦 ${deliStat}</button>
+                    <button type="button" onclick="quickToggleStatus('${sale.id}', 'payment')" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid ${payColor}; color: ${payColor}; padding: 6px 4px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">💰 ${payStat}</button>
+                </div>
+            `;
+            
+            const viewBtn = el.querySelector('.ledger-view-btn');
+            viewBtn.onclick = function(event) {
+                event.stopPropagation();
+                openLedgerDetail(sale);
+            };
+
+            const infoArea = el.querySelector(`#info-area-${sale.id}`);
+            infoArea.onclick = function(event) {
+                event.stopPropagation();
+                openLedgerDetail(sale);
+            };
+
+            listContainer.appendChild(el);
+        });
+    }
+    
+    // Smart Search Function
+    function filterLedgerSales() {
+        const query = document.getElementById('ledger-search-input').value.toLowerCase().trim();
+        if (!query) {
+            renderLedgerSalesList(allLedgerSales);
+            return;
+        }
+
+        const filtered = allLedgerSales.filter(sale => {
+            const custName = sale.customer?.name ? sale.customer.name.toLowerCase() : '';
+            const custPhone = sale.customer?.phone ? sale.customer.phone.toLowerCase() : '';
+            const custAddress = sale.customer?.address ? sale.customer.address.toLowerCase() : '';
+            const dateStr = sale.dateStr ? sale.dateStr.toLowerCase() : '';
+            const deliStat = sale.deliveryStatus ? sale.deliveryStatus.toLowerCase() : '';
+            const payStat = sale.paymentStatus ? sale.paymentStatus.toLowerCase() : '';
+            const deliDropStat = sale.deliDropStat ? sale.deliDropStat.toLowerCase() : '';
+
+            let itemMatch = false;
+            if (sale.items && Array.isArray(sale.items)) {
+                itemMatch = sale.items.some(i => 
+                    (i.brand && i.brand.toLowerCase().includes(query)) ||
+                    (i.series && i.series.toLowerCase().includes(query)) ||
+                    (i.type && i.type.toLowerCase().includes(query))
+                );
+            }
+
+            return custName.includes(query) ||
+                   custPhone.includes(query) ||
+                   custAddress.includes(query) ||
+                   dateStr.includes(query) ||
+                   deliStat.includes(query) ||
+                   payStat.includes(query) ||
+                   deliDropStat.includes(query) ||
+                   itemMatch;
+        });
+
+        renderLedgerSalesList(filtered);
+    }
+    
+</script>
+
+
+</body>
+</html> 
