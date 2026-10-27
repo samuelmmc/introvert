@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content & Caption Hub | TikTok & Website Description Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Padauk for Myanmar & Plus Jakarta Sans for English -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Padauk"', 'sans-serif'],
+                    },
+                    colors: {
+                        tiktok: {
+                            cyan: '#25F4EE',
+                            pink: '#FE2C55',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Padauk', sans-serif;
+            line-height: 1.6;
+        }
+        /* Custom Scrollbar for Textareas */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.5);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.8);
+        }
+        .tiktok-border-glow:hover {
+            box-shadow: -3px 0 12px -2px rgba(37, 244, 238, 0.3), 3px 0 12px -2px rgba(254, 44, 85, 0.3);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-card {
+            animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                
+                <!-- Brand Title -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <i data-lucide="layers" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+                                Content Copy Hub
+                            </h1>
+                            <p class="text-xs text-slate-400">ပုံနှင့် TikTok / Website စာသားများ အလွယ်တကူ သိမ်းဆည်းကူးယူရန်</p>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Add Button -->
+                    <button onclick="openModal()" class="md:hidden inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-2 rounded-xl shadow-lg shadow-indigo-600/30 transition active:scale-95 text-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>အသစ်ထည့်မည်</span>
+                    </button>
+                </div>
+
+                <!-- Search & Action Controls -->
+                <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1 md:max-w-xl md:justify-end">
+                    <!-- Search Input -->
+                    <div class="relative flex-1 min-w-[200px]">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            oninput="handleSearch(this.value)"
+                            placeholder="ခေါင်းစဉ် သို့မဟုတ် စာသားဖြင့် ရှာဖွေပါ..." 
+                            class="w-full pl-10 pr-9 py-2 bg-slate-800/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
+                        >
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Backup / Export / Import Dropdown or Buttons -->
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="exportData()" title="Backup ডাউনলোড (JSON)" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-1.5 text-xs font-medium">
+                            <i data-lucide="download" class="w-4 h-4 text-indigo-400"></i>
+                            <span class="hidden sm:inline">Backup</span>
+                        </button>
+                        <label title="Restore Backup (JSON)" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-1.5 text-xs font-medium cursor-pointer">
+                            <i data-lucide="upload" class="w-4 h-4 text-emerald-400"></i>
+                            <span class="hidden sm:inline">Restore</span>
+                            <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importData(event)">
+                        </label>
+                    </div>
+
+                    <!-- Desktop Add New Card Button -->
+                    <button onclick="openModal()" class="hidden md:inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition transform active:scale-95 text-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>ပုံနှင့်စာသား အသစ်ထည့်ရန်</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Stats & Quick Add Bar -->
+    <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-sm text-slate-300">စုစုပေါင်း ပို့စ်အရေအတွက်: <strong id="totalCountBadge" class="text-white font-bold ml-1">0</strong> ခု</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400 border-l border-slate-800 pl-6">
+                    <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
+                    <span>ကတ်ထဲရှိ စာသားများကို တိုက်ရိုက်ပြင်ဆင်နိုင်ပြီး အလိုအလျောက် သိမ်းဆည်းပေးပါသည်။</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="resetDemoData()" class="text-xs text-slate-400 hover:text-indigo-400 transition flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-slate-800/60">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>နမူနာပို့စ်များ ပြန်ထည့်ရန်</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center text-center py-16 px-4 bg-slate-900/40 border-2 border-dashed border-slate-800 rounded-3xl my-4">
+            <div class="w-20 h-20 rounded-3xl bg-slate-800/80 flex items-center justify-center mb-4 text-indigo-400 shadow-inner">
+                <i data-lucide="image-plus" class="w-10 h-10"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">ပုံနှင့် စာသားများ မရှိသေးပါ</h2>
+            <p class="text-slate-400 max-w-md text-sm mb-6">
+                ပုံအသစ်ထည့်ပြီး TikTok Description နှင့် Website Description စာသားများကို တစ်နေရာတည်းတွင် အလွယ်တကူ သိမ်းဆည်းကာ Easy Copy နှိပ်၍ သုံးနိုင်ပါပြီ။
+            </p>
+            <button onclick="openModal()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>ပထမဆုံး ပုံနှင့်စာသား စတင်ထည့်သွင်းပါ</span>
+            </button>
+        </div>
+
+        <!-- Cards Container -->
+        <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamically populated by JS -->
+        </div>
+
+    </main>
+
+    <!-- Add / Edit Modal -->
+    <div id="postModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden my-8 animate-card">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
+                        <i data-lucide="file-plus-2" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="modalTitle" class="text-lg font-bold text-white">ပုံနှင့် စာသားအသစ် ထည့်သွင်းရန်</h3>
+                </div>
+                <button onclick="closeModal()" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body Form -->
+            <form id="postForm" onsubmit="savePostFromModal(event)" class="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
+                <input type="hidden" id="editingCardId" value="">
+
+                <!-- Post Title -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                        ခေါင်းစဉ် / ပစ္စည်းအမည် (Optional Title)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="postTitleInput" 
+                        placeholder="ဥပမာ - Glow Serum New Arrival (သို့) Post #01" 
+                        class="w-full px-4 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    >
+                </div>
+
+                <!-- Image Upload / URL Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            ပုံထည့်သွင်းရန် (Upload Image သို့မဟုတ် Image Link)
+                        </label>
+                        <button type="button" onclick="clearModalImage()" id="removePreviewBtn" class="hidden text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ပုံဖယ်ရှားရန်
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <!-- Drag & Drop / File Upload Box -->
+                        <label id="dropZone" class="flex flex-col items-center justify-center h-40 border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl cursor-pointer bg-slate-800/40 hover:bg-slate-800/80 transition p-4 text-center group">
+                            <div class="w-10 h-10 rounded-full bg-slate-800 group-hover:bg-indigo-500/20 flex items-center justify-center mb-2 text-slate-400 group-hover:text-indigo-400 transition">
+                                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-xs font-medium text-slate-200">ပုံရွေးချယ်ရန် နှိပ်ပါ (သို့) ဆွဲထည့်ပါ</span>
+                            <span class="text-[11px] text-slate-400 mt-1">JPG, PNG, WEBP (Auto-compressed)</span>
+                            <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                        </label>
+
+                        <!-- Image Preview or URL Input -->
+                        <div class="flex flex-col justify-between h-40 space-y-3">
+                            <div id="imagePreviewWrapper" class="relative flex-1 bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden flex items-center justify-center">
+                                <img id="modalImagePreview" src="" alt="Preview" class="hidden w-full h-full object-cover">
+                                <div id="modalImagePlaceholder" class="text-slate-500 text-xs flex flex-col items-center gap-1">
+                                    <i data-lucide="image" class="w-6 h-6 opacity-50"></i>
+                                    <span>ပုံနမူနာ (Preview)</span>
+                                </div>
+                            </div>
+                            <input 
+                                type="url" 
+                                id="imageUrlInput" 
+                                oninput="handleImageUrlChange(this.value)"
+                                placeholder="သို့မဟုတ် ပုံ Link (URL) ထည့်ပါ..." 
+                                class="w-full px-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1: TikTok Description -->
+                <div class="p-4 rounded-2xl bg-slate-950/70 border border-pink-500/30 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-sm font-bold text-pink-400">
+                            <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-cyan-400 to-pink-500"></span>
+                            TikTok Description
+                        </label>
+                        <span class="text-[11px] text-slate-400">Hashtags & Short Hook</span>
+                    </div>
+                    <textarea 
+                        id="tiktokDescInput" 
+                        rows="4" 
+                        placeholder="TikTok အတွက် ဆွဲဆောင်မှုရှိသော စာသားနှင့် #hashtags များ ရေးထည့်ပါ..."
+                        class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-pink-500 transition resize-y"
+                    ></textarea>
+                </div>
+
+                <!-- Section 2: Website Description -->
+                <div class="p-4 rounded-2xl bg-slate-950/70 border border-sky-500/30 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-sm font-bold text-sky-400">
+                            <i data-lucide="globe" class="w-4 h-4 text-sky-400"></i>
+                            Website Description
+                        </label>
+                        <span class="text-[11px] text-slate-400">Product Details / Full Content</span>
+                    </div>
+                    <textarea 
+                        id="websiteDescInput" 
+                        rows="4" 
+                        placeholder="Website တွင် တင်ရန် အသေးစိတ်အချက်အလက်များ၊ စျေးနှုန်းနှင့် Description ရေးထည့်ပါ..."
+                        class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition resize-y"
+                    ></textarea>
+                </div>
+
+                <!-- Submit & Cancel Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition">
+                        မလုပ်တော့ပါ
+                    </button>
+                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>သိမ်းဆည်းမည် (Save)</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal for Full View -->
+    <div id="lightboxModal" onclick="closeLightbox()" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-zoom-out">
+        <img id="lightboxImg" src="" alt="Full View" class="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain">
+        <button class="absolute top-5 right-5 p-3 bg-slate-800/80 text-white rounded-full hover:bg-slate-700">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Delete Confirmation Modal (No browser confirm()) -->
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-6 text-center shadow-2xl animate-card">
+            <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-base font-bold text-white mb-1">ဤပို့စ်ကို ဖျက်ရန် သေချာပါသလား?</h4>
+            <p class="text-xs text-slate-400 mb-6">ဖျက်လိုက်ပါက ပုံနှင့် စာသားများကို ပြန်လည်ရယူနိုင်မည် မဟုတ်ပါ။</p>
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                    မဖျက်ပါ
+                </button>
+                <button id="confirmDeleteBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 transition">
+                    ဖျက်မည်
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Hidden File Input for Quick Card Image Change -->
+    <input type="file" id="quickCardImageInput" accept="image/*" class="hidden" onchange="handleQuickCardImageUpdate(event)">
+
+    <!-- Application Logic -->
+    <script>
+        const STORAGE_KEY = 'content_hub_cards_v1';
+        let posts = [];
+        let currentUploadedDataUrl = '';
+        let activeQuickImageCardId = null;
+        let pendingDeleteCardId = null;
+
+        // Default Starter Data in Burmese & English
+        const DEFAULT_POSTS = [
+            {
+                id: 'demo-1',
+                title: 'Vitamin C Brightening Serum',
+                image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80',
+                tiktokDesc: 'မျက်နှာလေး ကြည်လင်ဝင်းပချင်သူတွေအတွက် တစ်ပတ်အတွင်း သိသာစေမယ့် Vitamin C Serum ✨💧 အစက်အပြောက်ကင်းပြီး Glow ချင်ရင် အခုပဲ မှာယူလိုက်တော့နော်! 🛒💖 #skincaremyanmar #glowingskin #vitamincserum #틱톡뷰티 #fyp #myanmaronlineshop',
+                websiteDesc: 'Pure Vitamin C 15% ပါဝင်သော Brightening Facial Serum ဖြစ်ပါသည်။ အသားအရေ မညီညာခြင်း၊ နေလောင်ကွက်နှင့် ဝက်ခြံအမာရွတ်များကို သိသာစွာ လျော့ပါးသက်သာစေပြီး အသားအရေကို အတွင်းပိုင်းထိ အစိုဓာတ်ဖြည့်ပေးပါသည်။\n\n• Size: 30ml\n• Skin Type: All Skin Types\n• အသုံးပြုပုံ: မနက်/ည မျက်နှာသစ်ပြီးချိန် ၂ စက်ခန့် လိမ်းပေးပါ။',
+                updatedAt: Date.now()
+            },
+            {
+                id: 'demo-2',
+                title: 'Minimalist Wireless Headphones',
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+                tiktokDesc: 'သီချင်းနားထောင်ရတာ ကြိုက်တဲ့သူတွေအတွက် Bass သံရှယ်မိုက်ပြီး ဒီဇိုင်းလန်းတဲ့ Wireless Headphone 🎧🔥 Battery ကလည်း နာရီ ၄၀ အထိ ခံတယ်ဆိုတော့ လုံးဝရှယ်ပဲ! Link in bio မှာ ဝင်ကြည့်လို့ရပါပြီ ⚡ #techmyanmar #headphones #gadgets #unboxing #tiktokshop',
+                websiteDesc: 'Active Noise Cancelling (ANC) စနစ်ပါဝင်သည့် Premium Wireless Over-Ear Headphones ဖြစ်ပါသည်။ Bluetooth 5.3 နည်းပညာကြောင့် ချိတ်ဆက်မှု မြန်ဆန်တည်ငြိမ်ပြီး တစ်ကြိမ်အားသွင်းထားရုံဖြင့် နာရီ ၄၀ ဆက်တိုက် အသုံးပြုနိုင်ပါသည်။\n\n• 1 Year Official Warranty\n• Fast Charging (10 mins = 5 hours playback)\n• အရောင်: Matte Black, Cloud White',
+                updatedAt: Date.now() - 60000
+            }
+        ];
+
+        // Initialize App on Load
+        window.onload = function() {
+            loadPosts();
+            setupDragAndDrop();
+            lucide.createIcons();
+        };
+
+        // Load from LocalStorage
+        function loadPosts() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    posts = JSON.parse(raw);
+                } else {
+                    posts = [...DEFAULT_POSTS];
+                    saveToStorage();
+                }
+            } catch (err) {
+                console.error('Failed to read localStorage:', err);
+                posts = [...DEFAULT_POSTS];
+            }
+            renderCards();
+        }
+
+        // Save to LocalStorage
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+                document.getElementById('totalCountBadge').textContent = posts.length;
+            } catch (err) {
+                showToast('Storage ပြည့်နေပါသည်။ ပုံအချို့ကို ဖျက်ပေးပါ။', 'error');
+            }
+        }
+
+        // Escape HTML safely
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Render Cards Grid
+        function renderCards(filterText = '') {
+            const grid = document.getElementById('cardsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const totalBadge = document.getElementById('totalCountBadge');
+
+            totalBadge.textContent = posts.length;
+
+            const query = filterText.trim().toLowerCase();
+            const filtered = posts.filter(item => {
+                if (!query) return true;
+                return (
+                    (item.title && item.title.toLowerCase().includes(query)) ||
+                    (item.tiktokDesc && item.tiktokDesc.toLowerCase().includes(query)) ||
+                    (item.websiteDesc && item.websiteDesc.toLowerCase().includes(query))
+                );
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            grid.innerHTML = filtered.map(post => {
+                const fallbackImg = `https://placehold.co/800x500/1e293b/94a3b8?text=${encodeURIComponent(post.title || 'No+Image')}`;
+                const displayImg = post.image || fallbackImg;
+
+                return `
+                <article class="bg-slate-900/90 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition hover:border-slate-700 animate-card group">
+                    
+                    <!-- Top Card Image & Header -->
+                    <div>
+                        <div class="relative h-56 bg-slate-950 overflow-hidden">
+                            <img 
+                                src="${escapeHtml(displayImg)}" 
+                                alt="${escapeHtml(post.title)}"
+                                onclick="openLightbox('${escapeHtml(displayImg)}')"
+                                onerror="this.src='https://placehold.co/800x500/1e293b/94a3b8?text=Image+Not+Found'"
+                                class="w-full h-full object-cover cursor-zoom-in group-hover:scale-105 transition duration-500"
+                            >
+                            <!-- Floating Top Action Buttons on Image -->
+                            <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-slate-950/75 backdrop-blur-md p-1.5 rounded-2xl border border-white/10">
+                                <button onclick="triggerQuickImageChange('${post.id}')" title="ပုံပြောင်းရန်" class="p-2 text-slate-200 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                                    <i data-lucide="image-plus" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="openEditModal('${post.id}')" title="အသေးစိတ်ပြင်ရန်" class="p-2 text-slate-200 hover:text-indigo-400 hover:bg-slate-800 rounded-xl transition">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="promptDeleteCard('${post.id}')" title="ဖျက်ရန်" class="p-2 text-slate-200 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- Title Overlay Bar -->
+                            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent p-4 pt-10">
+                                <input 
+                                    type="text" 
+                                    value="${escapeHtml(post.title)}" 
+                                    placeholder="ခေါင်းစဉ်ရေးရန်..."
+                                    onchange="updateCardField('${post.id}', 'title', this.value)"
+                                    class="w-full bg-transparent text-base font-bold text-white placeholder-slate-400 focus:outline-none focus:bg-slate-900/80 focus:px-2 py-0.5 rounded-lg transition"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Descriptions Container -->
+                        <div class="p-4 space-y-4">
+                            
+                            <!-- SECTION 1: TikTok Description -->
+                            <div class="rounded-2xl bg-slate-950/80 border border-slate-800/90 p-3.5 tiktok-border-glow transition">
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-400 via-pink-500 to-rose-500 flex items-center justify-center text-slate-950 font-black text-xs shadow">
+                                            ♪
+                                        </span>
+                                        <span class="text-xs font-bold tracking-wide uppercase bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
+                                            TikTok Description
+                                        </span>
+                                    </div>
+
+                                    <!-- Prominent Easy Copy Button for TikTok -->
+                                    <button 
+                                        id="copy-tiktok-${post.id}"
+                                        onclick="copySectionText('${post.id}', 'tiktok')"
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-semibold text-xs shadow-md shadow-pink-600/20 active:scale-95 transition"
+                                    >
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                        <span>Easy Copy</span>
+                                    </button>
+                                </div>
+
+                                <textarea 
+                                    id="textarea-tiktok-${post.id}"
+                                    rows="4"
+                                    placeholder="TikTok အတွက် စာသားနှင့် #Hashtags များ ဒီနေရာမှာ ရေးပါ..."
+                                    oninput="updateCardField('${post.id}', 'tiktokDesc', this.value)"
+                                    class="w-full bg-slate-900/90 border border-slate-800/90 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-pink-500/70 transition resize-y leading-relaxed"
+                                >${escapeHtml(post.tiktokDesc)}</textarea>
+                            </div>
+
+                            <!-- SECTION 2: Website Description -->
+                            <div class="rounded-2xl bg-slate-950/80 border border-slate-800/90 p-3.5 hover:border-sky-500/40 transition">
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                                            <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                                        </span>
+                                        <span class="text-xs font-bold tracking-wide uppercase text-sky-400">
+                                            Website Description
+                                        </span>
+                                    </div>
+
+                                    <!-- Prominent Easy Copy Button for Website -->
+                                    <button 
+                                        id="copy-website-${post.id}"
+                                        onclick="copySectionText('${post.id}', 'website')"
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-md shadow-sky-600/20 active:scale-95 transition"
+                                    >
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                        <span>Easy Copy</span>
+                                    </button>
+                                </div>
+
+                                <textarea 
+                                    id="textarea-website-${post.id}"
+                                    rows="4"
+                                    placeholder="Website အတွက် အသေးစိတ် Description စာသားများ ဒီနေရာမှာ ရေးပါ..."
+                                    oninput="updateCardField('${post.id}', 'websiteDesc', this.value)"
+                                    class="w-full bg-slate-900/90 border border-slate-800/90 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500/70 transition resize-y leading-relaxed"
+                                >${escapeHtml(post.websiteDesc)}</textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Card Footer: Copy Both or Status -->
+                    <div class="px-4 py-3 bg-slate-950/50 border-t border-slate-800/70 flex items-center justify-between text-xs text-slate-400">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            Auto-saved
+                        </span>
+                        <button 
+                            onclick="copyBothDescriptions('${post.id}')" 
+                            class="text-slate-300 hover:text-indigo-400 font-medium flex items-center gap-1 transition"
+                        >
+                            <i data-lucide="clipboard-List" class="w-3.5 h-3.5"></i>
+                            <span>နှစ်ခုလုံး Copy ကူးရန်</span>
+                        </button>
+                    </div>
+
+                </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // Direct live editing inside any card
+        function updateCardField(cardId, field, value) {
+            const index = posts.findIndex(p => p.id === cardId);
+            if (index !== -1) {
+                posts[index][field] = value;
+                posts[index].updatedAt = Date.now();
+                saveToStorage();
+            }
+        }
+
+        // One-Click Easy Copy with Fallback for iframe environments
+        function copySectionText(cardId, type) {
+            const textareaId = type === 'tiktok' ? `textarea-tiktok-${cardId}` : `textarea-website-${cardId}`;
+            const btnId = type === 'tiktok' ? `copy-tiktok-${cardId}` : `copy-website-${cardId}`;
+            const textarea = document.getElementById(textareaId);
+            const btn = document.getElementById(btnId);
+
+            if (!textarea) return;
+            const textToCopy = textarea.value.trim();
+
+            if (!textToCopy) {
+                showToast('ကူးယူရန် စာသားမရှိသေးပါ! စာသားအရင်ရေးပေးပါ။', 'warning');
+                textarea.focus();
+                return;
+            }
+
+            copyTextToClipboard(textToCopy);
+
+            // Visual Button Feedback
+            if (btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Copied!</span>`;
+                btn.classList.add('ring-2', 'ring-emerald-400');
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('ring-2', 'ring-emerald-400');
+                    lucide.createIcons();
+                }, 1600);
+            }
+
+            const label = type === 'tiktok' ? 'TikTok Description' : 'Website Description';
+            showToast(`${label} ကို ကူးယူပြီးပါပြီ (Copied!)`);
+        }
+
+        // Copy both TikTok & Website Descriptions together
+        function copyBothDescriptions(cardId) {
+            const post = posts.find(p => p.id === cardId);
+            if (!post) return;
+
+            const combined = `[TikTok Description]\n${post.tiktokDesc || '-'}\n\n[Website Description]\n${post.websiteDesc || '-'}`;
+            copyTextToClipboard(combined);
+            showToast('TikTok နှင့် Website Description နှစ်ခုလုံး ကူးယူပြီးပါပြီ!');
+        }
+
+        // Reliable Clipboard Helper using execCommand for iframe compatibility
+        function copyTextToClipboard(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.left = '-9999px';
+            tempInput.style.top = '0';
+            document.body.appendChild(tempInput);
+            tempInput.focus();
+            tempInput.select();
+
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text);
+                }
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // Compress & Convert Uploaded Image File to DataURL so it fits cleanly in localStorage
+        function compressImageFile(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 900;
+                    const MAX_HEIGHT = 900;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    callback(compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle Modal File Input
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressImageFile(file, (dataUrl) => {
+                currentUploadedDataUrl = dataUrl;
+                document.getElementById('imageUrlInput').value = '';
+                updateModalImagePreview(dataUrl);
+            });
+        }
+
+        // Handle URL Input in Modal
+        function handleImageUrlChange(url) {
+            currentUploadedDataUrl = '';
+            updateModalImagePreview(url.trim());
+        }
+
+        function updateModalImagePreview(src) {
+            const previewImg = document.getElementById('modalImagePreview');
+            const placeholder = document.getElementById('modalImagePlaceholder');
+            const removeBtn = document.getElementById('removePreviewBtn');
+
+            if (src) {
+                previewImg.src = src;
+                previewImg.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                removeBtn.classList.remove('hidden');
+            } else {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                removeBtn.classList.add('hidden');
+            }
+        }
+
+        function clearModalImage() {
+            currentUploadedDataUrl = '';
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('imageUrlInput').value = '';
+            updateModalImagePreview('');
+        }
+
+        // Quick Image Change directly on a Card
+        function triggerQuickImageChange(cardId) {
+            activeQuickImageCardId = cardId;
+            document.getElementById('quickCardImageInput').click();
+        }
+
+        function handleQuickCardImageUpdate(event) {
+            const file = event.target.files[0];
+            if (!file || !activeQuickImageCardId) return;
+
+            compressImageFile(file, (dataUrl) => {
+                updateCardField(activeQuickImageCardId, 'image', dataUrl);
+                renderCards(document.getElementById('searchInput').value);
+                showToast('ပုံအသစ် ပြောင်းလဲပြီးပါပြီ!');
+                activeQuickImageCardId = null;
+                event.target.value = '';
+            });
+        }
+
+        // Modal Open / Close
+        function openModal() {
+            document.getElementById('editingCardId').value = '';
+            document.getElementById('modalTitle').textContent = 'ပုံနှင့် စာသားအသစ် ထည့်သွင်းရန်';
+            document.getElementById('postTitleInput').value = '';
+            document.getElementById('tiktokDescInput').value = '';
+            document.getElementById('websiteDescInput').value = '';
+            clearModalImage();
+
+            const modal = document.getElementById('postModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openEditModal(cardId) {
+            const post = posts.find(p => p.id === cardId);
+            if (!post) return;
+
+            document.getElementById('editingCardId').value = post.id;
+            document.getElementById('modalTitle').textContent = 'ပုံနှင့် စာသား ပြင်ဆင်ရန်';
+            document.getElementById('postTitleInput').value = post.title || '';
+            document.getElementById('tiktokDescInput').value = post.tiktokDesc || '';
+            document.getElementById('websiteDescInput').value = post.websiteDesc || '';
+
+            if (post.image && post.image.startsWith('data:')) {
+                currentUploadedDataUrl = post.image;
+                document.getElementById('imageUrlInput').value = '';
+            } else {
+                currentUploadedDataUrl = '';
+                document.getElementById('imageUrlInput').value = post.image || '';
+            }
+            updateModalImagePreview(post.image || '');
+
+            const modal = document.getElementById('postModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('postModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Save New or Edited Card from Modal
+        function savePostFromModal(event) {
+            event.preventDefault();
+
+            const editingId = document.getElementById('editingCardId').value;
+            const title = document.getElementById('postTitleInput').value.trim() || `Post #${posts.length + 1}`;
+            const tiktokDesc = document.getElementById('tiktokDescInput').value;
+            const websiteDesc = document.getElementById('websiteDescInput').value;
+            const urlInput = document.getElementById('imageUrlInput').value.trim();
+            const finalImage = currentUploadedDataUrl || urlInput || '';
+
+            if (editingId) {
+                const idx = posts.findIndex(p => p.id === editingId);
+                if (idx !== -1) {
+                    posts[idx] = {
+                        ...posts[idx],
+                        title,
+                        image: finalImage,
+                        tiktokDesc,
+                        websiteDesc,
+                        updatedAt: Date.now()
+                    };
+                    showToast('ပြင်ဆင်မှုများကို သိမ်းဆည်းပြီးပါပြီ!');
+                }
+            } else {
+                const newPost = {
+                    id: 'card-' + Date.now(),
+                    title,
+                    image: finalImage,
+                    tiktokDesc,
+                    websiteDesc,
+                    updatedAt: Date.now()
+                };
+                posts.unshift(newPost);
+                showToast('ပုံနှင့် စာသားအသစ် ထည့်သွင်းပြီးပါပြီ!');
+            }
+
+            saveToStorage();
+            renderCards(document.getElementById('searchInput').value);
+            closeModal();
+        }
+
+        // Delete Card Modal Workflow
+        function promptDeleteCard(cardId) {
+            pendingDeleteCardId = cardId;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.getElementById('confirmDeleteBtn').onclick = function() {
+                if (pendingDeleteCardId) {
+                    posts = posts.filter(p => p.id !== pendingDeleteCardId);
+                    saveToStorage();
+                    renderCards(document.getElementById('searchInput').value);
+                    showToast('ပို့စ်ကို ဖျက်ပြီးပါပြီ။', 'warning');
+                }
+                closeDeleteModal();
+            };
+        }
+
+        function closeDeleteModal() {
+            pendingDeleteCardId = null;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Search Filtering
+        function handleSearch(query) {
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (query.trim().length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            renderCards(query);
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderCards('');
+        }
+
+        // Restore Demo Posts
+        function resetDemoData() {
+            if (posts.length === 0) {
+                posts = [...DEFAULT_POSTS];
+            } else {
+                const existingIds = new Set(posts.map(p => p.id));
+                DEFAULT_POSTS.forEach(demo => {
+                    if (!existingIds.has(demo.id)) {
+                        posts.push({ ...demo });
+                    }
+                });
+            }
+            saveToStorage();
+            renderCards(document.getElementById('searchInput').value);
+            showToast('နမူနာ ပို့စ်များကို ထည့်သွင်းပေးထားပါသည်။');
+        }
+
+        // Export JSON Backup
+        function exportData() {
+            const dataStr = JSON.stringify(posts, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `content-hub-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Backup ဖိုင် ဒေါင်းလုဒ်ဆွဲပြီးပါပြီ!');
+        }
+
+        // Import JSON Backup
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        posts = imported;
+                        saveToStorage();
+                        renderCards();
+                        showToast('Backup ဖိုင်မှ အချက်အလက်များ ပြန်လည်ထည့်သွင်းပြီးပါပြီ!');
+                    } else {
+                        showToast('ဖိုင်ပုံစံ မှားယွင်းနေပါသည်။', 'error');
+                    }
+                } catch (err) {
+                    showToast('Backup ဖိုင် ဖတ်မရပါ။', 'error');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // Lightbox Preview
+        function openLightbox(imgSrc) {
+            const modal = document.getElementById('lightboxModal');
+            document.getElementById('lightboxImg').src = imgSrc;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Drag and Drop Image Support inside Modal
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            if (!dropZone) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.add('border-indigo-500', 'bg-indigo-500/10');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-500/10');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files && files[0] && files[0].type.startsWith('image/')) {
+                    compressImageFile(files[0], (dataUrl) => {
+                        currentUploadedDataUrl = dataUrl;
+                        document.getElementById('imageUrlInput').value = '';
+                        updateModalImagePreview(dataUrl);
+                    });
+                }
+            }, false);
+        }
+
+        // Toast Feedback Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            let colorClasses = 'bg-slate-900 border-emerald-500/50 text-emerald-300';
+            let iconName = 'check-circle-2';
+
+            if (type === 'warning') {
+                colorClasses = 'bg-slate-900 border-amber-500/50 text-amber-300';
+                iconName = 'alert-circle';
+            } else if (type === 'error') {
+                colorClasses = 'bg-slate-900 border-rose-500/50 text-rose-300';
+                iconName = 'x-circle';
+            }
+
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-md text-xs font-semibold animate-card ${colorClasses}`;
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                toast.style.transition = 'all 0.25s ease';
+                setTimeout(() => toast.remove(), 250);
+            }, 2400);
+        }
+    </script>
+</body>
+</html>
